@@ -51,13 +51,24 @@ class PathType(Enum):
 
     def succ(self):
         return PathType(self.value % 2 + 1)
+
+# Each point is generated through interpolating between poses
+class Point:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.theta = None
         
 class Path:
     
-    def __init__(self):
+    def __init__(self, segmentDistance):
 
         self.poses = []
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
+        self.points = []
+
+        self.segmentDistance = segmentDistance
 
         self.pathIndex = -1
 
@@ -155,6 +166,7 @@ class Path:
                 if m.startDragX != m.x or m.startDragY != m.y: # make sure mouse actually has moved
                     m.poseDragged.x = m.x
                     m.poseDragged.y = m.y
+                    self.interpolatePoints()
             else:
                 if m.released and m.startDragX == m.x and m.startDragY == m.y:
                     m.poseDragged.showCoords = not m.poseDragged.showCoords
@@ -168,6 +180,7 @@ class Path:
         # Toggle type of path if c pressed
         if self.pathIndex != -1 and m.pressedC:
             self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
+            self.interpolatePoints()
 
         if not anyHovered and m.pressed:
             self.addPose(m.x, m.y)
@@ -198,9 +211,11 @@ class Path:
             self.poses.insert(self.pathIndex + 1, Pose(px, py, None))
 
             self.paths.insert(self.pathIndex, self.paths[self.pathIndex])
+
+        self.interpolatePoints()
     
 
-    def draw(self, screen):
+    def drawPaths(self, screen):
 
         if len(self.poses) == 0:
             return
@@ -214,7 +229,51 @@ class Path:
             pose.draw(screen, first)
             first = False
 
-    def drawPoints(self, screen, ds):
+
+    def interpolateLinear(self, i, s):
+
+        magnitude = Utility.distance(self.poses[i].x, self.poses[i].y, self.poses[i+1].x, self.poses[i+1].y)
+        normx = (self.poses[i+1].x - self.poses[i].x) / magnitude
+        normy = (self.poses[i+1].y - self.poses[i].y) / magnitude
+        while s < magnitude:
+            x = self.poses[i].x + normx * s
+            y = self.poses[i].y + normy * s
+            self.points.append(Point(x, y, Utility.BLUE))
+            s += self.segmentDistance
+        s -= magnitude # any "spillover" gets carried over to the next point in the next path so that across all paths, every segment is equidistant
+
+        return s
+
+    def interpolateSplineCurve(self, i, s):
+
+        P2 = [self.poses[i].x, self.poses[i].y]
+        P1 = P2 if i == 0 else [self.poses[i-1].x, self.poses[i-1].y]
+        P3 = [self.poses[i+1].x, self.poses[i+1].y]
+        P4 = P3 if i+2 == len(self.poses) else [self.poses[i+2].x, self.poses[i+2].y]
+
+        # Find starting point from previous "spillover"
+        if s == 0:
+            ns = 0
+        else:
+            dxds,dyds = SplineCurves.getSplineGradient(0, P1, P2, P3, P4)
+            dsdt = s / Utility.hypo(dxds, dyds)
+            ns = dsdt # s normalized from 0 to 1 for this specific spline
+
+        while ns < 1:
+            x,y = SplineCurves.getSplinePoint(ns, P1, P2, P3, P4)
+            self.points.append(Point(x, y, Utility.RED))
+
+            dxds,dyds = SplineCurves.getSplineGradient(ns, P1, P2, P3, P4)
+            dsdt = self.segmentDistance / Utility.hypo(dxds, dyds)
+            ns += dsdt
+
+        s = self.segmentDistance - Utility.distance(x,y,*P3)
+        return s
+
+    def interpolatePoints(self):
+
+        self.points = []
+        self.knownThetaIndexes = []
 
         s = 0
 
@@ -224,41 +283,15 @@ class Path:
                 continue
 
             if self.paths[i] == PathType.LINEAR:
-                magnitude = Utility.distance(self.poses[i].x, self.poses[i].y, self.poses[i+1].x, self.poses[i+1].y)
-                normx = (self.poses[i+1].x - self.poses[i].x) / magnitude
-                normy = (self.poses[i+1].y - self.poses[i].y) / magnitude
-                while s < magnitude:
-                    x = self.poses[i].x + normx * s
-                    y = self.poses[i].y + normy * s
-                    Utility.drawCircle(screen, x, y, Utility.BLUE, 2)
-                    s += ds
-                s -= magnitude # any "spillover" gets carried over to the next point in the next path so that across all paths, every segment is equidistant
+                s = self.interpolateLinear(i, s)
 
             else: # PathType.CURVE
-
-                P2 = [self.poses[i].x, self.poses[i].y]
-                P1 = P2 if i == 0 else [self.poses[i-1].x, self.poses[i-1].y]
-                P3 = [self.poses[i+1].x, self.poses[i+1].y]
-                P4 = P3 if i+2 == len(self.poses) else [self.poses[i+2].x, self.poses[i+2].y]
-
-                # Find starting point from previous "spillover"
-                if s == 0:
-                    ns = 0
-                else:
-                    dxds,dyds = SplineCurves.getSplineGradient(0, P1, P2, P3, P4)
-                    dsdt = s / Utility.hypo(dxds, dyds)
-                    ns = dsdt # s normalized from 0 to 1 for this specific spline
-
-                while ns < 1:
-                    x,y = SplineCurves.getSplinePoint(ns, P1, P2, P3, P4)
-                    Utility.drawCircle(screen, x, y, Utility.RED, 2)
-
-                    dxds,dyds = SplineCurves.getSplineGradient(ns, P1, P2, P3, P4)
-                    dsdt = ds / Utility.hypo(dxds, dyds)
-                    ns += dsdt
-
-                s = ds - Utility.distance(x,y,*P3)
+                s = self.interpolateSplineCurve(i, s)
 
             # no spillovers at break points
             if self.poses[i+1].isBreak:
                 s = 0
+
+    def drawPoints(self, screen):
+        for point in self.points:
+            Utility.drawCircle(screen, point.x, point.y, point.color, 2)

@@ -8,7 +8,7 @@ fieldSurface = pygame.transform.smoothscale(pygame.image.load("Images/squarefiel
 
 
 
-path = PathStructures.Path()
+path = PathStructures.Path(10)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 
 while True:
@@ -28,8 +28,8 @@ while True:
 
 
     # Draw everything
-    path.draw(screen)
-    path.drawPoints(screen, 10)
+    path.drawPaths(screen)
+    path.drawPoints(screen)
     
     p = m.poseSelectHeading # Draw guide line for heading
     if p is not None and p.theta is not None: 
