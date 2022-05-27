@@ -81,6 +81,7 @@ class Path:
                 m.poseDragged.y = m.y
             else:
                 m.poseDragged = None
+
                 
 
         anyHovered = False
