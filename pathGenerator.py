@@ -6,8 +6,6 @@ pygame.display.set_caption("Path Generation by Ansel")
 
 fieldSurface = pygame.transform.smoothscale(pygame.image.load("Images/squarefield.png"), Utility.SCREEN_DIMS)
 
-
-
 path = PathStructures.Path(10)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 

@@ -88,6 +88,8 @@ class Path:
         if len(self.paths) != 0:
             del self.paths[max(index - 1, 0)]
 
+        if index == 0 and len(self.poses) > 1 and self.poses[1].theta is None:
+            self.poses[1].theta = self.poses[0].theta
         self.poses.remove(pose)
 
     def getTouchingPathIndex(self, x, y):
@@ -143,6 +145,7 @@ class Path:
 
                     if m.keyX:
                         self.deletePose(pose)
+                        self.interpolatePoints()
                     elif m.pressed and m.poseDragged is None:
                         if m.keyZ:
                             m.poseSelectHeading = pose
@@ -229,7 +232,7 @@ class Path:
             pose.draw(screen, first)
             first = False
 
-
+    # Interpolate pose[i] to pose[i+1] linearly with s spillover
     def interpolateLinear(self, i, s):
 
         magnitude = Utility.distance(self.poses[i].x, self.poses[i].y, self.poses[i+1].x, self.poses[i+1].y)
@@ -244,6 +247,7 @@ class Path:
 
         return s
 
+    # Interpolate pose[i] to pose[i+1] using Catmull-Rom spline curve with s spillover
     def interpolateSplineCurve(self, i, s):
 
         P2 = [self.poses[i].x, self.poses[i].y]
@@ -270,10 +274,11 @@ class Path:
         s = self.segmentDistance - Utility.distance(x,y,*P3)
         return s
 
+    # Call this function to update self.points whenever there is a change in interpolation. Generates a list of points from the entire combined path
     def interpolatePoints(self):
 
         self.points = []
-        self.knownThetaIndexes = []
+        knownThetaIndexes = [] # for the purposes of interpolating theta after initially generating list of points
 
         s = 0
 
@@ -291,6 +296,7 @@ class Path:
             # no spillovers at break points
             if self.poses[i+1].isBreak:
                 s = 0
+
 
     def drawPoints(self, screen):
         for point in self.points:
