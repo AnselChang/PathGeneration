@@ -82,7 +82,6 @@ class Path:
             else:
                 m.poseDragged = None
        
-
         anyHovered = False
         for pose in self.poses:
             if pose.touching(m):
