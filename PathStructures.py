@@ -1,5 +1,5 @@
 from enum import Enum
-import Utility
+import Utility, math
 
 class Pose:
 
@@ -136,3 +136,21 @@ class Path:
 
         for pose in self.poses:
             pose.draw(screen)
+
+    def drawPoints(self, screen, ds):
+
+        s = 0
+
+        for i in range(len(self.paths)):
+
+            if self.paths[i] == PathType.LINEAR:
+                magnitude = Utility.distance(self.poses[i].x, self.poses[i].y, self.poses[i+1].x, self.poses[i+1].y)
+                normx = (self.poses[i+1].x - self.poses[i].x) / magnitude
+                normy = (self.poses[i+1].y - self.poses[i].y) / magnitude
+                while s < magnitude:
+                    x = self.poses[i].x + normx * s
+                    y = self.poses[i].y + normy * s
+                    Utility.drawCircle(screen, x, y, Utility.BLUE, 1)
+                    s += ds
+                s -= magnitude # any "spillover" gets carried over to the next point in the next path so that across all paths, every segment is equidistant
+                

@@ -44,7 +44,7 @@ def getSplineGradient(t, p1, p2, p3, p4):
 
     return [tx, ty]
 
-points = [[100,100], [200,300], [400,400], [500,100]]
+points = [[200,300], [200,300], [400,400], [500,100]]
 P1, P2, P3, P4  = points
 
 screen.fill([255,255,255])

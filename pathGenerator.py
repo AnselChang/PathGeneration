@@ -32,6 +32,7 @@ while True:
 
     # Draw everything
     path.draw(screen)
+    path.drawPoints(screen, 5)
     if not anyPoseHovered: # Draw hovering pose if nothing selected
         Utility.drawCircle(screen, *path.getMousePosePosition(m.x,m.y), Utility.GREEN, PathStructures.Pose.RADIUS, 100)
     

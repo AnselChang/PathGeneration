@@ -1,8 +1,12 @@
 import pygame, math, pygame.gfxdraw
 
+BLUE = (0,0,230)
 GREEN = (50,205,50)
 LINEGREY = (100, 100, 100)
 LINEDARKGREY = (75, 75, 75)
+
+def hypo(s1, s2):
+    return math.sqrt(s1*s1 + s2 * s2)
 
 def distance(x1,y1,x2,y2):
     return math.sqrt( ((x1-x2)**2)+((y1-y2)**2) )
