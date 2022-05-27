@@ -12,7 +12,7 @@ fieldSurface = pygame.transform.smoothscale(pygame.image.load("Images/squarefiel
 
 
 path = PathStructures.Path()
-m = MouseHandler.Mouse(pygame.mouse)
+m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 
 while True:
 

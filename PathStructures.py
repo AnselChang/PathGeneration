@@ -13,7 +13,7 @@ class Pose:
         self.hovered = False
 
     def touching(self, m):
-        return Utility.distance(self.x, self.y, m.x, m.y) <= Pose.RADIUS
+        return Utility.distance(self.x, self.y, m.x, m.y) <= Pose.RADIUS + 5
 
     def draw(self, screen):
         Utility.drawCircle(screen, self.x, self.y, Utility.GREEN, Pose.RADIUS + 3 if self.hovered else Pose.RADIUS)
@@ -29,14 +29,34 @@ class Path:
         self.poses = []
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
 
+    def getPoseIndex(self, pose):
+        index = -1
+        for i in range(len(self.poses)):
+            if self.poses[i] == pose:
+                index  = i
+                break
+        return index
+
+    def deletePose(self, pose):
+        index  = self.getPoseIndex(pose)
+        if index == -1:
+            return
+
+        if len(self.paths) != 0:
+            del self.paths[max(index - 1, 0)]
+
+        self.poses.remove(pose)
+       
+
     def handleMouse(self, m):
 
         if m.poseDragged is not None:
-            if not m.pressing:
-                m.poseDragged = None
-            else:
+            if m.pressing:
                 m.poseDragged.x = m.x
                 m.poseDragged.y = m.y
+            else:
+                m.poseDragged = None
+                
 
         anyHovered = False
         for pose in self.poses:
@@ -44,7 +64,9 @@ class Path:
                 anyHovered = True
                 pose.hovered = True
 
-                if m.pressed and m.poseDragged is None:
+                if m.keyX:
+                    self.deletePose(pose)
+                elif m.pressed and m.poseDragged is None:
                     m.poseDragged = pose
             else:
                 pose.hovered = False
