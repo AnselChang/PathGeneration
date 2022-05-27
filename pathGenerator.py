@@ -1,13 +1,10 @@
 import sys, pygame
 import MouseHandler, PathStructures, Utility
 
-SCREEN_SIZE = 800
-SCREEN_DIMS = (SCREEN_SIZE, SCREEN_SIZE)
-
-screen = pygame.display.set_mode(SCREEN_DIMS)
+screen = pygame.display.set_mode(Utility.SCREEN_DIMS)
 pygame.display.set_caption("Path Generation by Ansel")
 
-fieldSurface = pygame.transform.smoothscale(pygame.image.load("Images/squarefield.png"), SCREEN_DIMS)
+fieldSurface = pygame.transform.smoothscale(pygame.image.load("Images/squarefield.png"), Utility.SCREEN_DIMS)
 
 
 
@@ -27,7 +24,7 @@ while True:
     elif anyPoseHovered:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
     else:
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
 
 
     # Draw everything

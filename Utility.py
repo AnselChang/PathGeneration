@@ -1,10 +1,22 @@
 import pygame, math, pygame.gfxdraw
 
+pygame.font.init()
+
+SCREEN_SIZE = 800
+SCREEN_DIMS = (SCREEN_SIZE, SCREEN_SIZE)
+
 BLUE = (0,0,230)
 RED = (230,0,0)
 GREEN = (50,205,50)
 LINEGREY = (100, 100, 100)
 LINEDARKGREY = (75, 75, 75)
+TEXTCOLOR = (30, 30, 30)
+
+def pixelsToInches(pixels):
+    return (pixels / SCREEN_SIZE) * 144
+
+def pixelsToTiles(pixels):
+    return (pixels / SCREEN_SIZE) * 6
 
 def hypo(s1, s2):
     return math.sqrt(s1*s1 + s2 * s2)
@@ -31,7 +43,11 @@ def pointOnLineClosestToPoint(x, y, x1, y1, x2, y2):
 
     scalar = (ax * bx + ay * by) / (bx * bx + by * by)
     return [x1 + scalar * bx, y1 + scalar * by]
-    
+
+FONT20 = pygame.font.SysFont('Corbel', 20)
+def drawText(surface, font, string, color, x, y, s = 0.5):
+    text = font.render(string, True, color)
+    surface.blit(text, [x - text.get_width()*s, y])
 
 def drawCircle(screen, x, y, color, radius, alpha = 255):
     if alpha == 255:

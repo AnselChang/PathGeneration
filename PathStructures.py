@@ -12,12 +12,17 @@ class Pose:
         self.y = y
         self.theta  = theta
         self.hovered = False
+        self.showCoords = False
+        self.isBreak = False # a break pose is a stopping pose where poses on one side of this pose don't affect the other
 
     def touching(self, m):
         return Utility.distance(self.x, self.y, m.x, m.y) <= Pose.RADIUS + 5
 
     def draw(self, screen):
-        Utility.drawCircle(screen, self.x, self.y, Utility.GREEN, Pose.RADIUS + 3 if self.hovered else Pose.RADIUS)
+        Utility.drawCircle(screen, self.x, self.y, Utility.RED if self.isBreak else Utility.GREEN, Pose.RADIUS + 3 if self.hovered else Pose.RADIUS)
+        if self.showCoords or self.hovered:
+            string = "({},{})".format(round(Utility.pixelsToTiles(self.x), 2), round(Utility.pixelsToTiles(Utility.SCREEN_SIZE - self.y), 2))
+            Utility.drawText(screen, Utility.FONT20, string, Utility.TEXTCOLOR, self.x, self.y - 20)
 
 class PathType(Enum):
     LINEAR  = 1
@@ -77,17 +82,16 @@ class Path:
 
     def handleMouse(self, m):
 
-        self.pathIndex = self.getTouchingPathIndex(m.x, m.y)
-
-        # Toggle type of path if c pressed
-        if self.pathIndex != -1 and m.pressedC:
-            self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
-
         if m.poseDragged is not None:
-            if m.pressing:
-                m.poseDragged.x = m.x
-                m.poseDragged.y = m.y
+            
+            if m.pressing: 
+                if m.startDragX != m.x or m.startDragY != m.y: # make sure mouse actually has moved
+                    m.poseDragged.x = m.x
+                    m.poseDragged.y = m.y
             else:
+                if m.released and m.startDragX == m.x and m.startDragY == m.y:
+                    m.poseDragged.showCoords = not m.poseDragged.showCoords
+                    
                 m.poseDragged = None
        
         anyHovered = False
@@ -96,12 +100,23 @@ class Path:
                 anyHovered = True
                 pose.hovered = True
 
+                if m.pressedR:
+                    pose.isBreak = not pose.isBreak
+
                 if m.keyX:
                     self.deletePose(pose)
                 elif m.pressed and m.poseDragged is None:
                     m.poseDragged = pose
+                    m.startDragX = m.x
+                    m.startDragY = m.y
             else:
                 pose.hovered = False
+
+        self.pathIndex = -1 if anyHovered else self.getTouchingPathIndex(m.x, m.y)
+
+        # Toggle type of path if c pressed
+        if self.pathIndex != -1 and m.pressedC:
+            self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
 
         if not anyHovered and m.pressed:
             self.addPose(m.x, m.y, 0)
@@ -187,4 +202,7 @@ class Path:
                     ns += dsdt
 
                 s = ds - Utility.distance(x,y,*P3)
-                print(s)
+
+            # no spillovers at break points
+            if self.poses[i+1].isBreak:
+                s = 0
