@@ -44,12 +44,12 @@ def getSplineGradient(t, p1, p2, p3, p4):
 
     return [tx, ty]
 
-points = [[200,300], [200,300], [400,400], [500,100]]
+points = [[200,300], [200,500], [400,400], [500,100]]
 P1, P2, P3, P4  = points
 
 screen.fill([255,255,255])
 
-SPEED = 5
+SPEED = 10
 s = 0
 while s < 1:
     x,y = getSplinePoint(s, P1, P2, P3, P4)
@@ -57,8 +57,10 @@ while s < 1:
 
     dxds,dyds = getSplineGradient(s, P1, P2, P3, P4)
     dsdt = SPEED / hypo(dxds, dyds)
-    print(dsdt)
     s += dsdt
+
+x2,y2 = getSplinePoint(1, P1, P2, P3, P4)
+print(SPEED - distance(x,y,x2,y2))
 
 for p in points:
     pygame.draw.circle(screen, [255,0,0], p, 4)

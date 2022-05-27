@@ -1,6 +1,7 @@
 import pygame, math, pygame.gfxdraw
 
 BLUE = (0,0,230)
+RED = (230,0,0)
 GREEN = (50,205,50)
 LINEGREY = (100, 100, 100)
 LINEDARKGREY = (75, 75, 75)

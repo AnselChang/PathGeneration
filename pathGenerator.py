@@ -1,7 +1,7 @@
 import sys, pygame
 import MouseHandler, PathStructures, Utility
 
-SCREEN_SIZE = 600
+SCREEN_SIZE = 800
 SCREEN_DIMS = (SCREEN_SIZE, SCREEN_SIZE)
 
 screen = pygame.display.set_mode(SCREEN_DIMS)
@@ -32,7 +32,7 @@ while True:
 
     # Draw everything
     path.draw(screen)
-    path.drawPoints(screen, 5)
+    path.drawPoints(screen, 10)
     if not anyPoseHovered: # Draw hovering pose if nothing selected
         Utility.drawCircle(screen, *path.getMousePosePosition(m.x,m.y), Utility.GREEN, PathStructures.Pose.RADIUS, 100)
     

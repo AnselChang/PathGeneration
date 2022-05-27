@@ -14,6 +14,8 @@ class Mouse:
 
         self.poseDragged  = None
         self.keyX = False
+        self.keyC = False
+        self.keyCPressed = False
         
 
     def tick(self):
@@ -27,6 +29,8 @@ class Mouse:
 
         # keyboard
         self.keyX = self.key.get_pressed()[pygame.K_x]
+        self.pressedC = self.key.get_pressed()[pygame.K_c] and not self.keyC
+        self.keyC = self.key.get_pressed()[pygame.K_c]
 
 
         

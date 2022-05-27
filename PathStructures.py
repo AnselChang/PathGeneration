@@ -1,5 +1,6 @@
 from enum import Enum
 import Utility, math
+import SplineCurves
 
 class Pose:
 
@@ -21,6 +22,9 @@ class Pose:
 class PathType(Enum):
     LINEAR  = 1
     CURVE = 2
+
+    def succ(self):
+        return PathType(self.value % 2 + 1)
         
 class Path:
     
@@ -75,6 +79,10 @@ class Path:
 
         self.pathIndex = self.getTouchingPathIndex(m.x, m.y)
 
+        # Toggle type of path if c pressed
+        if self.pathIndex != -1 and m.pressedC:
+            self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
+
         if m.poseDragged is not None:
             if m.pressing:
                 m.poseDragged.x = m.x
@@ -117,12 +125,13 @@ class Path:
             
             self.poses.append(Pose(px, py, theta))
             if len(self.poses) >= 2: # no path created if it's only one node
-                self.paths.append(PathType.LINEAR)
+                self.paths.append(PathType.LINEAR if len(self.paths) == 0 else self.paths[-1])
                 
         else: # insert between two poses
         
             self.poses.insert(self.pathIndex + 1, Pose(px, py, theta))
-            self.paths.insert(self.pathIndex, PathType.LINEAR)
+
+            self.paths.insert(self.pathIndex, self.paths[self.pathIndex])
     
 
     def draw(self, screen):
@@ -150,7 +159,32 @@ class Path:
                 while s < magnitude:
                     x = self.poses[i].x + normx * s
                     y = self.poses[i].y + normy * s
-                    Utility.drawCircle(screen, x, y, Utility.BLUE, 1)
+                    Utility.drawCircle(screen, x, y, Utility.BLUE, 2)
                     s += ds
                 s -= magnitude # any "spillover" gets carried over to the next point in the next path so that across all paths, every segment is equidistant
-                
+
+            else: # PathType.CURVE
+
+                P2 = [self.poses[i].x, self.poses[i].y]
+                P1 = P2 if i == 0 else [self.poses[i-1].x, self.poses[i-1].y]
+                P3 = [self.poses[i+1].x, self.poses[i+1].y]
+                P4 = P3 if i+2 == len(self.poses) else [self.poses[i+2].x, self.poses[i+2].y]
+
+                # Find starting point from previous "spillover"
+                if s == 0:
+                    ns = 0
+                else:
+                    dxds,dyds = SplineCurves.getSplineGradient(0, P1, P2, P3, P4)
+                    dsdt = s / Utility.hypo(dxds, dyds)
+                    ns = dsdt # s normalized from 0 to 1 for this specific spline
+
+                while ns < 1:
+                    x,y = SplineCurves.getSplinePoint(ns, P1, P2, P3, P4)
+                    Utility.drawCircle(screen, x, y, Utility.RED, 2)
+
+                    dxds,dyds = SplineCurves.getSplineGradient(ns, P1, P2, P3, P4)
+                    dsdt = ds / Utility.hypo(dxds, dyds)
+                    ns += dsdt
+
+                s = ds - Utility.distance(x,y,*P3)
+                print(s)
