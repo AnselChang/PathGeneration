@@ -30,6 +30,11 @@ while True:
     # Draw everything
     path.draw(screen)
     path.drawPoints(screen, 10)
+    
+    p = m.poseSelectHeading # Draw guide line for heading
+    if p is not None and p.theta is not None: 
+        Utility.drawThinLine(screen, Utility.PURPLE, p.x, p.y, m.x, m.y)
+        
     if not anyPoseHovered: # Draw hovering pose if nothing selected
         Utility.drawCircle(screen, *path.getMousePosePosition(m.x,m.y), Utility.GREEN, PathStructures.Pose.RADIUS, 100)
     

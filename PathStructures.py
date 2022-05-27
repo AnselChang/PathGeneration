@@ -100,25 +100,27 @@ class Path:
 
         return -1
         
-
-    def handleMouse(self, m):
+    def handleMouseHeading(self, m):
 
         if not m.pressing:
             m.poseSelectHeading = None
 
-        if m.poseDragged is not None:
+        # update heading for pose
+        if m.poseSelectHeading is not None:
+            p = m.poseSelectHeading
             
-            if m.pressing: 
-                if m.startDragX != m.x or m.startDragY != m.y: # make sure mouse actually has moved
-                    m.poseDragged.x = m.x
-                    m.poseDragged.y = m.y
-            else:
-                if m.released and m.startDragX == m.x and m.startDragY == m.y:
-                    m.poseDragged.showCoords = not m.poseDragged.showCoords
-                    
-                m.poseDragged = None
-       
+            if Utility.distance(m.x, m.y, p.x, p.y) < Pose.RADIUS*2: # for close distances, remove heading
+                p.theta = None
+            else: # Otherwise, get heading from normalized vector from center to mouse
+                p.theta = math.atan2(m.y - p.y, m.x - p.x)
+
+
+                
+
+    def handleHoveringOverPoses(self, m):
+
         anyHovered = False
+        
         if m.poseDragged is None and m.poseSelectHeading is None:
             for pose in self.poses:
                 if pose.touching(m):
@@ -139,6 +141,27 @@ class Path:
                             m.startDragY = m.y
                 else:
                     pose.hovered = False
+
+        return anyHovered
+    
+    def handleMouse(self, m):
+
+        self.handleMouseHeading(m)
+
+        # Update dragging and handle toggling showCoords
+        if m.poseDragged is not None:
+            
+            if m.pressing: 
+                if m.startDragX != m.x or m.startDragY != m.y: # make sure mouse actually has moved
+                    m.poseDragged.x = m.x
+                    m.poseDragged.y = m.y
+            else:
+                if m.released and m.startDragX == m.x and m.startDragY == m.y:
+                    m.poseDragged.showCoords = not m.poseDragged.showCoords
+                    
+                m.poseDragged = None
+       
+        anyHovered = self.handleHoveringOverPoses(m)
 
         self.pathIndex = -1 if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(m.x, m.y)
 

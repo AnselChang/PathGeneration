@@ -9,6 +9,7 @@ BLACK = (0,0,0)
 ORANGE = (255, 165, 0)
 BLUE = (0,0,230)
 RED = (230,0,0)
+PURPLE = (62, 12, 94)
 GREEN = (50,205,50)
 LINEGREY = (100, 100, 100)
 LINEDARKGREY = (75, 75, 75)
@@ -54,6 +55,9 @@ FONT20 = pygame.font.SysFont('Corbel', 20)
 def drawText(surface, font, string, color, x, y, s = 0.5):
     text = font.render(string, True, color)
     surface.blit(text, [x - text.get_width()*s, y])
+
+def drawThinLine(screen, color, x1, y1, x2, y2):
+    pygame.draw.aaline(screen, color, (x1,y1), (x2,y2))
 
 def drawCircle(screen, x, y, color, radius, alpha = 255):
     x = int(x)
