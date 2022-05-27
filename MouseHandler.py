@@ -19,6 +19,7 @@ class Mouse:
         self.y = -1
 
         self.poseDragged  = None
+        self.poseSelectHeading = None
         self.keyX = False
         self.keyC = False
         self.keyCPressed = False
@@ -53,6 +54,7 @@ class Mouse:
         self.keyX = self.key.get_pressed()[pygame.K_x]
         self.pressedC = self.key.get_pressed()[pygame.K_c] and not self.keyC
         self.keyC = self.key.get_pressed()[pygame.K_c]
+        self.keyZ = self.key.get_pressed()[pygame.K_z]
 
 
         

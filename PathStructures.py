@@ -103,6 +103,9 @@ class Path:
 
     def handleMouse(self, m):
 
+        if not m.pressing:
+            m.poseSelectHeading = None
+
         if m.poseDragged is not None:
             
             if m.pressing: 
@@ -116,24 +119,28 @@ class Path:
                 m.poseDragged = None
        
         anyHovered = False
-        for pose in self.poses:
-            if pose.touching(m):
-                anyHovered = True
-                pose.hovered = True
+        if m.poseDragged is None and m.poseSelectHeading is None:
+            for pose in self.poses:
+                if pose.touching(m):
+                    anyHovered = True
+                    pose.hovered = True
 
-                if m.pressedR:
-                    pose.isBreak = not pose.isBreak
+                    if m.pressedR:
+                        pose.isBreak = not pose.isBreak
 
-                if m.keyX:
-                    self.deletePose(pose)
-                elif m.pressed and m.poseDragged is None:
-                    m.poseDragged = pose
-                    m.startDragX = m.x
-                    m.startDragY = m.y
-            else:
-                pose.hovered = False
+                    if m.keyX:
+                        self.deletePose(pose)
+                    elif m.pressed and m.poseDragged is None:
+                        if m.keyZ:
+                            m.poseSelectHeading = pose
+                        else:
+                            m.poseDragged = pose
+                            m.startDragX = m.x
+                            m.startDragY = m.y
+                else:
+                    pose.hovered = False
 
-        self.pathIndex = -1 if anyHovered else self.getTouchingPathIndex(m.x, m.y)
+        self.pathIndex = -1 if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(m.x, m.y)
 
         # Toggle type of path if c pressed
         if self.pathIndex != -1 and m.pressedC:
@@ -189,6 +196,9 @@ class Path:
         s = 0
 
         for i in range(len(self.paths)):
+
+            if self.poses[i].x == self.poses[i+1].x and self.poses[i].y == self.poses[i+1].y:
+                continue
 
             if self.paths[i] == PathType.LINEAR:
                 magnitude = Utility.distance(self.poses[i].x, self.poses[i].y, self.poses[i+1].x, self.poses[i+1].y)
