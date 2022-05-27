@@ -274,18 +274,40 @@ class Path:
         s = self.segmentDistance - Utility.distance(x,y,*P3)
         return s
 
+    def interpolateTheta(self, knownThetaIndexes):
+        i1, theta1 = knownThetaIndexes[0]
+        assert i == 0
+
+        for i2, theta2 in knownThetaIndexes:
+
+            for i in range(0, i2-i1+1):
+                self.points[ i1 + i].theta = theta1 + (theta2 - theta1) * (i / (i2-i1))    
+
+            i1 = i2
+            theta1 = theta2
+
+        # For all the points past the last known theta index, just set theta to the same number
+        for index in range(i2, len(self.points)):
+            self.points[index].theta = theta2
+
     # Call this function to update self.points whenever there is a change in interpolation. Generates a list of points from the entire combined path
     def interpolatePoints(self):
 
         self.points = []
         knownThetaIndexes = [] # for the purposes of interpolating theta after initially generating list of points
 
-        s = 0
+        if len(self.paths) == 0:
+            return
 
+        s = 0
         for i in range(len(self.paths)):
 
             if self.poses[i].x == self.poses[i+1].x and self.poses[i].y == self.poses[i+1].y:
                 continue
+
+            # Mark point with theta if pose has specified theta
+            if self.poses[i].theta is not None:
+                knownThetaIndexes.append([len(self.points), self.poses[i].theta])
 
             if self.paths[i] == PathType.LINEAR:
                 s = self.interpolateLinear(i, s)
@@ -297,6 +319,11 @@ class Path:
             if self.poses[i+1].isBreak:
                 s = 0
 
+        # Mark last point with theta if it exists
+        if self.poses[-1].theta is not None:
+            knownThetaIndexes.append([len(self.points)-1, self.poses[-1].theta])
+
+        self.interpolateTheta(self, knownThetaIndexes)
 
     def drawPoints(self, screen):
         for point in self.points:
