@@ -17,6 +17,17 @@ def pointTouchingLine(x, y, x1, y1, x2, y2, lineThickness):
             return True
     return False
 
+# Vector projection algorithm
+def pointOnLineClosestToPoint(x, y, x1, y1, x2, y2):
+    ax = x - x1
+    ay = y - y1
+    bx = x2 - x1
+    by = y2 - y1
+
+    scalar = (ax * bx + ay * by) / (bx * bx + by * by)
+    return [x1 + scalar * bx, y1 + scalar * by]
+    
+
 def drawCircle(screen, x, y, color, radius, alpha = 255):
     if alpha == 255:
         pygame.draw.circle(screen, color, (x,y), radius)

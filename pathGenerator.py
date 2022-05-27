@@ -29,11 +29,11 @@ while True:
     else:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
-    # Draw hovering pose if nothing selected
-    if not anyPoseHovered:
-        Utility.drawCircle(screen, m.x, m.y, Utility.GREEN, PathStructures.Pose.RADIUS, 100)
-        
+
+    # Draw everything
     path.draw(screen)
+    if not anyPoseHovered: # Draw hovering pose if nothing selected
+        Utility.drawCircle(screen, *path.getMousePosePosition(m.x,m.y), Utility.GREEN, PathStructures.Pose.RADIUS, 100)
     
     pygame.display.update()
 

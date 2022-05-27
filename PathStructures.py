@@ -62,7 +62,7 @@ class Path:
             x2 = self.poses[i].x
             y2 = self.poses[i].y
             
-            if Utility.pointTouchingLine(x, y, x1, y1, x2, y2, 5):
+            if Utility.pointTouchingLine(x, y, x1, y1, x2, y2, 10):
                 return i - 1
 
             x1 = x2
@@ -100,10 +100,29 @@ class Path:
 
         return anyHovered
 
+    def getMousePosePosition(self, x, y):
+
+        if self.pathIndex == -1:
+               return (x, y)
+        else:
+            p1, p2 = self.poses[self.pathIndex], self.poses[self.pathIndex+1]
+            return Utility.pointOnLineClosestToPoint(x, y, p1.x, p1.y, p2.x, p2.y)
+
     def addPose(self, x, y, theta):
-            self.poses.append(Pose(x, y, theta))
+
+        px, py = self.getMousePosePosition(x,y)
+
+         
+        if self.pathIndex == -1: # add to the end
+            
+            self.poses.append(Pose(px, py, theta))
             if len(self.poses) >= 2: # no path created if it's only one node
                 self.paths.append(PathType.LINEAR)
+                
+        else: # insert between two poses
+        
+            self.poses.insert(self.pathIndex + 1, Pose(px, py, theta))
+            self.paths.insert(self.pathIndex, PathType.LINEAR)
     
 
     def draw(self, screen):
