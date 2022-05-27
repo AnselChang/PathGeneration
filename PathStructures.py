@@ -1,3 +1,6 @@
+from enum import Enum
+import Utility
+
 class Pose:
 
     RADIUS = 5
@@ -10,10 +13,10 @@ class Pose:
         self.hovered = False
 
     def touching(self, m):
-        return distance(self.x, self.y, m.x, m.y) <= Pose.RADIUS
+        return Utility.distance(self.x, self.y, m.x, m.y) <= Pose.RADIUS
 
     def draw(self, screen):
-        drawCircle(screen, self.x, self.y, GREEN, Pose.RADIUS + 3 if self.hovered else Pose.RADIUS)
+        Utility.drawCircle(screen, self.x, self.y, Utility.GREEN, Pose.RADIUS + 3 if self.hovered else Pose.RADIUS)
 
 class PathType(Enum):
     LINEAR  = 1
@@ -50,7 +53,16 @@ class Path:
 
     def addPose(self, x, y, theta):
             self.poses.append(Pose(x, y, theta))
+            if len(self.poses) >= 2: # no path created if it's only one node
+                self.paths.append(PathType.LINEAR)
 
     def draw(self, screen):
+
+        if len(self.poses) == 0:
+            return
+        
+        for i in range(1, len(self.poses)):
+            Utility.drawLine(screen, Utility.LINEGREY, self.poses[i-1].x, self.poses[i-1].y, self.poses[i].x, self.poses[i].y, 3)
+
         for pose in self.poses:
             pose.draw(screen)
