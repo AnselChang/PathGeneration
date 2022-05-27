@@ -20,8 +20,7 @@ while True:
     m.tick()
     
     anyPoseHovered = path.handleMouse(m)
-    if not anyPoseHovered and m.pressed:
-        path.addPose(m.x, m.y, 0)
+    
 
     if m.poseDragged is not None:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEALL)

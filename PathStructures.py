@@ -29,6 +29,8 @@ class Path:
         self.poses = []
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
 
+        self.pathIndex = -1
+
     def getPoseIndex(self, pose):
         index = -1
         for i in range(len(self.poses)):
@@ -46,9 +48,32 @@ class Path:
             del self.paths[max(index - 1, 0)]
 
         self.poses.remove(pose)
-       
+
+    def getTouchingPathIndex(self, x, y):
+
+        if len(self.poses) == 0:
+            return -1
+        
+        x1 = self.poses[0].x
+        y1 = self.poses[0].y
+        
+        for i in range(1, len(self.poses)):
+
+            x2 = self.poses[i].x
+            y2 = self.poses[i].y
+            
+            if Utility.pointTouchingLine(x, y, x1, y1, x2, y2, 5):
+                return i - 1
+
+            x1 = x2
+            y1 = y2
+
+        return -1
+        
 
     def handleMouse(self, m):
+
+        self.pathIndex = self.getTouchingPathIndex(m.x, m.y)
 
         if m.poseDragged is not None:
             if m.pressing:
@@ -71,12 +96,16 @@ class Path:
             else:
                 pose.hovered = False
 
+        if not anyHovered and m.pressed:
+            self.addPose(m.x, m.y, 0)
+
         return anyHovered
 
     def addPose(self, x, y, theta):
             self.poses.append(Pose(x, y, theta))
             if len(self.poses) >= 2: # no path created if it's only one node
                 self.paths.append(PathType.LINEAR)
+    
 
     def draw(self, screen):
 
@@ -84,7 +113,8 @@ class Path:
             return
         
         for i in range(1, len(self.poses)):
-            Utility.drawLine(screen, Utility.LINEGREY, self.poses[i-1].x, self.poses[i-1].y, self.poses[i].x, self.poses[i].y, 3)
+            color = Utility.LINEDARKGREY if (self.pathIndex == i-1) else Utility.LINEGREY
+            Utility.drawLine(screen, color, self.poses[i-1].x, self.poses[i-1].y, self.poses[i].x, self.poses[i].y, 3)
 
         for pose in self.poses:
             pose.draw(screen)

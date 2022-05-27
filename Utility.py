@@ -2,9 +2,20 @@ import pygame, math, pygame.gfxdraw
 
 GREEN = (50,205,50)
 LINEGREY = (100, 100, 100)
+LINEDARKGREY = (75, 75, 75)
 
 def distance(x1,y1,x2,y2):
     return math.sqrt( ((x1-x2)**2)+((y1-y2)**2) )
+
+def distanceTwoPoints(x0, y0, x1, y1, x2, y2):
+    return abs((x2-x1)*(y1-y0)- (x1-x0)*(y2-y1)) / distance(x1, y1, x2, y2)
+
+def pointTouchingLine(x, y, x1, y1, x2, y2, lineThickness):
+    if distanceTwoPoints(x,y, x1, y1, x2, y2) <=  lineThickness:
+        dist = distance(x1, y1, x2, y2)
+        if distance(x, y, x1, y1) < dist and distance(x, y, x2, y2) < dist:
+            return True
+    return False
 
 def drawCircle(screen, x, y, color, radius, alpha = 255):
     if alpha == 255:
