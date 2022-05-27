@@ -4,7 +4,7 @@ import SplineCurves
 
 class Pose:
 
-    RADIUS = 5
+    RADIUS = 6
     
     # units are in SCREEN PIXELS (which would be converted to inches during export) and theta is in degrees (0-360)
     def __init__(self, x, y, theta):
@@ -18,11 +18,32 @@ class Pose:
     def touching(self, m):
         return Utility.distance(self.x, self.y, m.x, m.y) <= Pose.RADIUS + 5
 
-    def draw(self, screen):
-        Utility.drawCircle(screen, self.x, self.y, Utility.RED if self.isBreak else Utility.GREEN, Pose.RADIUS + 3 if self.hovered else Pose.RADIUS)
+    def draw(self, screen, forceOrange = False):
+
+        r = Pose.RADIUS + 2 if self.hovered else Pose.RADIUS
+
+        if forceOrange:
+            color = Utility.ORANGE
+            r += 3
+        else:
+            color = Utility.RED if self.isBreak else Utility.GREEN
+
+        #  draw triangle
+        if self.theta is not None:
+            a = 0.9
+            x1 = self.x + r * math.cos(self.theta - a)
+            y1 = self.y + r * math.sin(self.theta - a)
+            x2 = self.x + r * math.cos(self.theta + a)
+            y2 = self.y + r * math.sin(self.theta + a)
+            x3 = self.x + 2.3 * r * math.cos(self.theta)
+            y3 = self.y + 2.3 * r * math.sin(self.theta)
+            Utility.drawTriangle(screen, Utility.BLACK, x1, y1, x2, y2, x3, y3)
+
+        Utility.drawCircle(screen, self.x, self.y, color, r)
+        
         if self.showCoords or self.hovered:
             string = "({},{})".format(round(Utility.pixelsToTiles(self.x), 2), round(Utility.pixelsToTiles(Utility.SCREEN_SIZE - self.y), 2))
-            Utility.drawText(screen, Utility.FONT20, string, Utility.TEXTCOLOR, self.x, self.y - 20)
+            Utility.drawText(screen, Utility.FONT20, string, Utility.TEXTCOLOR, self.x, self.y - 25)
 
 class PathType(Enum):
     LINEAR  = 1
@@ -119,7 +140,7 @@ class Path:
             self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
 
         if not anyHovered and m.pressed:
-            self.addPose(m.x, m.y, 0)
+            self.addPose(m.x, m.y)
 
         return anyHovered
 
@@ -131,20 +152,20 @@ class Path:
             p1, p2 = self.poses[self.pathIndex], self.poses[self.pathIndex+1]
             return Utility.pointOnLineClosestToPoint(x, y, p1.x, p1.y, p2.x, p2.y)
 
-    def addPose(self, x, y, theta):
+    def addPose(self, x, y):
 
         px, py = self.getMousePosePosition(x,y)
 
          
         if self.pathIndex == -1: # add to the end
             
-            self.poses.append(Pose(px, py, theta))
+            self.poses.append(Pose(px, py, 3*math.pi/2 if len(self.poses) == 0 else None)) # only the first pose has a predefined position
             if len(self.poses) >= 2: # no path created if it's only one node
                 self.paths.append(PathType.LINEAR if len(self.paths) == 0 else self.paths[-1])
                 
         else: # insert between two poses
         
-            self.poses.insert(self.pathIndex + 1, Pose(px, py, theta))
+            self.poses.insert(self.pathIndex + 1, Pose(px, py, None))
 
             self.paths.insert(self.pathIndex, self.paths[self.pathIndex])
     
@@ -158,8 +179,10 @@ class Path:
             color = Utility.LINEDARKGREY if (self.pathIndex == i-1) else Utility.LINEGREY
             Utility.drawLine(screen, color, self.poses[i-1].x, self.poses[i-1].y, self.poses[i].x, self.poses[i].y, 3)
 
+        first = True
         for pose in self.poses:
-            pose.draw(screen)
+            pose.draw(screen, first)
+            first = False
 
     def drawPoints(self, screen, ds):
 

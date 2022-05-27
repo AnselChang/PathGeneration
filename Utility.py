@@ -5,6 +5,8 @@ pygame.font.init()
 SCREEN_SIZE = 800
 SCREEN_DIMS = (SCREEN_SIZE, SCREEN_SIZE)
 
+BLACK = (0,0,0)
+ORANGE = (255, 165, 0)
 BLUE = (0,0,230)
 RED = (230,0,0)
 GREEN = (50,205,50)
@@ -50,12 +52,26 @@ def drawText(surface, font, string, color, x, y, s = 0.5):
     surface.blit(text, [x - text.get_width()*s, y])
 
 def drawCircle(screen, x, y, color, radius, alpha = 255):
+    x = int(x)
+    y = int(y)
     if alpha == 255:
+        pygame.gfxdraw.aacircle(screen, x, y, radius, color)
         pygame.draw.circle(screen, color, (x,y), radius)
     else:
         surface = pygame.Surface([radius*2, radius*2], pygame.SRCALPHA)
+        pygame.gfxdraw.aacircle(surface, radius, radius, radius, (*color, alpha))
         pygame.draw.circle(surface, (*color, alpha), (radius, radius), radius)
         screen.blit(surface, (x - radius, y - radius))
+
+def drawTriangle(screen, color,  x1, y1, x2, y2, x3, y3):
+    x1 = int(x1)
+    x2 = int(x2)
+    x3 = int(x3)
+    y1 = int(y1)
+    y2 = int(y2)
+    y3 = int(y3)
+    pygame.gfxdraw.aatrigon(screen, x1, y1, x2, y2, x3, y3, color)
+    pygame.gfxdraw.filled_trigon(screen, x1, y1, x2, y2, x3, y3, color)
 
 def drawLine(screen, color, x1, y1, x2, y2, thickness):
 
