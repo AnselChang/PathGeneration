@@ -122,7 +122,7 @@ class Path:
         if m.poseSelectHeading is not None:
             p = m.poseSelectHeading
             
-            if Utility.distance(m.x, m.y, p.x, p.y) < Pose.RADIUS*2: # for close distances, remove heading
+            if  p is not self.poses[0] and Utility.distance(m.x, m.y, p.x, p.y) < Pose.RADIUS*2: # for close distances, remove heading. But first MUST have heading
                 p.theta = None
             else: # Otherwise, get heading from normalized vector from center to mouse
                 p.theta = math.atan2(m.y - p.y, m.x - p.x)
@@ -276,6 +276,7 @@ class Path:
 
     # Interpolate between all the *given* thetas, as in some poses do not specify theta and should just be interpolated between the poses besides them
     def interpolateTheta(self, knownThetaIndexes):
+
         i1, theta1 = knownThetaIndexes[0]
         assert i1 == 0
         for ki in range(1, len(knownThetaIndexes)):
