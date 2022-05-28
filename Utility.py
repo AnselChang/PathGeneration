@@ -30,6 +30,9 @@ def distance(x1,y1,x2,y2):
 def distanceTwoPoints(x0, y0, x1, y1, x2, y2):
     return abs((x2-x1)*(y1-y0)- (x1-x0)*(y2-y1)) / distance(x1, y1, x2, y2)
 
+def vector(x0, y0, theta, magnitude):
+    return [x0 + magnitude*math.cos(theta), y0 + magnitude*math.sin(theta)]
+
 def pointTouchingLine(x, y, x1, y1, x2, y2, lineThickness):
 
     if x1 == x2 and y1 == y2:
@@ -99,3 +102,5 @@ def drawLine(screen, color, x1, y1, x2, y2, thickness):
 
     pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
     pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
+
+

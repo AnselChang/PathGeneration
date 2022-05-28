@@ -127,7 +127,7 @@ class Path:
             else: # Otherwise, get heading from normalized vector from center to mouse
                 p.theta = math.atan2(m.y - p.y, m.x - p.x)
 
-
+            self.interpolatePoints()
                 
 
     def handleHoveringOverPoses(self, m):
@@ -205,7 +205,7 @@ class Path:
          
         if self.pathIndex == -1: # add to the end
             
-            self.poses.append(Pose(px, py, 3*math.pi/2 if len(self.poses) == 0 else None)) # only the first pose has a predefined position
+            self.poses.append(Pose(px, py, -math.pi/2 if len(self.poses) == 0 else None)) # only the first pose has a predefined position (pointing up)
             if len(self.poses) >= 2: # no path created if it's only one node
                 self.paths.append(PathType.LINEAR if len(self.paths) == 0 else self.paths[-1])
                 
@@ -274,21 +274,29 @@ class Path:
         s = self.segmentDistance - Utility.distance(x,y,*P3)
         return s
 
+    # Interpolate between all the *given* thetas, as in some poses do not specify theta and should just be interpolated between the poses besides them
     def interpolateTheta(self, knownThetaIndexes):
         i1, theta1 = knownThetaIndexes[0]
-        assert i == 0
-
-        for i2, theta2 in knownThetaIndexes:
+        assert i1 == 0
+        for ki in range(1, len(knownThetaIndexes)):
+            i2, theta2 = knownThetaIndexes[ki]
 
             for i in range(0, i2-i1+1):
-                self.points[ i1 + i].theta = theta1 + (theta2 - theta1) * (i / (i2-i1))    
+                # Eliminate mod "wraparounds" by always finding the closest direction to spin
+                theta2adjusted = theta2
+                if theta2 - theta1 >= math.pi:
+                    theta2adjusted -= 2*math.pi
+                elif theta1 - theta2 >= math.pi:
+                    theta2adjusted += 2*math.pi
+                    
+                self.points[ i1 + i].theta = theta1 + (theta2adjusted - theta1) * (i / (i2-i1))    
 
             i1 = i2
             theta1 = theta2
 
         # For all the points past the last known theta index, just set theta to the same number
-        for index in range(i2, len(self.points)):
-            self.points[index].theta = theta2
+        for index in range(i1, len(self.points)):
+            self.points[index].theta = theta1
 
     # Call this function to update self.points whenever there is a change in interpolation. Generates a list of points from the entire combined path
     def interpolatePoints(self):
@@ -323,8 +331,16 @@ class Path:
         if self.poses[-1].theta is not None:
             knownThetaIndexes.append([len(self.points)-1, self.poses[-1].theta])
 
-        self.interpolateTheta(self, knownThetaIndexes)
+        if len(self.poses) > 1:
+            self.interpolateTheta(knownThetaIndexes)
 
     def drawPoints(self, screen):
-        for point in self.points:
-            Utility.drawCircle(screen, point.x, point.y, point.color, 2)
+
+        POINT_SIZE = 2
+        TANGENT_LENGTH = 10
+
+        for p in self.points:
+            Utility.drawThinLine(screen, Utility.PURPLE, p.x, p.y, *Utility.vector(p.x, p.y, p.theta, TANGENT_LENGTH))
+        
+        for p in self.points:
+            Utility.drawCircle(screen, p.x, p.y, p.color, POINT_SIZE)

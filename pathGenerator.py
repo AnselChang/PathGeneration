@@ -14,8 +14,7 @@ while True:
     screen.blit(fieldSurface, (0,0)) # draw field
     m.tick()
     
-    anyPoseHovered = path.handleMouse(m)
-    
+    anyPoseHovered = path.handleMouse(m)    
 
     if m.poseDragged is not None:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEALL)
