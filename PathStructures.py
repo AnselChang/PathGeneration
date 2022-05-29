@@ -16,11 +16,12 @@ class Pose:
         self.isBreak = False # a break pose is a stopping pose where poses on one side of this pose don't affect the other
 
     def touching(self, m):
-        return Utility.distance(self.x, self.y, m.x, m.y) <= Pose.RADIUS + 5
+        return Utility.distance(self.x, self.y, m.zx, m.zy) <= (Pose.RADIUS + 5)
 
-    def draw(self, screen, forceOrange = False):
+    def draw(self, screen, m, forceOrange = False):
 
-        r = Pose.RADIUS + 2 if self.hovered else Pose.RADIUS
+        r = (Pose.RADIUS + 2 if self.hovered else Pose.RADIUS) * m.getPartialZoom(1.5)
+        x, y = m.inchToPixel(self.x, self.y)
 
         if forceOrange:
             color = Utility.ORANGE
@@ -31,19 +32,19 @@ class Pose:
         #  draw triangle
         if self.theta is not None:
             a = 0.9
-            x1 = self.x + r * math.cos(self.theta - a)
-            y1 = self.y + r * math.sin(self.theta - a)
-            x2 = self.x + r * math.cos(self.theta + a)
-            y2 = self.y + r * math.sin(self.theta + a)
-            x3 = self.x + 2.3 * r * math.cos(self.theta)
-            y3 = self.y + 2.3 * r * math.sin(self.theta)
+            x1 = x + r * math.cos(self.theta - a)
+            y1 = y + r * math.sin(self.theta - a)
+            x2 = x + r * math.cos(self.theta + a)
+            y2 = y + r * math.sin(self.theta + a)
+            x3 = x + 2.3 * r * math.cos(self.theta)
+            y3 = y + 2.3 * r * math.sin(self.theta)
             Utility.drawTriangle(screen, Utility.BLACK, x1, y1, x2, y2, x3, y3)
 
-        Utility.drawCircle(screen, self.x, self.y, color, r)
+        Utility.drawCircle(screen, x, y, color, r)
         
         if self.showCoords or self.hovered:
-            string = "({},{})".format(round(Utility.pixelsToTiles(self.x), 2), round(Utility.pixelsToTiles(Utility.SCREEN_SIZE - self.y), 2))
-            Utility.drawText(screen, Utility.FONT20, string, Utility.TEXTCOLOR, self.x, self.y - 25)
+            string = "({},{})".format(round(self.x, 1), round(self.y, 1))
+            Utility.drawText(screen, Utility.getFont(23 * m.getPartialZoom(1.02)), string, Utility.TEXTCOLOR, x, y - 25*m.getPartialZoom(1.2))
 
 class PathType(Enum):
     LINEAR  = 1
@@ -121,11 +122,12 @@ class Path:
         # update heading for pose
         if m.poseSelectHeading is not None:
             p = m.poseSelectHeading
+            px, py = m.inchToPixel(p.x, p.y)
             
-            if  p is not self.poses[0] and Utility.distance(m.x, m.y, p.x, p.y) < Pose.RADIUS*2: # for close distances, remove heading. But first MUST have heading
+            if  p is not self.poses[0] and Utility.distance(m.x, m.y, px, py) < Pose.RADIUS*2: # for close distances, remove heading. But first MUST have heading
                 p.theta = None
             else: # Otherwise, get heading from normalized vector from center to mouse
-                p.theta = math.atan2(m.y - p.y, m.x - p.x)
+                p.theta = math.atan2(m.y - py, m.x - px)
 
             self.interpolatePoints()
                 
@@ -167,8 +169,8 @@ class Path:
             
             if m.pressing: 
                 if m.startDragX != m.x or m.startDragY != m.y: # make sure mouse actually has moved
-                    m.poseDragged.x = m.x
-                    m.poseDragged.y = m.y
+                    m.poseDragged.x = m.zx
+                    m.poseDragged.y = m.zy
                     self.interpolatePoints()
             else:
                 if m.released and m.startDragX == m.x and m.startDragY == m.y:
@@ -178,15 +180,15 @@ class Path:
        
         anyHovered = self.handleHoveringOverPoses(m)
 
-        self.pathIndex = -1 if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(m.x, m.y)
+        self.pathIndex = -1 if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(m.zx, m.zy)
 
         # Toggle type of path if c pressed
         if self.pathIndex != -1 and m.pressedC:
             self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
             self.interpolatePoints()
 
-        if not anyHovered and m.pressed:
-            self.addPose(m.x, m.y)
+        if not anyHovered and m.pressedR:
+            self.addPose(m.zx, m.zy)
 
         return anyHovered
 
@@ -218,18 +220,18 @@ class Path:
         self.interpolatePoints()
     
 
-    def drawPaths(self, screen):
+    def drawPaths(self, screen, m):
 
         if len(self.poses) == 0:
             return
         
         for i in range(1, len(self.poses)):
             color = Utility.LINEDARKGREY if (self.pathIndex == i-1) else Utility.LINEGREY
-            Utility.drawLine(screen, color, self.poses[i-1].x, self.poses[i-1].y, self.poses[i].x, self.poses[i].y, 3)
+            Utility.drawLine(screen, color, *m.inchToPixel(self.poses[i-1].x, self.poses[i-1].y), *m.inchToPixel(self.poses[i].x, self.poses[i].y), 2 *  m.getPartialZoom(1.5))
 
         first = True
         for pose in self.poses:
-            pose.draw(screen, first)
+            pose.draw(screen, m, first)
             first = False
 
     # Interpolate pose[i] to pose[i+1] linearly with s spillover
@@ -335,13 +337,15 @@ class Path:
         if len(self.poses) > 1:
             self.interpolateTheta(knownThetaIndexes)
 
-    def drawPoints(self, screen):
+    def drawPoints(self, screen, m):
 
-        POINT_SIZE = 2
+        POINT_SIZE = 1
         TANGENT_LENGTH = 10
 
+
         for p in self.points:
-            Utility.drawThinLine(screen, Utility.PURPLE, p.x, p.y, *Utility.vector(p.x, p.y, p.theta, TANGENT_LENGTH))
+            p.px, p.py = m.inchToPixel(p.x, p.y)
+            Utility.drawLine(screen, Utility.PURPLE, p.px, p.py, *Utility.vector(p.px, p.py, p.theta, TANGENT_LENGTH *  m.getPartialZoom(1.25)),  m.getPartialZoom(1.5))
         
         for p in self.points:
-            Utility.drawCircle(screen, p.x, p.y, p.color, POINT_SIZE)
+            Utility.drawCircle(screen, p.px, p.py, p.color, POINT_SIZE * m.getPartialZoom(1.5))

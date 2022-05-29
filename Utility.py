@@ -55,6 +55,17 @@ def pointOnLineClosestToPoint(x, y, x1, y1, x2, y2):
     return [x1 + scalar * bx, y1 + scalar * by]
 
 FONT20 = pygame.font.SysFont('Corbel', 20)
+FONT30 = pygame.font.SysFont('Corbel', 30)
+FONT40 = pygame.font.SysFont('Corbel', 40)
+
+def getFont(size):
+    if size < 25:
+        return FONT20
+    elif size < 35:
+        return FONT30
+    else:
+        return FONT40
+
 def drawText(surface, font, string, color, x, y, s = 0.5):
     text = font.render(string, True, color)
     surface.blit(text, [x - text.get_width()*s, y])
@@ -65,6 +76,7 @@ def drawThinLine(screen, color, x1, y1, x2, y2):
 def drawCircle(screen, x, y, color, radius, alpha = 255):
     x = int(x)
     y = int(y)
+    radius = int(radius)
     if alpha == 255:
         pygame.gfxdraw.aacircle(screen, x, y, radius, color)
         pygame.draw.circle(screen, color, (x,y), radius)

@@ -1,7 +1,9 @@
 import pygame
+    
 
 class Mouse:
     def __init__(self, mouse, key):
+        
         self.mouse = mouse
         self.key = key
         
@@ -14,7 +16,9 @@ class Mouse:
         self.pressingR = False
         self.pressedR = False
         self.releasedR = False
-        
+
+        self. rx = -1
+        self.ry = -1
         self.x = -1
         self.y = -1
 
@@ -26,9 +30,32 @@ class Mouse:
 
         self.startDragX = -1
         self.startDragY = -1
-        
+
+        self.zoom = 1
+        self.panX = 0
+        self.panY = 0
+
+
+    def pixelToInch(self, x, y):
+        x -= self.panX
+        y -= self.panY
+        return [x / self.zoom, y / self.zoom]
+
+    def inchToPixel(self, x, y):
+        x *= self.zoom
+        y *= self.zoom
+        return [x + self.panX, y + self.panY]
+
+    def getKey(self, k):
+        return self.allKeys[k]
+
+    # To make objects grow slightly larger when zoom
+    def getPartialZoom(self, scalar):
+        return (self.zoom - 1) * scalar + 1
 
     def tick(self):
+
+        self.allKeys = self.key.get_pressed()
 
         ctrl = self.key.get_pressed()[pygame.K_LCTRL] or self.key.get_pressed()[pygame.K_RCTRL]
         
@@ -38,8 +65,11 @@ class Mouse:
 
         self.prevPressedR = self.pressingR
         self.pressingR = self.mouse.get_pressed()[1]
-        
+
+        # Get mouse x and y through zoom transformations
         self.x, self.y = self.mouse.get_pos()
+        self.zx, self.zy = self.pixelToInch(self.x, self.y)
+        
         self.pressed = self.pressing and not self.prevPressed
         self.released = not self.pressing and self.prevPressed
         self.pressedR = (self.pressingR and not self.prevPressedR) or (self.pressed and ctrl)
@@ -51,10 +81,10 @@ class Mouse:
             
 
         # keyboard
-        self.keyX = self.key.get_pressed()[pygame.K_x]
-        self.pressedC = self.key.get_pressed()[pygame.K_c] and not self.keyC
-        self.keyC = self.key.get_pressed()[pygame.K_c]
-        self.keyZ = self.key.get_pressed()[pygame.K_z]
+        self.keyX = self.getKey(pygame.K_x)
+        self.pressedC = self.getKey(pygame.K_c) and not self.keyC
+        self.keyC = self.getKey(pygame.K_c)
+        self.keyZ = self.getKey(pygame.K_z)
 
 
         

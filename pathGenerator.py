@@ -4,15 +4,39 @@ import MouseHandler, PathStructures, Utility
 screen = pygame.display.set_mode(Utility.SCREEN_DIMS)
 pygame.display.set_caption("Path Generation by Ansel")
 
-fieldSurface = pygame.transform.smoothscale(pygame.image.load("Images/squarefield.png"), Utility.SCREEN_DIMS)
+rawFieldSurface = pygame.image.load("Images/squarefield.png")
+IMAGE_SIZE = 812
+fieldSurface = pygame.transform.smoothscale(rawFieldSurface, Utility.SCREEN_DIMS)
 
-path = PathStructures.Path(10)
+path = PathStructures.Path(5)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 
 while True:
 
-    screen.blit(fieldSurface, (0,0)) # draw field
     m.tick()
+
+    zx,zy =m.zx, m.zy
+    z = m.zoom
+    if m.getKey(pygame.K_a):
+        m.zoom = min(3, m.zoom + 0.15) # zoom in
+    elif m.getKey(pygame.K_s):
+        m.zoom = max(1, m.zoom - 0.15) # zoom out
+        if m.zoom == 1:
+            m.panX *= 0.7
+            m.panY *= 0.7
+
+    # Rescale the field surface ONLY when there is a zoom update
+    if z != m.zoom:
+        x,y = m.inchToPixel(zx, zy)
+        m.panX += m.x - x
+        m.panY += m.y - y
+        m.panX = min(0, m.panX)
+        m.panY = min(0, m.panY)
+        # fuck this
+        fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
+
+    # draw field
+    screen.blit(fieldSurface, (m.panX,m.panY))
     
     anyPoseHovered = path.handleMouse(m)    
 
@@ -25,15 +49,16 @@ while True:
 
 
     # Draw everything
-    path.drawPaths(screen)
-    path.drawPoints(screen)
+    path.drawPaths(screen, m)
+    path.drawPoints(screen, m)
     
     p = m.poseSelectHeading # Draw guide line for heading
     if p is not None and p.theta is not None: 
-        Utility.drawThinLine(screen, Utility.PURPLE, p.x, p.y, m.x, m.y)
-        
+        Utility.drawThinLine(screen, Utility.PURPLE, *m.inchToPixel(p.x, p.y), m.x, m.y)
+
+    print(anyPoseHovered)
     if not anyPoseHovered: # Draw hovering pose if nothing selected
-        Utility.drawCircle(screen, *path.getMousePosePosition(m.x,m.y), Utility.GREEN, PathStructures.Pose.RADIUS, 100)
+        Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(1.25), 100)
     
     pygame.display.update()
 
