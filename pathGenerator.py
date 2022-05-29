@@ -30,13 +30,10 @@ while True:
         m.boundFieldPan()
         # slightly inefficient but oh well
         fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
-
-    # draw field
-    screen.blit(fieldSurface, (m.panX,m.panY))
     
     anyPoseHovered = path.handleMouse(m)    
 
-    if m.poseDragged is not None:
+    if m.poseDragged is not None or m.scrolling:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEALL)
     elif anyPoseHovered:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -45,6 +42,7 @@ while True:
 
 
     # Draw everything
+    screen.blit(fieldSurface, (m.panX,m.panY)) # draw field
     path.drawPaths(screen, m)
     path.drawPoints(screen, m)
     
@@ -52,7 +50,7 @@ while True:
     if p is not None and p.theta is not None: 
         Utility.drawThinLine(screen, Utility.PURPLE, *m.inchToPixel(p.x, p.y), m.x, m.y)
 
-    if not anyPoseHovered: # Draw hovering pose if nothing selected
+    if not anyPoseHovered and not m.scrolling: # Draw hovering pose if nothing selected and not scrolling field
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(1.25), 100)
     
     pygame.display.update()
