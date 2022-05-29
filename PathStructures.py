@@ -147,7 +147,7 @@ class Path:
                     if m.pressedR:
                         pose.isBreak = not pose.isBreak
 
-                    if m.keyX:
+                    if m.keyX and not m.keyC:
                         self.deletePose(pose)
                         self.interpolatePoints()
                     elif m.pressed and m.poseDragged is None:
@@ -161,6 +161,19 @@ class Path:
                     pose.hovered = False
 
         return anyHovered
+
+    def handleToggleCurve(self, m):
+
+        if m.keyC:                
+
+            if self.pathIndex != -1:
+                if m.lastToggledEdge != self.pathIndex: # Toggle path if it hasn't just been toggled
+                    self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
+                    self.interpolatePoints()
+                    m.lastToggledEdge = self.pathIndex
+            else:
+                m.lastToggledEdge = -1
+                
     
     def handleMouse(self, m):
 
@@ -193,11 +206,11 @@ class Path:
 
         self.pathIndex = -1 if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(m.zx, m.zy)
 
+        self.handleToggleCurve(m)
+
         if self.pathIndex != -1:
-            if m.pressedC: # Toggle type of path if c pressed
-                self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
-                self.interpolatePoints()
-            elif not anyHovered and m.keyX: # Delete node closest to mouse if edge hovered and pressed X
+        
+            if not anyHovered and m.keyX and not m.keyC: # Delete node closest to mouse if edge hovered and pressed X
                 print(self.pathIndex,len(self.poses))
                 p1 = self.poses[self.pathIndex]
                 p2 = self.poses[self.pathIndex + 1]
@@ -209,7 +222,7 @@ class Path:
                 self.pathIndex = -1 # now that it's deleted, the mouse is not hovering over any path
 
         if not anyHovered:
-            if m.pressedR:
+            if m.pressedR and not m.pressedC:
                 self.addPose(m.zx, m.zy)
             elif m.pressed:
                 m.scrolling = True

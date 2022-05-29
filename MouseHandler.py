@@ -32,7 +32,8 @@ class Mouse:
         
         self.keyX = False
         self.keyC = False
-        self.keyCPressed = False
+        self.keyZ = False
+        self.pressedC = False
 
         self.startDragX = -1
         self.startDragY = -1
@@ -40,6 +41,8 @@ class Mouse:
         self.zoom = 1
         self.panX = 0
         self.panY = 0
+
+        self.lastToggledEdge = -1
 
 
     def pixelToInch(self, x, y):
