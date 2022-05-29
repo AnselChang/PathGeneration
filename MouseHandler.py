@@ -1,4 +1,4 @@
-import pygame
+import pygame, Utility
     
 
 class Mouse:
@@ -22,8 +22,14 @@ class Mouse:
         self.x = -1
         self.y = -1
 
+        self.prevX = 0
+        self.prevY = 0
+
         self.poseDragged  = None
         self.poseSelectHeading = None
+        
+        self.scrolling = False
+        
         self.keyX = False
         self.keyC = False
         self.keyCPressed = False
@@ -53,6 +59,10 @@ class Mouse:
     def getPartialZoom(self, scalar):
         return (self.zoom - 1) * scalar + 1
 
+    def boundFieldPan(self):
+        self.panX = max(min(0, self.panX),  (1-self.zoom)*Utility.SCREEN_SIZE)
+        self.panY = max(min(0, self.panY), (1-self.zoom)*Utility.SCREEN_SIZE)
+
     def tick(self):
 
         self.allKeys = self.key.get_pressed()
@@ -67,6 +77,8 @@ class Mouse:
         self.pressingR = self.mouse.get_pressed()[1]
 
         # Get mouse x and y through zoom transformations
+        self.prevX = self.x
+        self.prevY = self.y
         self.x, self.y = self.mouse.get_pos()
         self.zx, self.zy = self.pixelToInch(self.x, self.y)
         
@@ -77,8 +89,6 @@ class Mouse:
         if ctrl:
             self.pressed = False
             self.released = False
-
-            
 
         # keyboard
         self.keyX = self.getKey(pygame.K_x)

@@ -27,8 +27,7 @@ while True:
         x,y = m.inchToPixel(zx, zy)
         m.panX += m.x - x
         m.panY += m.y - y
-        m.panX = max(min(0, m.panX),  (1-m.zoom)*Utility.SCREEN_SIZE)
-        m.panY = max(min(0, m.panY), (1-m.zoom)*Utility.SCREEN_SIZE)
+        m.boundFieldPan()
         # slightly inefficient but oh well
         fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
 

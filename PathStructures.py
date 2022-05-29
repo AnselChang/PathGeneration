@@ -162,6 +162,15 @@ class Path:
     
     def handleMouse(self, m):
 
+        # Handle scrolling the field
+        if not m.pressing:
+            m.scrolling = False
+        if m.scrolling:
+            dx = m.x - m.prevX
+            dy = m.y - m.prevY
+            m.panX += dx
+            m.panY += dy
+            m.boundFieldPan()
         self.handleMouseHeading(m)
 
         # Update dragging and handle toggling showCoords
@@ -187,8 +196,11 @@ class Path:
             self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
             self.interpolatePoints()
 
-        if not anyHovered and m.pressedR:
-            self.addPose(m.zx, m.zy)
+        if not anyHovered:
+            if m.pressedR:
+                self.addPose(m.zx, m.zy)
+            elif m.pressed:
+                m.scrolling = True
 
         return anyHovered
 
