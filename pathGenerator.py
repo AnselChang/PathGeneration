@@ -21,18 +21,15 @@ while True:
         m.zoom = min(3, m.zoom + 0.15) # zoom in
     elif m.getKey(pygame.K_s):
         m.zoom = max(1, m.zoom - 0.15) # zoom out
-        if m.zoom == 1:
-            m.panX *= 0.7
-            m.panY *= 0.7
-
+        
     # Rescale the field surface ONLY when there is a zoom update
     if z != m.zoom:
         x,y = m.inchToPixel(zx, zy)
         m.panX += m.x - x
         m.panY += m.y - y
-        m.panX = min(0, m.panX)
-        m.panY = min(0, m.panY)
-        # fuck this
+        m.panX = max(min(0, m.panX),  (1-m.zoom)*Utility.SCREEN_SIZE)
+        m.panY = max(min(0, m.panY), (1-m.zoom)*Utility.SCREEN_SIZE)
+        # slightly inefficient but oh well
         fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
 
     # draw field
@@ -56,7 +53,6 @@ while True:
     if p is not None and p.theta is not None: 
         Utility.drawThinLine(screen, Utility.PURPLE, *m.inchToPixel(p.x, p.y), m.x, m.y)
 
-    print(anyPoseHovered)
     if not anyPoseHovered: # Draw hovering pose if nothing selected
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(1.25), 100)
     
