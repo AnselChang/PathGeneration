@@ -40,7 +40,6 @@ while True:
     else:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_CROSSHAIR)
 
-
     # Draw everything
     screen.blit(fieldSurface, (m.panX,m.panY)) # draw field
     path.drawPaths(screen, m)

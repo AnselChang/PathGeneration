@@ -81,8 +81,10 @@ class Path:
                 break
         return index
 
-    def deletePose(self, pose):
-        index  = self.getPoseIndex(pose)
+    def deletePose(self, index):
+        if type(index) is not int:
+            index  = self.getPoseIndex(index)
+            pose = index
         if index == -1:
             return
 
@@ -91,7 +93,7 @@ class Path:
 
         if index == 0 and len(self.poses) > 1 and self.poses[1].theta is None:
             self.poses[1].theta = self.poses[0].theta
-        self.poses.remove(pose)
+        del self.poses[index]
 
     def getTouchingPathIndex(self, x, y):
 
@@ -191,10 +193,20 @@ class Path:
 
         self.pathIndex = -1 if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(m.zx, m.zy)
 
-        # Toggle type of path if c pressed
-        if self.pathIndex != -1 and m.pressedC:
-            self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
-            self.interpolatePoints()
+        if self.pathIndex != -1:
+            if m.pressedC: # Toggle type of path if c pressed
+                self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
+                self.interpolatePoints()
+            elif not anyHovered and m.keyX: # Delete node closest to mouse if edge hovered and pressed X
+                print(self.pathIndex,len(self.poses))
+                p1 = self.poses[self.pathIndex]
+                p2 = self.poses[self.pathIndex + 1]
+                distTo1 = Utility.distance(m.zx, m.zy, p1.x, p1.y)
+                distTo2 = Utility.distance(m.zx, m.zy, p2.x, p2.y)
+                index = self.pathIndex if distTo1 < distTo2 else self.pathIndex + 1
+                self.deletePose(index)
+                self.interpolatePoints()
+                self.pathIndex = -1 # now that it's deleted, the mouse is not hovering over any path
 
         if not anyHovered:
             if m.pressedR:
