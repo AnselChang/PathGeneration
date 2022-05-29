@@ -108,7 +108,7 @@ class Path:
             x2 = self.poses[i].x
             y2 = self.poses[i].y
             
-            if Utility.pointTouchingLine(x, y, x1, y1, x2, y2, 10):
+            if Utility.pointTouchingLine(x, y, x1, y1, x2, y2, 15):
                 return i - 1
 
             x1 = x2
@@ -173,6 +173,8 @@ class Path:
                     m.lastToggledEdge = self.pathIndex
             else:
                 m.lastToggledEdge = -1
+        else:
+            m.lastToggledEdge = -1
                 
     
     def handleMouse(self, m):
