@@ -1,6 +1,6 @@
 import Utility
 
-SLIDER_WIDTH = 150
+SLIDER_WIDTH = 250
 SLIDER_MARGIN = 60
 
 m = None

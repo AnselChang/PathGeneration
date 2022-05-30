@@ -147,7 +147,7 @@ class Path:
                         self.deletePose(pose)
                         self.interpolatePoints()
                     elif m.pressed and m.poseDragged is None:
-                        if m.keyZ:
+                        if m.keyZ and not m.simulating:
                             m.poseSelectHeading = pose
                         else:
                             m.poseDragged = pose
