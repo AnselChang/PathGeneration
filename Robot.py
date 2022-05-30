@@ -1,19 +1,19 @@
 import math, Utility, random
 
 STEP_TIME = 0.02 # 20 millisecond cycle time
-K_P_TRANS = 1
-K_P_ROT = 1
+K_P_TRANS = 10
+K_P_ROT = 10
 STOP_DISTANCE_THRESHOLD = 1 # In inches, pathfinding algo terminates when distance to destination dips below threshold
 POSITION_NOISE = 0.1 # position noise in inches that cna be generated at each timestep. triangular distribution with [-POSITION_NOISE, POSITION_NOISE]
 
 # A point at some timestep in the simulation, generated numerically from some pathfinding algorithm, which can differ slightly from the theoretical trajectory
 class SimulationPoint:
-    def __init__(self, x, y, theta, xvel = None, yvel = None):
+    def __init__(self, x, y, theta, **kwargs):
         self.x = x
         self.y = y
         self.theta = theta
-        self.xvel = xvel
-        self.yvel = yvel
+
+        self.__dict__.update(kwargs) # handy way to store any keyword arguments as instance variables
 
 # Abstract
 class GenericRobot:
@@ -139,8 +139,28 @@ class PurePursuitRobot(GenericRobot):
             theta += tvel * STEP_TIME
 
             # Add timestep to simulation
-            self.simulation.append(SimulationPoint(x, y, theta, xvel, yvel))
+            self.simulation.append(SimulationPoint(x, y, theta, xvel = xvel, yvel = yvel, tvel = tvel))
 
         return len(self.simulation)
+
+    # Override generic simulationTick by drawing stats and lookahead line
+    def simulationTick(self, screen, m, pointIndex):
+
+        ret = super().simulationTick(screen, m, pointIndex)
+
+        # Draw position and velocity stats
+        p = self.simulation[pointIndex]
+        Utility.drawText(screen, Utility.getFont(30), "Pure Pursuit", Utility.BLACK, 200, 30, 0)
+        Utility.drawText(screen, Utility.getFont(20), "xpos: {} inch".format(round(p.x, 2)), Utility.BLACK, 200, 50, 0)
+        Utility.drawText(screen, Utility.getFont(20), "ypos: {} inch".format(round(p.y, 2)), Utility.BLACK, 200, 65, 0)
+        Utility.drawText(screen, Utility.getFont(20), "theta: {} deg".format(round(p.theta * 180 / math.pi, 2)), Utility.BLACK, 200, 80, 0)
+        Utility.drawText(screen, Utility.getFont(20), "xvel: {} inch/sec".format(round(p.xvel, 2)), Utility.BLACK, 330, 50, 0)
+        Utility.drawText(screen, Utility.getFont(20), "yvel: {} inch/sec".format(round(p.yvel, 2)), Utility.BLACK, 330, 65, 0)
+        Utility.drawText(screen, Utility.getFont(20), "tvel: {} deg/sec".format(round(p.tvel * 180 / math.pi, 2)), Utility.BLACK, 330, 80, 0)
+
+        # Draw lookahead line
+        
+
+        return ret
         
     

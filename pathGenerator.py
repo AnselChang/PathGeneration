@@ -50,7 +50,8 @@ while True:
 
     # Draw everything
     screen.blit(fieldSurface, (m.panX,m.panY)) # draw field
-    path.drawPaths(screen, m)
+    if not m.simulating:
+        path.drawPaths(screen, m)
     path.drawPoints(screen, m)
     path.drawRobot(screen, m, slider.pointIndex)
     
