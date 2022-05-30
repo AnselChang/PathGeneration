@@ -8,15 +8,14 @@ class Robot:
 
     def startSimulation(self, points):
         self.points = points
-        self.pointIndex = 0
 
     # return if animation is still going
-    def simulationTick(self, screen, m):
+    def simulationTick(self, screen, m, pointIndex):
 
-        if self.pointIndex == len(self.points):
+        if pointIndex == len(self.points):
             return False
         
-        p = self.points[self.pointIndex]
+        p = self.points[pointIndex]
         cx, cy = m.inchToPixel(p.x, p.y)
         theta = p.theta
         width = self.width * m.zoom
@@ -44,5 +43,4 @@ class Robot:
         Utility.drawLine(screen, Utility.BLACK, cx, cy, tx, ty, 4  * s)
         Utility.drawPolarTriangle(screen, Utility.BLACK, tx, ty, theta, 7 * s, 1, math.pi / 2)
 
-        self.pointIndex += 1
         return True

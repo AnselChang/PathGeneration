@@ -30,6 +30,8 @@ class Mouse:
         
         self.scrolling = False
         self.simulating = False
+        self.playingSimulation = False
+        self.draggingSlider = False
         
         self.keyX = False
         self.keyC = False

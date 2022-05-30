@@ -1,5 +1,5 @@
 from enum import Enum
-import Utility, math
+import Utility, math, pygame
 import SplineCurves, Robot
 
 class Pose:
@@ -172,19 +172,34 @@ class Path:
         else:
             m.lastToggledEdge = -1
                 
-    
-    def handleMouse(self, m):
+
+    def handleSimulation(self, m, slider):
 
         # Handle start simulation
-        if m.pressedSpace:
-            if m.simulating:
-                m.simulating = False
-            elif len(self.points) > 0:
-                m.simulating = True
+        if m.pressedSpace and len(self.points) > 0:
+            
+            if m.simulating: # Toggle playback
+                if slider.pointIndex == slider.high:
+                    slider.reset()
+                    m.playingSimulation = True
+                else:
+                    m.playingSimulation = not m.playingSimulation
+            else:
+                m.simulating = True # Start simulation
+                slider.setRange(len(self.points) - 1)
+                slider.reset()
+                m.playingSimulation = False
                 m.poseDragged = None
                 m.poseSelectHeading = None
-                print(len(self.points))
                 self.robot.startSimulation(self.points)
+
+        # Handle stop simulation
+        if m.getKey(pygame.K_ESCAPE):
+            m.simulating = False
+    
+    def handleMouse(self, m, slider):
+
+        self.handleSimulation(m, slider)
 
         # Handle scrolling the field
         if not m.pressing:
@@ -399,7 +414,7 @@ class Path:
         for p in self.points:
             Utility.drawCircle(screen, p.px, p.py, p.color, POINT_SIZE * m.getPartialZoom(0.75))
 
-    def drawRobot(self, screen, m):
+    def drawRobot(self, screen, m, pointIndex):
 
         if m.simulating:
-            m.simulating = self.robot.simulationTick(screen, m)
+            m.simulating = self.robot.simulationTick(screen, m, pointIndex)

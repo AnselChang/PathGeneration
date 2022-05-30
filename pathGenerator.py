@@ -33,8 +33,9 @@ while True:
         m.boundFieldPan()
         # slightly inefficient but oh well
         fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
-    
-    anyPoseHovered = path.handleMouse(m)    
+
+    slider.handleMouse()
+    anyPoseHovered = path.handleMouse(m, slider)    
         
     if m.simulating:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if slider.mouseHovering() else pygame.SYSTEM_CURSOR_WAIT)
@@ -49,7 +50,7 @@ while True:
     screen.blit(fieldSurface, (m.panX,m.panY)) # draw field
     path.drawPaths(screen, m)
     path.drawPoints(screen, m)
-    path.drawRobot(screen, m)
+    path.drawRobot(screen, m, slider.pointIndex)
     
     p = m.poseSelectHeading # Draw guide line for heading
     if p is not None and p.theta is not None: 
@@ -59,6 +60,7 @@ while True:
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(0.75), 100)
 
     slider.draw(screen)
+    slider.incrementPossibly(m)
     
     pygame.display.update()
 
