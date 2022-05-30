@@ -14,6 +14,8 @@ m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 Slider.init(m)
 slider = Slider.Slider()
 
+clock = pygame.time.Clock()
+
 while True:
 
     m.tick()
@@ -59,12 +61,15 @@ while True:
     if not anyPoseHovered and not m.scrolling and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(0.75), 100)
 
+    # Draw fps counter
+    Utility.drawText(screen, Utility.getFont(30), "FPS: {}".format(round(clock.get_fps())), Utility.BLACK, 30, 30, 0)
+
     slider.draw(screen)
     slider.incrementPossibly(m)
     
     pygame.display.update()
 
-    pygame.time.wait(20)
+    clock.tick(20) # limit to a 50 fps, or 20 ms per loop iteration
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

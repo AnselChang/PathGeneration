@@ -21,6 +21,9 @@ def pixelsToInches(pixels):
 def pixelsToTiles(pixels):
     return (pixels / SCREEN_SIZE) * 6
 
+def clamp(value, mn, mx):
+    return max(mn, min(mx, value))
+
 def hypo(s1, s2):
     return math.sqrt(s1*s1 + s2 * s2)
 

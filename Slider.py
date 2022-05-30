@@ -19,8 +19,8 @@ class Slider:
         self.high = 1
         self.pointIndex = 0
 
-    def setRange(self, high):
-        self.high = high
+    def setRange(self, simulationLength):
+        self.high = simulationLength - 1
 
     def mouseHovering(self):
         # Only hovering when slider is actually shown (in simulation)
