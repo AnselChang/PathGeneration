@@ -1,13 +1,15 @@
 import math, Utility
 
-class Robot:
+# Abstract
+class GenericRobot:
 
     def __init__(self, width, length):
         self.width = width
         self.length = length
+        self.points = None
 
     def startSimulation(self, points):
-        self.points = points
+        raise NotImplementedError("Must implement this function")
 
     # return if animation is still going
     def simulationTick(self, screen, m, pointIndex):
@@ -44,3 +46,27 @@ class Robot:
         Utility.drawPolarTriangle(screen, Utility.BLACK, tx, ty, theta, 7 * s, 1, math.pi / 2)
 
         return True
+
+class IdealRobot(GenericRobot):
+
+    def __init__(self, width, height):
+        super().__init__(width, height)
+
+    # With an ideal robot, the robot's actual position in each timestep is what it is supposed to be
+    def startSimulation(self, points):
+        self.points = points
+
+class PurePursuitRobot(GenericRobot):
+
+    def __init__(self, width, height):
+        super().__init__(width, height)
+
+    # Find closest point to (x,y) in points, from index range [start, end)
+    def findClosestPoint(self, points, x, y, start, end):
+
+        pass
+
+    def computeSimulation(self, points):
+        pass
+        
+    
