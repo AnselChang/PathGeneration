@@ -20,7 +20,7 @@ class Pose:
 
     def draw(self, screen, m, forceOrange = False):
 
-        r = (Pose.RADIUS + 2 if self.hovered else Pose.RADIUS) * m.getPartialZoom(1.5)
+        r = (Pose.RADIUS + 2 if self.hovered else Pose.RADIUS) * m.getPartialZoom(0.75)
         x, y = m.inchToPixel(self.x, self.y)
 
         if forceOrange:
@@ -31,20 +31,13 @@ class Pose:
 
         #  draw triangle
         if self.theta is not None:
-            a = 0.9
-            x1 = x + r * math.cos(self.theta - a)
-            y1 = y + r * math.sin(self.theta - a)
-            x2 = x + r * math.cos(self.theta + a)
-            y2 = y + r * math.sin(self.theta + a)
-            x3 = x + 2.3 * r * math.cos(self.theta)
-            y3 = y + 2.3 * r * math.sin(self.theta)
-            Utility.drawTriangle(screen, Utility.BLACK, x1, y1, x2, y2, x3, y3)
+            Utility.drawPolarTriangle(screen, Utility.BLACK, x, y, self.theta, r, 2.3, 0.9)
 
         Utility.drawCircle(screen, x, y, color, r)
         
         if self.showCoords or self.hovered:
             string = "({},{})".format(round(self.x, 1), round(self.y, 1))
-            Utility.drawText(screen, Utility.getFont(23 * m.getPartialZoom(1.02)), string, Utility.TEXTCOLOR, x, y - 25*m.getPartialZoom(1.2))
+            Utility.drawText(screen, Utility.getFont(23 * m.getPartialZoom(0.75)), string, Utility.TEXTCOLOR, x, y - 25*m.getPartialZoom(0.75))
 
 class PathType(Enum):
     LINEAR  = 1
@@ -281,7 +274,7 @@ class Path:
         
         for i in range(1, len(self.poses)):
             color = Utility.LINEDARKGREY if (self.pathIndex == i-1) else Utility.LINEGREY
-            Utility.drawLine(screen, color, *m.inchToPixel(self.poses[i-1].x, self.poses[i-1].y), *m.inchToPixel(self.poses[i].x, self.poses[i].y), 2 *  m.getPartialZoom(1.5))
+            Utility.drawLine(screen, color, *m.inchToPixel(self.poses[i-1].x, self.poses[i-1].y), *m.inchToPixel(self.poses[i].x, self.poses[i].y), 2 *  m.getPartialZoom(0.75))
 
         first = True
         for pose in self.poses:
@@ -401,12 +394,12 @@ class Path:
 
         for p in self.points:
             p.px, p.py = m.inchToPixel(p.x, p.y)
-            Utility.drawLine(screen, Utility.PURPLE, p.px, p.py, *Utility.vector(p.px, p.py, p.theta, TANGENT_LENGTH *  m.getPartialZoom(1.25)),  m.getPartialZoom(1.5))
+            Utility.drawLine(screen, Utility.PURPLE, p.px, p.py, *Utility.vector(p.px, p.py, p.theta, TANGENT_LENGTH *  m.getPartialZoom(0.75)),  m.getPartialZoom(0.75))
         
         for p in self.points:
-            Utility.drawCircle(screen, p.px, p.py, p.color, POINT_SIZE * m.getPartialZoom(1.5))
+            Utility.drawCircle(screen, p.px, p.py, p.color, POINT_SIZE * m.getPartialZoom(0.75))
 
     def drawRobot(self, screen, m):
 
         if m.simulating:
-            m.simulating = self.robot.simulationTick(screen)
+            m.simulating = self.robot.simulationTick(screen, m)

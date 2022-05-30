@@ -53,7 +53,7 @@ while True:
         Utility.drawThinLine(screen, Utility.PURPLE, *m.inchToPixel(p.x, p.y), m.x, m.y)
 
     if not anyPoseHovered and not m.scrolling and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
-        Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(1.25), 100)
+        Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(0.75), 100)
     
     pygame.display.update()
 

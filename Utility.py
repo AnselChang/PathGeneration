@@ -96,12 +96,27 @@ def drawTriangle(screen, color,  x1, y1, x2, y2, x3, y3):
     pygame.gfxdraw.aatrigon(screen, x1, y1, x2, y2, x3, y3, color)
     pygame.gfxdraw.filled_trigon(screen, x1, y1, x2, y2, x3, y3, color)
 
+# Draws isoceles triangle given a center of rotation
+# r1 is the radius from center of rotation to the closest two points
+# r2 is the radius from center of rotation to the far point
+def drawPolarTriangle(screen, color, x, y, theta, r1, r2Scalar, a):
+    x1 = x + r1 * math.cos(theta - a)
+    y1 = y + r1 * math.sin(theta - a)
+    x2 = x + r1 * math.cos(theta + a)
+    y2 = y + r1 * math.sin(theta + a)
+    x3 = x + r2Scalar * r1 * math.cos(theta)
+    y3 = y + r2Scalar * r1 * math.sin(theta)
+    drawTriangle(screen, color, x1, y1, x2, y2, x3, y3)
+
 def drawPolygon(screen, color, points, width = 1):
+    width = round(width)
     pygame.gfxdraw.aapolygon(screen, points, color)
     if width > 1:
         pygame.draw.polygon(screen, color, points, width = width)
 
-def drawLine(screen, color, x1, y1, x2, y2, thickness):
+def drawLine(screen, color, x1, y1, x2, y2, thickness = 1):
+
+    thickness = round(thickness)
 
     from math import cos, sin
 
