@@ -1,8 +1,8 @@
 import math, Utility, random
 
 STEP_TIME = 0.02 # 20 millisecond cycle time
-K_P_TRANS = 10
-K_P_ROT = 10
+K_P_TRANS = 30
+K_P_ROT = 1
 STOP_DISTANCE_THRESHOLD = 1 # In inches, pathfinding algo terminates when distance to destination dips below threshold
 POSITION_NOISE = 0.1 # position noise in inches that cna be generated at each timestep. triangular distribution with [-POSITION_NOISE, POSITION_NOISE]
 
@@ -86,14 +86,15 @@ class PurePursuitRobot(GenericRobot):
     # Returns index of closest point in points lis
     def findClosestPoint(self, points, x, y, start, end):
 
-        self.simulation = []
+        start = max(start, 0)
+        end = min(end, len(points) - 1)
 
         minIndex = start
-        minDist = Utility.distance(x, y, points[start])
+        minDist = Utility.distance(x, y, points[start].x, points[start].y)
         start += 1
         while start < end:
-            dist = Utility.distance(x, y, points[start])
-            if dist > minDist:
+            dist = Utility.distance(x, y, points[start].x, points[start].y)
+            if dist < minDist:
                 minIndex = start
                 minDist = dist
             start += 1
@@ -102,6 +103,9 @@ class PurePursuitRobot(GenericRobot):
 
     # starting x, y, theta
     def startSimulation(self, points):
+
+        MAX_TIMESTEPS = 1000
+        timestep = 0
 
         self.simulation = []
 
@@ -114,24 +118,35 @@ class PurePursuitRobot(GenericRobot):
         yvel = 0
         tvel = 0 # angular velocity
         li = 0 # lookahead index
+        ci = 0 # closest index
 
         while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) < STOP_DISTANCE_THRESHOLD:
 
+            if timestep > MAX_TIMESTEPS:
+                break
+
+            # Find closest waypoint within 5 points of the current waypoint
+            ci = self.findClosestPoint(points, x, y, ci - 5, ci + 5)
+        
             # Update lookahead distance
-            while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, x, y) < self.lookahead:
+            while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookahead:
                 li += 1
 
              # Calculate target velocities
             targetXVel = (points[li].x - x) * K_P_TRANS
             targetYVel = (points[li].y - y) * K_P_TRANS
-            targetTVel =(points[li].theta - theta) * K_P_ROT
+
+            dtheta = (points[li].theta - theta) % (2*math.pi)
+            if dtheta > math.pi:
+                dtheta -= math.pi
+            targetTVel = dtheta * K_P_ROT
 
             # I'd constrain individual wheel accelerations here but I don't know mecanum kinematics yet
 
             # Update velocities given target velocities, with acceleration limits in mind
             xvel += Utility.clamp(targetXVel - xvel, -self.maxTransAccel, self.maxTransAccel)
             yvel += Utility.clamp(targetYVel - yvel, -self.maxTransAccel, self.maxTransAccel)
-            tvel += Utility.clamp(targetXVel - xvel, -self.maxRotAccel, self.maxRotAccel)
+            tvel += Utility.clamp(targetTVel - tvel, -self.maxRotAccel, self.maxRotAccel)
 
             # d = r * t
             x += xvel * STEP_TIME + random.triangular(-POSITION_NOISE, POSITION_NOISE) # add positional noise to simulation for realism 
@@ -139,8 +154,10 @@ class PurePursuitRobot(GenericRobot):
             theta += tvel * STEP_TIME
 
             # Add timestep to simulation
-            self.simulation.append(SimulationPoint(x, y, theta, xvel = xvel, yvel = yvel, tvel = tvel))
+            self.simulation.append(SimulationPoint(x, y, theta, xvel = xvel, yvel = yvel, tvel = tvel, cx = points[ci].x, cy = points[ci].y, lx = points[li].x, ly = points[li].y))
+            timestep += 1
 
+        print("Simulation length: ", len(self.simulation))
         return len(self.simulation)
 
     # Override generic simulationTick by drawing stats and lookahead line
@@ -159,6 +176,12 @@ class PurePursuitRobot(GenericRobot):
         Utility.drawText(screen, Utility.getFont(20), "tvel: {} deg/sec".format(round(p.tvel * 180 / math.pi, 2)), Utility.BLACK, 330, 80, 0)
 
         # Draw lookahead line
+
+        lx, ly = m.inchToPixel(p.lx, p.ly)
+        Utility.drawCircle(screen, *m.inchToPixel(p.cx, p.cy), Utility.ORANGE, 2)
+        Utility.drawLine(screen, Utility.GREEN, *m.inchToPixel(p.x, p.y), lx, ly, 2)
+        Utility.drawCircle(screen, lx, ly, Utility.GREEN, 2)
+        
         
 
         return ret

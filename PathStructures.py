@@ -62,7 +62,7 @@ class Path:
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
         self.points = []
 
-        self.robot = Robot.PurePursuitRobot(50, 30, 5, 10, 10)
+        self.robot = Robot.PurePursuitRobot(50, 30, 10, 30, 10)
 
         self.segmentDistance = segmentDistance
 
