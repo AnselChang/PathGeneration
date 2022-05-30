@@ -303,6 +303,8 @@ class Path:
             dxds,dyds = SplineCurves.getSplineGradient(0, P1, P2, P3, P4)
             dsdt = s / Utility.hypo(dxds, dyds)
             ns = dsdt # s normalized from 0 to 1 for this specific spline
+            if ns > 1:
+                return ns - 1 # no points on this spline segment
 
         while ns < 1:
             x,y = SplineCurves.getSplinePoint(ns, P1, P2, P3, P4)
