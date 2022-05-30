@@ -246,7 +246,7 @@ class Path:
                 self.interpolatePoints()
                 self.pathIndex = -1 # now that it's deleted, the mouse is not hovering over any path
 
-        if not anyHovered:
+        if not anyHovered and not slider.mouseHovering():
             if m.pressedR and not m.pressedC and not m.simulating:
                 self.addPose(m.zx, m.zy)
             if m.pressed:

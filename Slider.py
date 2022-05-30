@@ -47,7 +47,7 @@ class Slider:
 
     def handleMouse(self):
 
-        if m.pressed and self.mouseHovering:
+        if m.pressed and self.mouseHovering():
             m.draggingSlider = True
 
         if not m.pressing:
@@ -57,7 +57,6 @@ class Slider:
             m.playingSimulation = False
             x = min(self.rightX, max(self.leftX, m.x)) - self.leftX
             self.pointIndex = round(self.high * x / SLIDER_WIDTH)
-            print(x, self.pointIndex)
             self.updateXFromIndex()
         
     def draw(self, screen):
