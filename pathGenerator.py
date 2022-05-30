@@ -33,7 +33,9 @@ while True:
     
     anyPoseHovered = path.handleMouse(m)    
 
-    if m.poseDragged is not None or m.scrolling:
+    if m.simulating:
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_WAIT)
+    elif m.poseDragged is not None or m.scrolling:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEALL)
     elif anyPoseHovered:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -44,12 +46,13 @@ while True:
     screen.blit(fieldSurface, (m.panX,m.panY)) # draw field
     path.drawPaths(screen, m)
     path.drawPoints(screen, m)
+    path.drawRobot(screen, m)
     
     p = m.poseSelectHeading # Draw guide line for heading
     if p is not None and p.theta is not None: 
         Utility.drawThinLine(screen, Utility.PURPLE, *m.inchToPixel(p.x, p.y), m.x, m.y)
 
-    if not anyPoseHovered and not m.scrolling: # Draw hovering pose if nothing selected and not scrolling field
+    if not anyPoseHovered and not m.scrolling and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(1.25), 100)
     
     pygame.display.update()

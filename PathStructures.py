@@ -1,6 +1,6 @@
 from enum import Enum
 import Utility, math
-import SplineCurves
+import SplineCurves, Robot
 
 class Pose:
 
@@ -68,6 +68,8 @@ class Path:
         self.poses = []
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
         self.points = []
+
+        self.robot = Robot.Robot(50, 30)
 
         self.segmentDistance = segmentDistance
 
@@ -144,10 +146,11 @@ class Path:
                     anyHovered = True
                     pose.hovered = True
 
-                    if m.pressedR:
+                    if m.pressedR and not m.simulating:
                         pose.isBreak = not pose.isBreak
+                        self.interpolatePoints()
 
-                    if m.keyX and not m.keyC:
+                    if not m.simulating and m.keyX and not m.keyC:
                         self.deletePose(pose)
                         self.interpolatePoints()
                     elif m.pressed and m.poseDragged is None:
@@ -164,7 +167,7 @@ class Path:
 
     def handleToggleCurve(self, m):
 
-        if m.keyC:                
+        if m.keyC and not m.simulating:                
 
             if self.pathIndex != -1:
                 if m.lastToggledEdge != self.pathIndex: # Toggle path if it hasn't just been toggled
@@ -178,6 +181,17 @@ class Path:
                 
     
     def handleMouse(self, m):
+
+        # Handle start simulation
+        if m.pressedSpace:
+            if m.simulating:
+                m.simulating = False
+            elif len(self.points) > 0:
+                m.simulating = True
+                m.poseDragged = None
+                m.poseSelectHeading = None
+                print(len(self.points))
+                self.robot.startSimulation(self.points)
 
         # Handle scrolling the field
         if not m.pressing:
@@ -193,12 +207,13 @@ class Path:
         # Update dragging and handle toggling showCoords
         if m.poseDragged is not None:
             
-            if m.pressing: 
+            if m.pressing and not m.simulating: 
                 if m.startDragX != m.x or m.startDragY != m.y: # make sure mouse actually has moved
                     m.poseDragged.x = m.zx
                     m.poseDragged.y = m.zy
                     self.interpolatePoints()
-            else:
+
+            if not m.pressing:
                 if m.released and m.startDragX == m.x and m.startDragY == m.y:
                     m.poseDragged.showCoords = not m.poseDragged.showCoords
                     
@@ -212,7 +227,7 @@ class Path:
 
         if self.pathIndex != -1:
         
-            if not anyHovered and m.keyX and not m.keyC: # Delete node closest to mouse if edge hovered and pressed X
+            if not m.simulating and not anyHovered and m.keyX and not m.keyC: # Delete node closest to mouse if edge hovered and pressed X
                 print(self.pathIndex,len(self.poses))
                 p1 = self.poses[self.pathIndex]
                 p2 = self.poses[self.pathIndex + 1]
@@ -224,9 +239,9 @@ class Path:
                 self.pathIndex = -1 # now that it's deleted, the mouse is not hovering over any path
 
         if not anyHovered:
-            if m.pressedR and not m.pressedC:
+            if m.pressedR and not m.pressedC and not m.simulating:
                 self.addPose(m.zx, m.zy)
-            elif m.pressed:
+            if m.pressed:
                 m.scrolling = True
 
         return anyHovered
@@ -390,3 +405,8 @@ class Path:
         
         for p in self.points:
             Utility.drawCircle(screen, p.px, p.py, p.color, POINT_SIZE * m.getPartialZoom(1.5))
+
+    def drawRobot(self, screen, m):
+
+        if m.simulating:
+            m.simulating = self.robot.simulationTick(screen)

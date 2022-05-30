@@ -96,6 +96,11 @@ def drawTriangle(screen, color,  x1, y1, x2, y2, x3, y3):
     pygame.gfxdraw.aatrigon(screen, x1, y1, x2, y2, x3, y3, color)
     pygame.gfxdraw.filled_trigon(screen, x1, y1, x2, y2, x3, y3, color)
 
+def drawPolygon(screen, color, points, width = 1):
+    pygame.gfxdraw.aapolygon(screen, points, color)
+    if width > 1:
+        pygame.draw.polygon(screen, color, points, width = width)
+
 def drawLine(screen, color, x1, y1, x2, y2, thickness):
 
     from math import cos, sin

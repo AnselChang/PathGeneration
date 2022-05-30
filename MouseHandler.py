@@ -29,10 +29,13 @@ class Mouse:
         self.poseSelectHeading = None
         
         self.scrolling = False
+        self.simulating = False
         
         self.keyX = False
         self.keyC = False
         self.keyZ = False
+        self.pressedSpace = False
+        self.keySpace = False
         self.pressedC = False
 
         self.startDragX = -1
@@ -98,6 +101,9 @@ class Mouse:
         self.pressedC = self.getKey(pygame.K_c) and not self.keyC
         self.keyC = self.getKey(pygame.K_c)
         self.keyZ = self.getKey(pygame.K_z)
+        self.pressedSpace = self.getKey(pygame.K_SPACE) and not self.keySpace
+        self.keySpace = self.getKey(pygame.K_SPACE)
+        
 
 
         
