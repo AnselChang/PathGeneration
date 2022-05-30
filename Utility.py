@@ -135,4 +135,8 @@ def drawLine(screen, color, x1, y1, x2, y2, thickness = 1):
     pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
     pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
 
-
+# Round the edges of the thick line
+def drawRoundedLine(screen, color, x1, y1, x2, y2, thickness):
+    drawLine(screen, color, x1, y1, x2, y2, thickness)
+    drawCircle(screen, x1, y1, color, thickness/2)
+    drawCircle(screen, x2, y2, color, thickness/2)

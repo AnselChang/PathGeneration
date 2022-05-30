@@ -1,5 +1,5 @@
 import sys, pygame
-import MouseHandler, PathStructures, Utility
+import MouseHandler, PathStructures, Utility, Slider
 
 screen = pygame.display.set_mode(Utility.SCREEN_DIMS)
 pygame.display.set_caption("Path Generation by Ansel")
@@ -10,6 +10,9 @@ fieldSurface = pygame.transform.smoothscale(rawFieldSurface, Utility.SCREEN_DIMS
 
 path = PathStructures.Path(5)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
+
+Slider.init(m)
+slider = Slider.Slider()
 
 while True:
 
@@ -32,9 +35,9 @@ while True:
         fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
     
     anyPoseHovered = path.handleMouse(m)    
-
+        
     if m.simulating:
-        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_WAIT)
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if slider.mouseHovering() else pygame.SYSTEM_CURSOR_WAIT)
     elif m.poseDragged is not None or m.scrolling:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEALL)
     elif anyPoseHovered:
@@ -54,6 +57,8 @@ while True:
 
     if not anyPoseHovered and not m.scrolling and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(0.75), 100)
+
+    slider.draw(screen)
     
     pygame.display.update()
 
