@@ -1,8 +1,6 @@
 import math, Utility, random
 
 STEP_TIME = 0.02 # 20 millisecond cycle time
-K_P_TRANS = 30
-K_P_ROT = 1
 STOP_DISTANCE_THRESHOLD = 1 # In inches, pathfinding algo terminates when distance to destination dips below threshold
 POSITION_NOISE = 0.1 # position noise in inches that cna be generated at each timestep. triangular distribution with [-POSITION_NOISE, POSITION_NOISE]
 
@@ -22,6 +20,24 @@ class SimulationPoint:
         self.theta = theta
 
         self.__dict__.update(kwargs) # handy way to store any keyword arguments as instance variables
+
+class PID:
+    def __init__(self, KP, KI, KD):
+        self.KP = KP
+        self.KI = KI
+        self.KD = KD
+
+        self.prevError = 0
+        self.prevIntegral = 0
+        
+    def tick(self, error):
+
+        integral = self.prevIntegral + error * STEP_TIME
+        derivative = (error - self.prevError) / STEP_TIME
+        self.prevError = error
+        self.prevIntegral = integral
+
+        return self.KP * error + self.KI * integral + self.KD * derivative
 
 # Abstract
 class GenericRobot:
@@ -136,6 +152,10 @@ class PurePursuitRobot(GenericRobot):
         x = points[0].x + 10 * random.triangular(-POSITION_NOISE, POSITION_NOISE)
         y = points[0].y + 10 * random.triangular(-POSITION_NOISE, POSITION_NOISE)
         theta = points[0].theta
+
+        pidX = PID(30, 0, 5)
+        pidY = PID(30, 0, 5)
+        pidRot = PID(1, 0, 0)
         
         xvel = 0 # velocities in inches/second
         yvel = 0
@@ -156,8 +176,8 @@ class PurePursuitRobot(GenericRobot):
                 li += 1
 
              # Calculate target velocities
-            targetXVel = (points[li].x - x) * K_P_TRANS
-            targetYVel = (points[li].y - y) * K_P_TRANS
+            targetXVel = pidX.tick(points[li].x - x)
+            targetYVel = pidY.tick(points[li].y - y)
 
             # Constrain maximum robot speed
             mag = Utility.hypo(targetXVel, targetYVel)
@@ -169,7 +189,7 @@ class PurePursuitRobot(GenericRobot):
             dtheta = (points[li].theta - theta) % (2*math.pi)
             if dtheta > math.pi:
                 dtheta -= 2*math.pi
-            targetTVel = dtheta * K_P_ROT
+            targetTVel = pidRot.tick(dtheta)
 
             # I'd constrain individual wheel accelerations here but I don't know mecanum kinematics yet
 
