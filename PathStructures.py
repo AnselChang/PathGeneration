@@ -62,7 +62,7 @@ class Path:
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
         self.points = []
 
-        self.robot = Robot.PurePursuitRobot(50, 30, 10, 30, 10)
+        self.robot = Robot.PurePursuitRobot(50, 30, 40)
 
         self.segmentDistance = segmentDistance
 
@@ -270,7 +270,7 @@ class Path:
             
             self.poses.append(Pose(px, py, -math.pi/2 if len(self.poses) == 0 else None)) # only the first pose has a predefined position (pointing up)
             if len(self.poses) >= 2: # no path created if it's only one node
-                self.paths.append(PathType.LINEAR if len(self.paths) == 0 else self.paths[-1])
+                self.paths.append(PathType.CURVE if len(self.paths) == 0 else self.paths[-1])
                 
         else: # insert between two poses
         

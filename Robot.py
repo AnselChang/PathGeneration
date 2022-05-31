@@ -6,6 +6,10 @@ K_P_ROT = 1
 STOP_DISTANCE_THRESHOLD = 1 # In inches, pathfinding algo terminates when distance to destination dips below threshold
 POSITION_NOISE = 0.1 # position noise in inches that cna be generated at each timestep. triangular distribution with [-POSITION_NOISE, POSITION_NOISE]
 
+MAX_TRANS_ACCEL = 40 # in/s^2
+MAX_ROT_ACCEL = 20 # deg/s^2
+MAX_SPEED = 60 # in/s
+
 # A point at some timestep in the simulation, generated numerically from some pathfinding algorithm, which can differ slightly from the theoretical trajectory
 class SimulationPoint:
     def __init__(self, x, y, theta, **kwargs):
@@ -60,6 +64,10 @@ class GenericRobot:
         Utility.drawLine(screen, Utility.BLACK, cx, cy, tx, ty, 4  * s)
         Utility.drawPolarTriangle(screen, Utility.BLACK, tx, ty, theta, 7 * s, 1, math.pi / 2)
 
+        # Draw timestamp
+        Utility.drawText(screen, Utility.getFont(30), "Current: {}s".format(round(pointIndex * STEP_TIME, 2)), Utility.BLACK, 30, 60, 0)
+        Utility.drawText(screen, Utility.getFont(30), "Total: {}s".format(round(len(self.simulation) * STEP_TIME, 2)), Utility.BLACK, 30, 90, 0)
+
         return True
 
 class IdealRobot(GenericRobot):
@@ -76,11 +84,9 @@ class PurePursuitRobot(GenericRobot):
 
     # lookahead in inches
     # acceleration limits in inches/seconds^2
-    def __init__(self, width, height, lookahead, maxTransAccel, maxRotAccel):
+    def __init__(self, width, height, lookahead):
         super().__init__(width, height)
         self.lookahead = lookahead
-        self.maxTransAccel = maxTransAccel
-        self.maxRotAccel = maxRotAccel
 
     # Find closest point to (x,y) in points, from index range [start, end)
     # Returns index of closest point in points lis
@@ -120,13 +126,13 @@ class PurePursuitRobot(GenericRobot):
         li = 0 # lookahead index
         ci = 0 # closest index
 
-        while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) < STOP_DISTANCE_THRESHOLD:
+        while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) > STOP_DISTANCE_THRESHOLD:
 
             if timestep > MAX_TIMESTEPS:
                 break
 
             # Find closest waypoint within 5 points of the current waypoint
-            ci = self.findClosestPoint(points, x, y, ci - 5, ci + 5)
+            ci = self.findClosestPoint(points, x, y, ci - 5, ci + 15)
         
             # Update lookahead distance
             while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookahead:
@@ -136,6 +142,13 @@ class PurePursuitRobot(GenericRobot):
             targetXVel = (points[li].x - x) * K_P_TRANS
             targetYVel = (points[li].y - y) * K_P_TRANS
 
+            # Constrain maximum robot speed
+            mag = Utility.hypo(targetXVel, targetYVel)
+            scalar = min(1, MAX_SPEED / mag)
+            targetXVel *= scalar
+            targetYVel *= scalar
+            
+
             dtheta = (points[li].theta - theta) % (2*math.pi)
             if dtheta > math.pi:
                 dtheta -= math.pi
@@ -144,9 +157,9 @@ class PurePursuitRobot(GenericRobot):
             # I'd constrain individual wheel accelerations here but I don't know mecanum kinematics yet
 
             # Update velocities given target velocities, with acceleration limits in mind
-            xvel += Utility.clamp(targetXVel - xvel, -self.maxTransAccel, self.maxTransAccel)
-            yvel += Utility.clamp(targetYVel - yvel, -self.maxTransAccel, self.maxTransAccel)
-            tvel += Utility.clamp(targetTVel - tvel, -self.maxRotAccel, self.maxRotAccel)
+            xvel += Utility.clamp(targetXVel - xvel, -MAX_TRANS_ACCEL, MAX_TRANS_ACCEL)
+            yvel += Utility.clamp(targetYVel - yvel, -MAX_TRANS_ACCEL, MAX_TRANS_ACCEL)
+            tvel += Utility.clamp(targetTVel - tvel, -MAX_ROT_ACCEL, MAX_ROT_ACCEL)
 
             # d = r * t
             x += xvel * STEP_TIME + random.triangular(-POSITION_NOISE, POSITION_NOISE) # add positional noise to simulation for realism 

@@ -70,7 +70,7 @@ while True:
     
     pygame.display.update()
 
-    clock.tick(20) # limit to a 50 fps, or 20 ms per loop iteration
+    clock.tick(50) # limit to a 50 fps, or 20 ms per loop iteration
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
