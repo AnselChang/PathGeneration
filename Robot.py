@@ -46,7 +46,9 @@ class GenericRobot:
         self.width = width
         self.length = length
         self.simulation = None
+        self.error = -1
 
+    # should return simulation list and error
     def computeSimulation(self, points):
         raise NotImplementedError("Must implement this function")
 
@@ -61,7 +63,7 @@ class GenericRobot:
                 angle -= 2*math.pi
             points[i].curve = abs(angle)
 
-        self.simulation = self.computeSimulation(points)
+        self.simulation, self.error = self.computeSimulation(points)
         return len(self.simulation)
 
     # return if animation is still going
@@ -99,8 +101,9 @@ class GenericRobot:
         Utility.drawPolarTriangle(screen, Utility.BLACK, tx, ty, theta, 7 * s, 1, math.pi / 2)
 
         # Draw timestamp
-        Utility.drawText(screen, Utility.getFont(30), "Current: {}s".format(round(pointIndex * STEP_TIME, 2)), Utility.BLACK, 30, 60, 0)
-        Utility.drawText(screen, Utility.getFont(30), "Total: {}s".format(round(len(self.simulation) * STEP_TIME, 2)), Utility.BLACK, 30, 90, 0)
+        Utility.drawText(screen, Utility.getFont(30), "Avg. error: {}\"".format(round(self.error, 2)), Utility.BLACK, 30, 60, 0)
+        Utility.drawText(screen, Utility.getFont(30), "Current: {}s".format(round(pointIndex * STEP_TIME, 2)), Utility.BLACK, 30, 90, 0)
+        Utility.drawText(screen, Utility.getFont(30), "Total: {}s".format(round(len(self.simulation) * STEP_TIME, 2)), Utility.BLACK, 30, 120, 0)
 
         return True
 
@@ -111,7 +114,7 @@ class IdealRobot(GenericRobot):
 
     # With an ideal robot, the robot's actual position in each timestep is what it is supposed to be
     def computeSimulation(self, points):
-        return [SimulationPoint(p.x, p.y, p.theta) for p in points]
+        return ([SimulationPoint(p.x, p.y, p.theta) for p in points], 0)
 
 class PurePursuitRobot(GenericRobot):
 
@@ -163,6 +166,8 @@ class PurePursuitRobot(GenericRobot):
         li = 0 # lookahead index
         ci = 0 # closest index
 
+        errorSum = 0
+
         while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) > STOP_DISTANCE_THRESHOLD or abs(xvel) > 5 or abs(yvel) > 5 or abs(tvel) > 5:
 
             if timestep > MAX_TIMESTEPS:
@@ -204,11 +209,15 @@ class PurePursuitRobot(GenericRobot):
             theta += tvel * STEP_TIME
 
             # Add timestep to simulation
-            simulation.append(SimulationPoint(x, y, theta,
-                                              xvel = xvel, yvel = yvel, tvel = tvel, cx = points[ci].x, cy = points[ci].y, lx = points[li].x, ly = points[li].y, curve = points[li].curve))
+            error = Utility.distance(x, y, points[ci].x, points[ci].y)
+            errorSum += error
+            sp = SimulationPoint(x, y, theta, xvel = xvel, yvel = yvel, tvel = tvel,
+                                 cx = points[ci].x, cy = points[ci].y, lx = points[li].x, ly = points[li].y, curve = points[li].curve,
+                                 error = error)
+            simulation.append(sp)
             timestep += 1
 
-        return simulation
+        return [simulation, 0 if len(simulation) == 0 else (errorSum / len(simulation))]
 
     
     # Override generic simulationTick by drawing stats and lookahead line
@@ -227,6 +236,7 @@ class PurePursuitRobot(GenericRobot):
         Utility.drawText(screen, Utility.getFont(20), "tvel: {} deg/sec".format(round(p.tvel * 180 / math.pi, 2)), Utility.BLACK, 330, 80, 0)
 
         Utility.drawText(screen, Utility.getFont(20), "Curve: {}".format(round(p.curve, 3)), Utility.BLACK, 200, 95, 0)
+        Utility.drawText(screen, Utility.getFont(20), "Error: {}\"".format(round(p.error, 3)), Utility.BLACK, 330, 95, 0)
 
         # Draw lookahead line
 
