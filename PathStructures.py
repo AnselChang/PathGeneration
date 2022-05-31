@@ -235,14 +235,20 @@ class Path:
         if self.pathIndex != -1:
         
             if not m.simulating and not anyHovered and m.keyX and not m.keyC: # Delete node closest to mouse if edge hovered and pressed X
-                print(self.pathIndex,len(self.poses))
-                p1 = self.poses[self.pathIndex]
-                p2 = self.poses[self.pathIndex + 1]
-                distTo1 = Utility.distance(m.zx, m.zy, p1.x, p1.y)
-                distTo2 = Utility.distance(m.zx, m.zy, p2.x, p2.y)
-                index = self.pathIndex if distTo1 < distTo2 else self.pathIndex + 1
-                self.deletePose(index)
-                self.interpolatePoints()
+
+                if len(self.poses) == 2: # delete everything if only 2 poses and deleting the edge between them
+                    self.poses = []
+                    self.paths = []
+                    self.points = []
+                else:
+                    print(self.pathIndex,len(self.poses))
+                    p1 = self.poses[self.pathIndex]
+                    p2 = self.poses[self.pathIndex + 1]
+                    distTo1 = Utility.distance(m.zx, m.zy, p1.x, p1.y)
+                    distTo2 = Utility.distance(m.zx, m.zy, p2.x, p2.y)
+                    index = self.pathIndex if distTo1 < distTo2 else self.pathIndex + 1
+                    self.deletePose(index)
+                    self.interpolatePoints()
                 self.pathIndex = -1 # now that it's deleted, the mouse is not hovering over any path
 
         if not anyHovered and not slider.mouseHovering():
