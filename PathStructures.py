@@ -16,7 +16,7 @@ class Pose:
         self.isBreak = False # a break pose is a stopping pose where poses on one side of this pose don't affect the other
 
     def touching(self, m):
-        return Utility.distance(self.x, self.y, m.zx, m.zy) <= (Pose.RADIUS + 5)
+        return Utility.distance(self.x, self.y, m.zx, m.zy) <= (Pose.RADIUS - 1)
 
     def draw(self, screen, m, forceOrange = False):
 
@@ -62,7 +62,7 @@ class Path:
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
         self.points = []
 
-        self.robot = Robot.PurePursuitRobot(50, 30, 40)
+        self.robot = Robot.PurePursuitRobot(50, 30, 6)
 
         self.segmentDistance = segmentDistance
 
@@ -103,7 +103,7 @@ class Path:
             x2 = self.poses[i].x
             y2 = self.poses[i].y
             
-            if Utility.pointTouchingLine(x, y, x1, y1, x2, y2, 15):
+            if Utility.pointTouchingLine(x, y, x1, y1, x2, y2, 3):
                 return i - 1
 
             x1 = x2
@@ -288,7 +288,7 @@ class Path:
         
         for i in range(1, len(self.poses)):
             color = Utility.LINEDARKGREY if (self.pathIndex == i-1) else Utility.LINEGREY
-            Utility.drawLine(screen, color, *m.inchToPixel(self.poses[i-1].x, self.poses[i-1].y), *m.inchToPixel(self.poses[i].x, self.poses[i].y), 2 *  m.getPartialZoom(0.75))
+            Utility.drawLine(screen, color, *m.inchToPixel(self.poses[i-1].x, self.poses[i-1].y), *m.inchToPixel(self.poses[i].x, self.poses[i].y), 3 *  m.getPartialZoom(0.75))
 
         first = True
         for pose in self.poses:

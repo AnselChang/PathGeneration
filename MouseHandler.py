@@ -49,16 +49,40 @@ class Mouse:
 
         self.lastToggledEdge = -1
 
-
+    # 19 785
     def pixelToInch(self, x, y):
         x -= self.panX
         y -= self.panY
-        return [x / self.zoom, y / self.zoom]
+        x /= self.zoom
+        y /= self.zoom
+
+        # x and y are now the pixels of the field. The field begins at 19 with a width of 766
+        x -= 19
+        y -= 19
+        x /= 766
+        y /= 766
+
+        # x and y are now between 0 and 1. Field has 144 inches
+        x *= 144
+        y *= 144
+        
+        return [x, y]
 
     def inchToPixel(self, x, y):
+
+        x /= 144
+        y /= 144
+
+        x *= 766
+        y *= 766
+        x += 19
+        y += 19
+        
         x *= self.zoom
         y *= self.zoom
-        return [x + self.panX, y + self.panY]
+        x += self.panX
+        y += self.panY
+        return [x, y]
 
     def getKey(self, k):
         return self.allKeys[k]

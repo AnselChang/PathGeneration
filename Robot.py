@@ -6,9 +6,13 @@ K_P_ROT = 1
 STOP_DISTANCE_THRESHOLD = 1 # In inches, pathfinding algo terminates when distance to destination dips below threshold
 POSITION_NOISE = 0.1 # position noise in inches that cna be generated at each timestep. triangular distribution with [-POSITION_NOISE, POSITION_NOISE]
 
-MAX_TRANS_ACCEL = 40 # in/s^2
-MAX_ROT_ACCEL = 20 # deg/s^2
+MAX_TRANS_ACCEL= 120 # in/s^2
+MAX_ROT_ACCEL = 100 # deg/s^2
 MAX_SPEED = 60 # in/s
+
+# convert to accel per timestep, which is 20 msec
+MAX_TRANS_ACCEL *= 0.02
+MAX_ROT_ACCEL *= 0.02
 
 # A point at some timestep in the simulation, generated numerically from some pathfinding algorithm, which can differ slightly from the theoretical trajectory
 class SimulationPoint:
@@ -110,7 +114,7 @@ class PurePursuitRobot(GenericRobot):
     # starting x, y, theta
     def startSimulation(self, points):
 
-        MAX_TIMESTEPS = 1000
+        MAX_TIMESTEPS = 50000
         timestep = 0
 
         self.simulation = []
@@ -132,7 +136,7 @@ class PurePursuitRobot(GenericRobot):
                 break
 
             # Find closest waypoint within 5 points of the current waypoint
-            ci = self.findClosestPoint(points, x, y, ci - 5, ci + 15)
+            ci = self.findClosestPoint(points, x, y, ci, ci + 30)
         
             # Update lookahead distance
             while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookahead:
@@ -148,20 +152,20 @@ class PurePursuitRobot(GenericRobot):
             targetXVel *= scalar
             targetYVel *= scalar
             
-
+            # Calculate heading delta (turn the fastest way)
             dtheta = (points[li].theta - theta) % (2*math.pi)
             if dtheta > math.pi:
-                dtheta -= math.pi
+                dtheta -= 2*math.pi
             targetTVel = dtheta * K_P_ROT
 
             # I'd constrain individual wheel accelerations here but I don't know mecanum kinematics yet
 
-            # Update velocities given target velocities, with acceleration limits in mind
+            # Update velocities given target velocities, and constrain with acceleration limits
             xvel += Utility.clamp(targetXVel - xvel, -MAX_TRANS_ACCEL, MAX_TRANS_ACCEL)
             yvel += Utility.clamp(targetYVel - yvel, -MAX_TRANS_ACCEL, MAX_TRANS_ACCEL)
             tvel += Utility.clamp(targetTVel - tvel, -MAX_ROT_ACCEL, MAX_ROT_ACCEL)
 
-            # d = r * t
+            # Update distance from actual velocity
             x += xvel * STEP_TIME + random.triangular(-POSITION_NOISE, POSITION_NOISE) # add positional noise to simulation for realism 
             y += yvel * STEP_TIME + random.triangular(-POSITION_NOISE, POSITION_NOISE)
             theta += tvel * STEP_TIME
