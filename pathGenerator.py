@@ -8,7 +8,7 @@ rawFieldSurface = pygame.image.load("Images/squarefield.png")
 IMAGE_SIZE = 812
 fieldSurface = pygame.transform.smoothscale(rawFieldSurface, (Utility.SCREEN_SIZE, Utility.SCREEN_SIZE))
 
-path = PathStructures.Path(1)
+path = PathStructures.Path(0.5)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 
 Slider.init(m)
