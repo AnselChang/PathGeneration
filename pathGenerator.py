@@ -1,5 +1,5 @@
 import sys, pygame
-import MouseHandler, PathStructures, Utility, Slider
+import MouseHandler, PathStructuresBezier, Utility, Slider
 
 screen = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
 pygame.display.set_caption("Path Generation by Ansel")
@@ -8,7 +8,8 @@ rawFieldSurface = pygame.image.load("Images/squarefield.png")
 IMAGE_SIZE = 812
 fieldSurface = pygame.transform.smoothscale(rawFieldSurface, (Utility.SCREEN_SIZE, Utility.SCREEN_SIZE))
 
-path = PathStructures.Path(0.5)
+path = PathStructuresBezier.Path(1)
+# path = PathStructures.Path(0.5)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 
 Slider.init(m)
@@ -46,7 +47,7 @@ while True:
         
     if m.simulating:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND if slider.mouseHovering() else pygame.SYSTEM_CURSOR_WAIT)
-    elif m.poseDragged is not None or m.scrolling:
+    elif m.poseDragged is not None or m.panning:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEALL)
     elif anyPoseHovered:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -64,8 +65,8 @@ while True:
     if p is not None and p.theta is not None: 
         Utility.drawThinLine(screen, Utility.PURPLE, *m.inchToPixel(p.x, p.y), m.x, m.y)
 
-    if not anyPoseHovered and not m.scrolling and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
-        Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(0.75), 100)
+    if not anyPoseHovered and not m.panning and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
+        Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructuresBezier.Pose.RADIUS * m.getPartialZoom(0.75), 100)
 
 
     # Draw panel things
