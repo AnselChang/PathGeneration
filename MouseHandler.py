@@ -28,7 +28,7 @@ class Mouse:
         self.poseDragged  = None
         self.poseSelectHeading = None
         
-        self.panning = False
+        self.scrolling = False
         self.simulating = False
         self.playingSimulation = False
         self.draggingSlider = False
