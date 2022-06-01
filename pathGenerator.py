@@ -12,7 +12,7 @@ path = PathStructures.Path(1)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
 
 Slider.init(m)
-slider = Slider.Slider()
+slider = Slider.Slider(830, 1070, 730)
 
 clock = pygame.time.Clock()
 
@@ -37,6 +37,9 @@ while True:
         fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
 
     slider.handleMouse()
+    if slider.draggingSlider:
+        m.playingSimulation = False
+
     anyPoseHovered = path.handleMouse(m, slider)    
         
     if m.simulating:
@@ -53,7 +56,7 @@ while True:
     if not m.simulating:
         path.drawPaths(screen, m)
     path.drawPoints(screen, m)
-    path.drawRobot(screen, m, slider.pointIndex)
+    path.drawRobot(screen, m, slider.value)
     
     p = m.poseSelectHeading # Draw guide line for heading
     if p is not None and p.theta is not None: 
@@ -62,13 +65,15 @@ while True:
     if not anyPoseHovered and not m.scrolling and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(0.75), 100)
 
-    slider.draw(screen)
-
 
     # Draw panel things
+
+    # Draw panel background
     border = 5
     pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
     pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
+
+    slider.draw(screen)
 
     # Draw fps counter
     Utility.drawText(screen, Utility.getFont(30), "FPS: {}".format(round(clock.get_fps())), Utility.BLACK, 1000, 760, 0)
@@ -76,7 +81,7 @@ while True:
     
     pygame.display.update()
 
-    slider.incrementPossibly(m)
+    path.handlePlayback(m, slider)
     clock.tick(50) # limit to a 50 fps, or 20 ms per loop iteration
 
     for event in pygame.event.get():

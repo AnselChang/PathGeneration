@@ -134,7 +134,7 @@ class Path:
 
         anyHovered = False
         
-        if m.poseDragged is None and m.poseSelectHeading is None:
+        if m.x < Utility.SCREEN_SIZE and m.poseDragged is None and m.poseSelectHeading is None:
             for pose in self.poses:
                 if pose.touching(m):
                     anyHovered = True
@@ -180,7 +180,7 @@ class Path:
         if m.pressedSpace and len(self.points) > 0:
             
             if m.simulating: # Toggle playback
-                if slider.pointIndex == slider.high:
+                if slider.value == slider.high:
                     slider.reset()
                     m.playingSimulation = True
                 else:
@@ -191,11 +191,20 @@ class Path:
                 m.playingSimulation = False
                 m.poseDragged = None
                 m.poseSelectHeading = None
-                slider.setRange(self.robot.startSimulation(self.points))
+                slider.high = self.robot.startSimulation(self.points) - 1
 
         # Handle stop simulation
         if m.getKey(pygame.K_ESCAPE):
             m.simulating = False
+
+    def handlePlayback(self, m, slider):
+
+        if m.simulating and m.playingSimulation:
+            if slider.value == slider.high:
+                m.playingSimulation = False
+            else:
+                slider.value += 1
+                slider.updateXFromIndex()
     
     def handleMouse(self, m, slider):
 
@@ -217,7 +226,7 @@ class Path:
             
             if m.pressing and not m.simulating: 
                 if m.startDragX != m.x or m.startDragY != m.y: # make sure mouse actually has moved
-                    m.poseDragged.x = m.zx
+                    m.poseDragged.x = min(m.pixelToInch(Utility.SCREEN_SIZE, 0)[0], m.zx)
                     m.poseDragged.y = m.zy
                     self.interpolatePoints()
 
@@ -252,7 +261,7 @@ class Path:
                     self.interpolatePoints()
                 self.pathIndex = -1 # now that it's deleted, the mouse is not hovering over any path
 
-        if not anyHovered and not slider.mouseHovering():
+        if not anyHovered and m.x < Utility.SCREEN_SIZE:
             if m.pressedR and not m.pressedC and not m.simulating:
                 self.addPose(m.zx, m.zy)
             if m.pressed:
@@ -415,7 +424,7 @@ class Path:
 
         for p in self.points:
             p.px, p.py = m.inchToPixel(p.x, p.y)
-            Utility.drawLine(screen, Utility.PURPLE, p.px, p.py, *Utility.vector(p.px, p.py, p.theta, TANGENT_LENGTH *  m.getPartialZoom(0.75)),  m.getPartialZoom(0.75))
+            Utility.drawLine(screen, Utility.PURPLE, p.px, p.py, *Utility.vector(p.px, p.py, p.theta, TANGENT_LENGTH *  m.getPartialZoom(0.5)),  m.getPartialZoom(0.75))
         
         for p in self.points:
             Utility.drawCircle(screen, p.px, p.py, p.color, POINT_SIZE * m.getPartialZoom(0.75))
@@ -428,3 +437,4 @@ class Path:
     def drawPanel(self, screen, m):
         if m.simulating:
             self.robot.drawPanel(screen)
+        

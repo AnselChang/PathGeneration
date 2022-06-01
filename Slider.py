@@ -1,8 +1,5 @@
 import Utility
 
-SLIDER_WIDTH = 250
-SLIDER_MARGIN = 60
-
 m = None
 
 def init(M):
@@ -11,16 +8,18 @@ def init(M):
 
 class Slider:
 
-    def __init__(self):
-        self.rightX = Utility.SCREEN_SIZE - SLIDER_MARGIN
-        self.leftX = self.rightX - SLIDER_WIDTH
+    def __init__(self, x1, x2, y, low = 0, high = 100):
+        self.y = y
+        self.leftX = x1
+        self.rightX = x2
+        self.width = x2 - x1
         self.x = self.leftX
-        self.y = self.rightX
-        self.high = 1
-        self.pointIndex = 0
 
-    def setRange(self, simulationLength):
-        self.high = simulationLength - 1
+        self.low = low
+        self.high = high
+        self.value = 0
+        self.draggingSlider = False
+
 
     def mouseHovering(self):
         # Only hovering when slider is actually shown (in simulation)
@@ -30,33 +29,23 @@ class Slider:
         return m.x >= self.leftX - 5 and m.x <= self.rightX + 5 and abs(m.y - self.y) < 10
 
     def updateXFromIndex(self):
-        self.x = self.leftX + (self.pointIndex / self.high) * SLIDER_WIDTH
-
-    def incrementPossibly(self, m):
-
-        if m.simulating and m.playingSimulation:
-            if self.pointIndex == self.high:
-                m.playingSimulation = False
-            else:
-                self.pointIndex += 1
-                self.updateXFromIndex()
+        self.x = self.leftX + ((self.value - self.low) / (self.high - self.low)) * (self.width)
 
     def reset(self):
-        self.pointIndex = 0
+        self.value = 0
         self.updateXFromIndex()
 
     def handleMouse(self):
 
         if m.pressed and self.mouseHovering():
-            m.draggingSlider = True
+            self.draggingSlider = True
 
         if not m.pressing:
-            m.draggingSlider = False
+            self.draggingSlider = False
 
-        if m.draggingSlider:
-            m.playingSimulation = False
+        if self.draggingSlider:
             x = min(self.rightX, max(self.leftX, m.x)) - self.leftX
-            self.pointIndex = round(self.high * x / SLIDER_WIDTH)
+            self.value = self.low + round((self.high - self.low) * x / self.width)
             self.updateXFromIndex()
         
     def draw(self, screen):
@@ -66,8 +55,7 @@ class Slider:
             return
         
         # Draw slider line
-        corner = Utility.SCREEN_SIZE - SLIDER_MARGIN
-        Utility.drawRoundedLine(screen, Utility.BLACK, corner - SLIDER_WIDTH, corner, corner, corner, 10)
+        Utility.drawRoundedLine(screen, Utility.BLACK, self.leftX, self.y, self.rightX, self.y, 10)
 
         # Draw slider knob
         Utility.drawCircle(screen, self.x, self.y, Utility.BLACK, 10)
