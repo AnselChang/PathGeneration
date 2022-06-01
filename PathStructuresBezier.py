@@ -290,7 +290,7 @@ class Path:
             if m.pressedR and not m.pressedC and not m.simulating:
                 working_zx = m.zx
                 working_zy = m.zy
-                self.addPose(working_zx, working_zy, m.zx + 20, m.zy + 20)
+                self.addPose(working_zx, working_zy, m.zx + 10, m.zy + 10)
                 # TODO make it initialize forward_x and y from pose creation and not just editing.
             if m.pressed:
                 m.panning = True
