@@ -63,6 +63,7 @@ class Path:
         self.points = []
 
         self.robot = Robot.PurePursuitRobot(50, 30, 6)
+        #self.robot = Robot.IdealRobot(50, 30)
 
         self.segmentDistance = segmentDistance
 
@@ -423,3 +424,7 @@ class Path:
 
         if m.simulating:
             m.simulating = self.robot.simulationTick(screen, m, pointIndex)
+
+    def drawPanel(self, screen, m):
+        if m.simulating:
+            self.robot.drawPanel(screen)

@@ -3,8 +3,10 @@ import pygame, math, pygame.gfxdraw
 pygame.font.init()
 
 SCREEN_SIZE = 800
-SCREEN_DIMS = (SCREEN_SIZE, SCREEN_SIZE)
+PANEL_WIDTH = 300
 
+PANEL_GREY = (169, 169, 169)
+BORDER_GREY = (64, 64, 64)
 BLACK = (0,0,0)
 ORANGE = (255, 165, 0)
 BLUE = (0,0,230)

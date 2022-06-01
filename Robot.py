@@ -69,6 +69,8 @@ class GenericRobot:
     # return if animation is still going
     def simulationTick(self, screen, m, pointIndex):
 
+        self.pointIndex = pointIndex
+
         if pointIndex == len(self.simulation):
             return False
         
@@ -100,12 +102,14 @@ class GenericRobot:
         Utility.drawLine(screen, Utility.BLACK, cx, cy, tx, ty, 4  * s)
         Utility.drawPolarTriangle(screen, Utility.BLACK, tx, ty, theta, 7 * s, 1, math.pi / 2)
 
-        # Draw timestamp
-        Utility.drawText(screen, Utility.getFont(30), "Avg. error: {}\"".format(round(self.error, 2)), Utility.BLACK, 30, 60, 0)
-        Utility.drawText(screen, Utility.getFont(30), "Current: {}s".format(round(pointIndex * STEP_TIME, 2)), Utility.BLACK, 30, 90, 0)
-        Utility.drawText(screen, Utility.getFont(30), "Total: {}s".format(round(len(self.simulation) * STEP_TIME, 2)), Utility.BLACK, 30, 120, 0)
-
         return True
+
+    def drawPanel(self, screen):
+
+        # Draw timestamp
+        Utility.drawText(screen, Utility.getFont(30), "Avg. error: {}\"".format(round(self.error, 2)), Utility.BLACK, 865, 70, 0)
+        Utility.drawText(screen, Utility.getFont(30), "Time: {:.2f}s / {:.2f}s".format(self.pointIndex * STEP_TIME, (len(self.simulation)-1) * STEP_TIME), Utility.BLACK, 865, 100, 0)
+        
 
 class IdealRobot(GenericRobot):
 
@@ -225,18 +229,7 @@ class PurePursuitRobot(GenericRobot):
 
         ret = super().simulationTick(screen, m, pointIndex)
 
-        # Draw position and velocity stats
         p = self.simulation[pointIndex]
-        Utility.drawText(screen, Utility.getFont(30), "Pure Pursuit", Utility.BLACK, 200, 30, 0)
-        Utility.drawText(screen, Utility.getFont(20), "xpos: {} inch".format(round(p.x, 2)), Utility.BLACK, 200, 50, 0)
-        Utility.drawText(screen, Utility.getFont(20), "ypos: {} inch".format(round(p.y, 2)), Utility.BLACK, 200, 65, 0)
-        Utility.drawText(screen, Utility.getFont(20), "theta: {} deg".format(round(p.theta * 180 / math.pi, 2)), Utility.BLACK, 200, 80, 0)
-        Utility.drawText(screen, Utility.getFont(20), "xvel: {} inch/sec".format(round(p.xvel, 2)), Utility.BLACK, 330, 50, 0)
-        Utility.drawText(screen, Utility.getFont(20), "yvel: {} inch/sec".format(round(p.yvel, 2)), Utility.BLACK, 330, 65, 0)
-        Utility.drawText(screen, Utility.getFont(20), "tvel: {} deg/sec".format(round(p.tvel * 180 / math.pi, 2)), Utility.BLACK, 330, 80, 0)
-
-        Utility.drawText(screen, Utility.getFont(20), "Curve: {}".format(round(p.curve, 3)), Utility.BLACK, 200, 95, 0)
-        Utility.drawText(screen, Utility.getFont(20), "Error: {}\"".format(round(p.error, 3)), Utility.BLACK, 330, 95, 0)
 
         # Draw lookahead line
 
@@ -246,5 +239,23 @@ class PurePursuitRobot(GenericRobot):
         Utility.drawCircle(screen, lx, ly, Utility.GREEN, 2)
         
         return ret
+
+    def drawPanel(self, screen):
+
+        super().drawPanel(screen)
+
+         # Draw position and velocity stats
+        p = self.simulation[self.pointIndex]
+        Utility.drawText(screen, Utility.getFont(40), "Pure Pursuit", Utility.BLACK, 865, 30, 0)
+        Utility.drawText(screen, Utility.getFont(20), "xpos: {} inch".format(round(p.x, 2)), Utility.BLACK, 825, 150, 0)
+        Utility.drawText(screen, Utility.getFont(20), "ypos: {} inch".format(round(p.y, 2)), Utility.BLACK, 825, 165, 0)
+        Utility.drawText(screen, Utility.getFont(20), "theta: {} deg".format(round(p.theta * 180 / math.pi, 2)), Utility.BLACK, 825, 180, 0)
+        Utility.drawText(screen, Utility.getFont(20), "xvel: {} inch/sec".format(round(p.xvel, 2)), Utility.BLACK, 955, 150, 0)
+        Utility.drawText(screen, Utility.getFont(20), "yvel: {} inch/sec".format(round(p.yvel, 2)), Utility.BLACK, 955, 165, 0)
+        Utility.drawText(screen, Utility.getFont(20), "tvel: {} deg/sec".format(round(p.tvel * 180 / math.pi, 2)), Utility.BLACK, 955, 180, 0)
+
+        Utility.drawText(screen, Utility.getFont(20), "Curve: {}".format(round(p.curve, 3)), Utility.BLACK, 825, 195, 0)
+        Utility.drawText(screen, Utility.getFont(20), "Error: {}\"".format(round(p.error, 3)), Utility.BLACK, 955, 195, 0)
+        
         
     

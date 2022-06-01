@@ -1,12 +1,12 @@
 import sys, pygame
 import MouseHandler, PathStructures, Utility, Slider
 
-screen = pygame.display.set_mode(Utility.SCREEN_DIMS)
+screen = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
 pygame.display.set_caption("Path Generation by Ansel")
 
 rawFieldSurface = pygame.image.load("Images/squarefield.png")
 IMAGE_SIZE = 812
-fieldSurface = pygame.transform.smoothscale(rawFieldSurface, Utility.SCREEN_DIMS)
+fieldSurface = pygame.transform.smoothscale(rawFieldSurface, (Utility.SCREEN_SIZE, Utility.SCREEN_SIZE))
 
 path = PathStructures.Path(1)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
@@ -62,14 +62,21 @@ while True:
     if not anyPoseHovered and not m.scrolling and not m.simulating: # Draw hovering pose if nothing selected and not scrolling field
         Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructures.Pose.RADIUS * m.getPartialZoom(0.75), 100)
 
-    # Draw fps counter
-    Utility.drawText(screen, Utility.getFont(30), "FPS: {}".format(round(clock.get_fps())), Utility.BLACK, 30, 30, 0)
-
     slider.draw(screen)
-    slider.incrementPossibly(m)
+
+
+    # Draw panel things
+    border = 5
+    pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
+    pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
+
+    # Draw fps counter
+    Utility.drawText(screen, Utility.getFont(30), "FPS: {}".format(round(clock.get_fps())), Utility.BLACK, 1000, 760, 0)
+    path.drawPanel(screen, m)
     
     pygame.display.update()
 
+    slider.incrementPossibly(m)
     clock.tick(50) # limit to a 50 fps, or 20 ms per loop iteration
 
     for event in pygame.event.get():
