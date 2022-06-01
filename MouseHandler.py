@@ -27,20 +27,15 @@ class Mouse:
 
         self.poseDragged  = None
         self.poseSelectHeading = None
+        self.selectVectorNotHeading = False
         
         self.scrolling = False
         self.simulating = False
         self.playingSimulation = False
         self.draggingSlider = False
         
-        self.keyX = False
-        self.keyC = False
-        self.keyZ = False
-        self.pressedSpace = False
-        self.keySpace = False
-        self.pressedC = False
-        self.keyEnter = False
-        self.pressedEnter = False
+        self.allKeys = None
+        self.keyPressed = None
 
         self.startDragX = -1
         self.startDragY = -1
@@ -49,7 +44,6 @@ class Mouse:
         self.panX = 0
         self.panY = 0
 
-        self.lastToggledEdge = -1
 
     # 19 785
     def pixelToInch(self, x, y):
@@ -89,6 +83,9 @@ class Mouse:
     def getKey(self, k):
         return self.allKeys[k]
 
+    def getKeyPressed(self, k):
+        return k == self.keyPressed
+
     # To make objects grow slightly larger when zoom
     def getPartialZoom(self, scalar):
         return (self.zoom - 1) * scalar + 1
@@ -97,12 +94,12 @@ class Mouse:
         self.panX = max(min(0, self.panX),  (1-self.zoom)*Utility.SCREEN_SIZE)
         self.panY = max(min(0, self.panY), (1-self.zoom)*Utility.SCREEN_SIZE)
 
-    def tick(self):
+    def tick(self, keyPressed):
 
         self.allKeys = self.key.get_pressed()
+        self.keyPressed = keyPressed
 
         ctrl = self.key.get_pressed()[pygame.K_LCTRL] or self.key.get_pressed()[pygame.K_RCTRL]
-        
 
         self.prevPressed = self.pressing
         self.pressing = self.mouse.get_pressed()[0]
@@ -123,16 +120,6 @@ class Mouse:
         if ctrl:
             self.pressed = False
             self.released = False
-
-        # keyboard
-        self.keyX = self.getKey(pygame.K_x)
-        self.pressedC = self.getKey(pygame.K_c) and not self.keyC
-        self.keyC = self.getKey(pygame.K_c)
-        self.keyZ = self.getKey(pygame.K_z)
-        self.pressedSpace = self.getKey(pygame.K_SPACE) and not self.keySpace
-        self.keySpace = self.getKey(pygame.K_SPACE)
-        self.pressedEnter = self.getKey(pygame.K_RETURN) and not self.keyEnter
-        self.keyEnter = self.getKey(pygame.K_RETURN)
         
 
 

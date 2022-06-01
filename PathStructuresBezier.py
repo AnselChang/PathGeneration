@@ -17,13 +17,8 @@ class Pose:
         self.x = x
         self.y = y
         
-
-        self.forward_x = forward_x_pt - x
-        self.backward_x = x - forward_x_pt
-
-        self.forward_y = forward_y_pt - y
-        self.backward_y = y - forward_y_pt
-
+        self.setVectorOffset(forward_x_pt, forward_y_pt)
+        
         # temp = (self.forward_y - self.y) / (self.forward_x - self.x)
 
         self.theta = theta
@@ -33,14 +28,21 @@ class Pose:
         # a break pose is a stopping pose where poses on one side of this pose don't affect the other
         self.isBreak = False
 
+    def setVectorOffset(self, forward_x_pt, forward_y_pt):
+        
+        self.forward_x = forward_x_pt - self.x
+        self.backward_x = self.x - forward_x_pt
+
+        self.forward_y = forward_y_pt - self.y
+        self.backward_y = self.y - forward_y_pt
+
     def touching(self, m):
-        return Utility.distance(self.x, self.y, m.zx, m.zy) <= (Pose.RADIUS - 1)
+        return Utility.distance(self.x, self.y, m.zx, m.zy) <= (Pose.RADIUS - 1) / m.zoom
 
     def draw(self, screen, m, forceOrange=False):
 
         r = (Pose.RADIUS + 2 if self.hovered else Pose.RADIUS) * \
             m.getPartialZoom(0.75)
-        x, y = m.inchToPixel(self.x, self.y)
 
         if forceOrange:
             color = Utility.ORANGE
@@ -48,12 +50,16 @@ class Pose:
         else:
             color = Utility.RED if self.isBreak else Utility.GREEN
 
+        p1 = m.inchToPixel(self.x - self.forward_x, self.y - self.forward_y)
+        p2 = m.inchToPixel(self.x + self.forward_x , self.y + self.forward_y)
+        Utility.drawVector(screen, *p1, *p2, m.getPartialZoom(0.75))
+
+        x, y = m.inchToPixel(self.x, self.y)
+
         #  draw triangle
         if self.theta is not None:
             Utility.drawPolarTriangle(
                 screen, Utility.BLACK, x, y, self.theta, r, 2.3, 0.9)
-        
-        Utility.drawVectors(screen, x, y, self.forward_x * m.getPartialZoom(0.75), self.forward_y * m.getPartialZoom(0.75))
 
         Utility.drawCircle(screen, x, y, color, r)
 
@@ -63,16 +69,8 @@ class Pose:
                              string, Utility.TEXTCOLOR, x, y - 25*m.getPartialZoom(0.75))
 
 
-class PathType(Enum):
-    LINEAR = 1
-    CURVE = 2
-
-    def succ(self):
-        return PathType(self.value % 2 + 1)
 
 # Each point is generated through interpolating between poses
-
-
 class Point:
     def __init__(self, x: int, y: int, color):
         self.x = x
@@ -85,7 +83,6 @@ class Path:
     def __init__(self, segmentDistance):
 
         self.poses = []
-        self.paths = []  # size of paths is size of self.poses - 1, specifies PathType between poses
         self.points = []
 
         self.robot = Robot.PurePursuitRobot(50, 30)
@@ -108,9 +105,6 @@ class Path:
             index = self.getPoseIndex(index)
         if index == -1:
             return
-
-        if len(self.paths) != 0:
-            del self.paths[max(index - 1, 0)]
 
         if index == 0 and len(self.poses) > 1 and self.poses[1].theta is None:
             self.poses[1].theta = self.poses[0].theta
@@ -147,13 +141,21 @@ class Path:
             p = m.poseSelectHeading
             px, py = m.inchToPixel(p.x, p.y)
 
-            # for close distances, remove heading. But first MUST have heading
-            if p is not self.poses[0] and Utility.distance(m.x, m.y, px, py) < Pose.RADIUS*2:
-                p.theta = None
-            else:  # Otherwise, get heading from normalized vector from center to mouse
-                p.theta = math.atan2(m.y - py, m.x - px)
+            if m.selectVectorNotHeading:
 
-            self.interpolatePoints()
+                # Set control point to mouse
+                if Utility.distance(m.zx, m.zy, p.x, p.y) > 1: # control point must be at least one inch away from pose
+                    p.setVectorOffset(m.zx, m.zy)
+                    self.interpolatePoints()
+                
+            else: # Set robot heading to mouse
+                # for close distances, remove heading. But first MUST have heading
+                if p is not self.poses[0] and Utility.distance(m.x, m.y, px, py) < Pose.RADIUS*2:
+                    p.theta = None
+                else:  # Otherwise, get heading from normalized vector from center to mouse
+                    p.theta = math.atan2(m.y - py, m.x - px)
+
+                self.interpolatePoints()
 
     def handleHoveringOverPoses(self, m):
 
@@ -169,12 +171,13 @@ class Path:
                         pose.isBreak = not pose.isBreak
                         self.interpolatePoints()
 
-                    if not m.simulating and m.keyX and not m.keyC:
+                    if not m.simulating and m.getKey(pygame.K_x) and not m.getKey(pygame.K_c):
                         self.deletePose(pose)
                         self.interpolatePoints()
                     elif m.pressed and m.poseDragged is None:
-                        if m.keyZ and not m.simulating:
+                        if (m.getKey(pygame.K_c) or m.getKey(pygame.K_v)) and not m.simulating:
                             m.poseSelectHeading = pose
+                            m.selectVectorNotHeading = m.getKey(pygame.K_v)
                         else:
                             m.poseDragged = pose
                             m.startDragX = m.x
@@ -185,24 +188,16 @@ class Path:
 
         return anyHovered
 
-    def handleToggleCurve(self, m):
-
-        if m.keyC and not m.simulating:
-
-            if self.pathIndex != -1:
-                if m.lastToggledEdge != self.pathIndex:  # Toggle path if it hasn't just been toggled
-                    self.paths[self.pathIndex] = self.paths[self.pathIndex].succ()
-                    self.interpolatePoints()
-                    m.lastToggledEdge = self.pathIndex
-            else:
-                m.lastToggledEdge = -1
-        else:
-            m.lastToggledEdge = -1
 
     def handleSimulation(self, m, slider):
 
+        # Handle auto-calibration
+        if m.simulating and m.getKey(pygame.K_RETURN) and len(self.points) > 0:
+            if isinstance(self.robot, Robot.PurePursuitRobot):
+                self.robot.autoCalibrate(m, slider)
+
         # Handle start simulation
-        if m.pressedSpace and len(self.points) > 0:
+        if m.getKeyPressed(pygame.K_SPACE) and len(self.points) > 0:
 
             if m.simulating:  # Toggle playback
                 if slider.value == slider.high:
@@ -263,17 +258,15 @@ class Path:
             if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(
                 m.zx, m.zy)
 
-        self.handleToggleCurve(m)
 
         if self.pathIndex != -1:
 
             # Delete node closest to mouse if edge hovered and pressed X
-            if not m.simulating and not anyHovered and m.keyX and not m.keyC:
+            if not m.simulating and not anyHovered and m.getKey(pygame.K_x) and not m.getKey(pygame.K_c):
 
                 # delete everything if only 2 poses and deleting the edge between them
                 if len(self.poses) == 2:
                     self.poses = []
-                    self.paths = []
                     self.points = []
                 else:
                     print(self.pathIndex, len(self.poses))
@@ -287,10 +280,10 @@ class Path:
                 self.pathIndex = -1  # now that it's deleted, the mouse is not hovering over any path
 
         if not anyHovered and m.x < Utility.SCREEN_SIZE:
-            if m.pressedR and not m.pressedC and not m.simulating:
+            if m.pressedR and not m.getKey(pygame.K_c) and not m.simulating:
                 working_zx = m.zx
                 working_zy = m.zy
-                self.addPose(working_zx, working_zy, m.zx + 10, m.zy + 10)
+                self.addPose(working_zx, working_zy, m.zx + 3, m.zy + 3)
                 # TODO make it initialize forward_x and y from pose creation and not just editing.
             if m.pressed:
                 m.panning = True
@@ -314,14 +307,10 @@ class Path:
 
             # only the first pose has a predefined position (pointing up)
             self.poses.append(Pose(px, py, fx, fy, -math.pi/2 if len(self.poses) == 0 else None))
-            if len(self.poses) >= 2:  # no path created if it's only one node
-                self.paths.append(PathType.CURVE if len(self.paths) == 0 else self.paths[-1])
 
         else:  # insert between two poses
 
             self.poses.insert(self.pathIndex + 1, Pose(px, py, fx, fy))
-
-            self.paths.insert(self.pathIndex, self.paths[self.pathIndex])
 
         self.interpolatePoints()
 
@@ -341,21 +330,6 @@ class Path:
             pose.draw(screen, m, first)
             first = False
 
-    # Interpolate pose[i] to pose[i+1] linearly with s spillover
-    def interpolateLinear(self, i, s):
-
-        magnitude = Utility.distance(
-            self.poses[i].x, self.poses[i].y, self.poses[i+1].x, self.poses[i+1].y)
-        normx = (self.poses[i+1].x - self.poses[i].x) / magnitude
-        normy = (self.poses[i+1].y - self.poses[i].y) / magnitude
-        while s < magnitude:
-            x = self.poses[i].x + normx * s
-            y = self.poses[i].y + normy * s
-            self.points.append(Point(x, y, Utility.BLUE))
-            s += self.segmentDistance
-        s -= magnitude  # any "spillover" gets carried over to the next point in the next path so that across all paths, every segment is equidistant
-
-        return s
 
     # Interpolate pose[i] to pose[i+1] using Catmull-Rom spline curve with s spillover
     def interpolateSplineCurve(self, i: int, s: int) -> int:
@@ -416,11 +390,11 @@ class Path:
         # for the purposes of interpolating theta after initially generating list of points
         knownThetaIndexes = []
 
-        if len(self.paths) == 0:
+        if len(self.poses) < 2:
             return
 
         s = 0
-        for i in range(len(self.paths)):
+        for i in range(len(self.poses) - 1):
 
             if self.poses[i].x == self.poses[i+1].x and self.poses[i].y == self.poses[i+1].y:
                 continue
@@ -430,11 +404,7 @@ class Path:
                 knownThetaIndexes.append(
                     [len(self.points), self.poses[i].theta])
 
-            if self.paths[i] == PathType.LINEAR:
-                s = self.interpolateLinear(i, s)
-
-            else:  # PathType.CURVE
-                s = self.interpolateSplineCurve(i, s)
+            s = self.interpolateSplineCurve(i, s)
 
             # no spillovers at break points
             if self.poses[i+1].isBreak:
