@@ -212,8 +212,8 @@ class Path:
 
         # Handle scrolling the field
         if not m.pressing:
-            m.panning = False
-        if m.panning:
+            m.scrolling = False
+        if m.scrolling:
             dx = m.x - m.prevX
             dy = m.y - m.prevY
             m.panX += dx
@@ -265,7 +265,7 @@ class Path:
             if m.pressedR and not m.pressedC and not m.simulating:
                 self.addPose(m.zx, m.zy)
             if m.pressed:
-                m.panning = True
+                m.scrolling = True
 
         return anyHovered
 

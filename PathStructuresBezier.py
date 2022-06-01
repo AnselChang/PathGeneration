@@ -53,7 +53,7 @@ class Pose:
             Utility.drawPolarTriangle(
                 screen, Utility.BLACK, x, y, self.theta, r, 2.3, 0.9)
         
-        Utility.drawVectors(screen, x, y, self.forward_x, self.forward_y)
+        Utility.drawVectors(screen, x, y, self.forward_x * m.getPartialZoom(0.75), self.forward_y * m.getPartialZoom(0.75))
 
         Utility.drawCircle(screen, x, y, color, r)
 
@@ -364,7 +364,14 @@ class Path:
         V2 = [self.poses[i+1].backward_x, self.poses[i+1].backward_y]
         P2 = [self.poses[i+1].x, self.poses[i+1].y]
 
-        ns = 0
+        if s == 0:
+            ns = 0
+        else:
+            dxds,dyds = BezierCurves.getBezierGradient(0, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
+            dsdt = s / Utility.hypo(dxds, dyds)
+            ns = dsdt # s normalized from 0 to 1 for this specific spline
+            if ns > 1:
+                return ns - 1 # no points on this spline segment
 
         while ns < 1:
             x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
