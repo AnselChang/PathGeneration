@@ -1,6 +1,12 @@
 # Return position at t, 0 < t < 1
-def getBezierPoint(t: float, p0: tuple, p1: tuple, p2: tuple, p3: tuple) -> list:
+def getBezierPoint(t: float, p0: list, p1: list, p2: list, p3: list) -> list:
     """Returns the point on a bezier curve defined by the four points on location 0<=t<1."""
+
+    p1[0] += p0[0]
+    p1[1] += p0[1]
+    p2[0] += p3[0]
+    p2[1] += p3[1]
+
     inv_t = 1-t
     coefs = [inv_t ** 3, 
              3 * t * inv_t ** 2, 
@@ -17,9 +23,16 @@ def getBezierPoint(t: float, p0: tuple, p1: tuple, p2: tuple, p3: tuple) -> list
 # Return position at t, 0 < t < 1
 
 
-def getBezierGadient(t: float, p0: tuple, p1: tuple, p2: tuple, p3: tuple) -> list:
+def getBezierGradient(t: float, p0: tuple, p1: tuple, p2: tuple, p3: tuple) -> list:
     """Returns the derivative on a bezier curve defined by the four points on location 0<=t<1."""
     inv_t = 1-t
+
+    p1[0] += p0[0]
+    p1[1] += p0[1]
+    p2[0] += p3[0]
+    p2[1] += p3[1]
+
+
     xs = [p1[0] - p0[0], p2[0] - p1[0], p3[0] - p2[0]]
     ys = [p1[1] - p0[1], p2[1] - p1[1], p3[1] - p2[1]]
 

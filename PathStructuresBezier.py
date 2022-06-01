@@ -13,21 +13,20 @@ class Pose:
     RADIUS = 6
 
     # units are in SCREEN PIXELS (which would be converted to inches during export) and theta is in degrees (0-360)
-    def __init__(self, x, y, forward_x, forward_y, theta):
+    def __init__(self, x, y, forward_x_pt, forward_y_pt, theta = None):
         self.x = x
         self.y = y
+        
 
-        self.forward_x = forward_x
-        self.backward_x = 2 * x - forward_x
+        self.forward_x = forward_x_pt - x
+        self.backward_x = x - forward_x_pt
+
+        self.forward_y = forward_y_pt - y
+        self.backward_y = y - forward_y_pt
 
         # temp = (self.forward_y - self.y) / (self.forward_x - self.x)
 
         self.theta = theta
-
-
-
-        self.forward_y = forward_y
-        self.backward_y = 2 * x - forward_y
 
         self.hovered = False
         self.showCoords = False
@@ -53,6 +52,8 @@ class Pose:
         if self.theta is not None:
             Utility.drawPolarTriangle(
                 screen, Utility.BLACK, x, y, self.theta, r, 2.3, 0.9)
+        
+        Utility.drawVectors(screen, x, y, self.forward_x, self.forward_y)
 
         Utility.drawCircle(screen, x, y, color, r)
 
@@ -178,6 +179,7 @@ class Path:
                             m.poseDragged = pose
                             m.startDragX = m.x
                             m.startDragY = m.y
+                            
                 else:
                     pose.hovered = False
 
@@ -288,8 +290,8 @@ class Path:
             if m.pressedR and not m.pressedC and not m.simulating:
                 working_zx = m.zx
                 working_zy = m.zy
-                self.addPose(working_zx, working_zy)
-                # TODO EDIT THIS TO MAKE VECTOR PAIRS INSTEAD OF POINTS.
+                self.addPose(working_zx, working_zy, m.zx + 20, m.zy + 20)
+                # TODO make it initialize forward_x and y from pose creation and not just editing.
             if m.pressed:
                 m.panning = True
                 
@@ -311,11 +313,9 @@ class Path:
         if self.pathIndex == -1:  # add to the end
 
             # only the first pose has a predefined position (pointing up)
-            self.poses.append(
-                Pose(px, py, fx, fy))
+            self.poses.append(Pose(px, py, fx, fy, -math.pi/2 if len(self.poses) == 0 else None))
             if len(self.poses) >= 2:  # no path created if it's only one node
-                self.paths.append(PathType.CURVE if len(
-                    self.paths) == 0 else self.paths[-1])
+                self.paths.append(PathType.CURVE if len(self.paths) == 0 else self.paths[-1])
 
         else:  # insert between two poses
 
@@ -358,24 +358,49 @@ class Path:
         return s
 
     # Interpolate pose[i] to pose[i+1] using Catmull-Rom spline curve with s spillover
-    def interpolateSplineCurve(self, i: int) -> None:
-        P1 = (self.poses[i].x, self.poses[i].y)
-        V1 = (self.poses[i].forward_x, self.poses[i].forward_y)
-        V2 = (self.poses[i+1].backward_x, self.poses[i+1].backward_y)
-        P2 = (self.poses[i+1].x, self.poses[i+1].y)
+    def interpolateSplineCurve(self, i: int, s: int) -> int:
+        P1 = [self.poses[i].x, self.poses[i].y]
+        V1 = [self.poses[i].forward_x, self.poses[i].forward_y]
+        V2 = [self.poses[i+1].backward_x, self.poses[i+1].backward_y]
+        P2 = [self.poses[i+1].x, self.poses[i+1].y]
 
         ns = 0
 
         while ns < 1:
-            x, y = BezierCurves.getBezierPoint(ns, P1, V1, V2, P2)
+            x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
             self.points.append(Point(x, y, Utility.RED))
 
-            dxds, dyds = SplineCurves.getBezierGradient(ns, P1, V1, V2, P2)
+            dxds, dyds = BezierCurves.getBezierGradient(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
             dsdt = self.segmentDistance / Utility.hypo(dxds, dyds)
             ns += dsdt
 
         s = self.segmentDistance - Utility.distance(x,y,*P2)
         return s
+
+    # Interpolate between all the *given* thetas, as in some poses do not specify theta and should just be interpolated between the poses besides them
+    def interpolateTheta(self, knownThetaIndexes):
+
+        i1, theta1 = knownThetaIndexes[0]
+        assert i1 == 0
+        for ki in range(1, len(knownThetaIndexes)):
+            i2, theta2 = knownThetaIndexes[ki]
+
+            for i in range(0, i2-i1+1):
+                # Eliminate mod "wraparounds" by always finding the closest direction to spin
+                theta2adjusted = theta2
+                if theta2 - theta1 >= math.pi:
+                    theta2adjusted -= 2*math.pi
+                elif theta1 - theta2 >= math.pi:
+                    theta2adjusted += 2*math.pi
+                    
+                self.points[ i1 + i].theta = theta1 + (theta2adjusted - theta1) * (i / (i2-i1))    
+
+            i1 = i2
+            theta1 = theta2
+
+        # For all the points past the last known theta index, just set theta to the same number
+        for index in range(i1, len(self.points)):
+            self.points[index].theta = theta1
 
     # Call this function to update self.points whenever there is a change in interpolation. Generates a list of points from the entire combined path
     def interpolatePoints(self) -> None:
@@ -402,7 +427,7 @@ class Path:
                 s = self.interpolateLinear(i, s)
 
             else:  # PathType.CURVE
-                self.interpolateSplineCurve(i)
+                s = self.interpolateSplineCurve(i, s)
 
             # no spillovers at break points
             if self.poses[i+1].isBreak:

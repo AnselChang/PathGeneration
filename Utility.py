@@ -16,6 +16,7 @@ GREEN = (50,205,50)
 LINEGREY = (100, 100, 100)
 LINEDARKGREY = (75, 75, 75)
 TEXTCOLOR = (30, 30, 30)
+VECTORCOLOR = (34, 185, 151)
 
 def pixelsToInches(pixels):
     return (pixels / SCREEN_SIZE) * 144
@@ -139,6 +140,14 @@ def drawLine(screen, color, x1, y1, x2, y2, thickness = 1):
 
     pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
     pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
+
+def drawVectors(screen, x, y, fx, fy):
+
+    drawLine(screen, VECTORCOLOR, x - fx, y - fy, x + fx, y + fy, 2)
+    theta = math.atan(fy/fx)
+    drawPolarTriangle(screen, VECTORCOLOR, x + fx, y + fy, theta, 3, 2, .9)
+
+
 
 # Round the edges of the thick line
 def drawRoundedLine(screen, color, x1, y1, x2, y2, thickness):
