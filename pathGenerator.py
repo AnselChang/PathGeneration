@@ -36,9 +36,11 @@ while True:
         # slightly inefficient but oh well
         fieldSurface = pygame.transform.smoothscale(rawFieldSurface, [Utility.SCREEN_SIZE * m.zoom, Utility.SCREEN_SIZE * m.zoom])
 
-    slider.handleMouse()
-    if slider.draggingSlider:
-        m.playingSimulation = False
+    if m.simulating:
+        slider.handleMouse()
+        if slider.draggingSlider:
+            m.playingSimulation = False
+        path.handleRobotSliders(m, slider)
 
     anyPoseHovered = path.handleMouse(m, slider)    
         

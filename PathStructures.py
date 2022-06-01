@@ -62,7 +62,7 @@ class Path:
         self.paths = [] # size of paths is size of self.poses - 1, specifies PathType between poses
         self.points = []
 
-        self.robot = Robot.PurePursuitRobot(50, 30, 6)
+        self.robot = Robot.PurePursuitRobot(50, 30)
         #self.robot = Robot.IdealRobot(50, 30)
 
         self.segmentDistance = segmentDistance
@@ -172,7 +172,7 @@ class Path:
                 m.lastToggledEdge = -1
         else:
             m.lastToggledEdge = -1
-                
+
 
     def handleSimulation(self, m, slider):
 
@@ -186,12 +186,8 @@ class Path:
                 else:
                     m.playingSimulation = not m.playingSimulation
             else:
-                m.simulating = True # Start simulation
-                slider.reset()
-                m.playingSimulation = False
-                m.poseDragged = None
-                m.poseSelectHeading = None
-                slider.high = self.robot.startSimulation(self.points) - 1
+                self.robot.startSimulation(m, slider, self.points)
+                
 
         # Handle stop simulation
         if m.getKey(pygame.K_ESCAPE):
@@ -437,4 +433,7 @@ class Path:
     def drawPanel(self, screen, m):
         if m.simulating:
             self.robot.drawPanel(screen)
+
+    def handleRobotSliders(self, m, slider):
+        self.robot.handleSliders(m, slider)
         

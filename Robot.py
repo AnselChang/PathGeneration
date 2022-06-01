@@ -1,4 +1,4 @@
-import math, Utility, random
+import math, Utility, random, Slider
 
 STEP_TIME = 0.02 # 20 millisecond cycle time
 STOP_DISTANCE_THRESHOLD = 1 # In inches, pathfinding algo terminates when distance to destination dips below threshold
@@ -47,12 +47,23 @@ class GenericRobot:
         self.length = length
         self.simulation = None
         self.error = -1
+        self.prevPoints = None
 
     # should return simulation list and error
     def computeSimulation(self, points):
         raise NotImplementedError("Must implement this function")
 
-    def startSimulation(self, points):
+    def restartSimulation(self, m, slider):
+        self.startSimulation(m, slider, self.prevPoints)
+
+    def startSimulation(self, m, slider, points):
+        self.prevPoints = points
+        slider.reset()
+
+        m.simulating = True
+        m.playingSimulation = False
+        m.poseDragged = None
+        m.poseSelectHeading = None
 
         # Calculate curvature of each point
         points[0].curve = 0
@@ -64,7 +75,7 @@ class GenericRobot:
             points[i].curve = abs(angle)
 
         self.simulation, self.error = self.computeSimulation(points)
-        return len(self.simulation)
+        slider.high =  len(self.simulation) - 1
 
     # return if animation is still going
     def simulationTick(self, screen, m, pointIndex):
@@ -124,9 +135,17 @@ class PurePursuitRobot(GenericRobot):
 
     # lookahead in inches
     # acceleration limits in inches/seconds^2
-    def __init__(self, width, height, lookahead):
+    def __init__(self, width, height):
         super().__init__(width, height)
-        self.lookahead = lookahead
+
+        self.lookaheadSlider = Slider.Slider(830, 1070, 270, 1, 20, 6, "Lookahead (inches)")
+        self.kpSlider = Slider.Slider(830, 1070, 350, 1, 100, 30, "Translation KP")
+        self.kdSlider = Slider.Slider(830, 1070, 430, 0, 20, 5, "Translation KD")
+
+    def handleSliders(self, m, slider):
+        recalculate = self.lookaheadSlider.handleMouse() or self.kpSlider.handleMouse() or self.kdSlider.handleMouse()
+        if recalculate:
+            self.restartSimulation(m, slider)
 
     # Find closest point to (x,y) in points, from index range [start, end)
     # Returns index of closest point in points lis
@@ -160,9 +179,9 @@ class PurePursuitRobot(GenericRobot):
         y = points[0].y + 10 * random.triangular(-POSITION_NOISE, POSITION_NOISE)
         theta = points[0].theta
 
-        pidX = PID(30, 0, 5)
-        pidY = PID(30, 0, 5)
-        pidRot = PID(1, 0, 0)
+        pidX = PID(self.kpSlider.value, 0, self.kdSlider.value)
+        pidY = PID(self.kpSlider.value, 0, self.kdSlider.value)
+        pidRot = PID(2, 0, 0)
         
         xvel = 0 # velocities in inches/second
         yvel = 0
@@ -172,7 +191,7 @@ class PurePursuitRobot(GenericRobot):
 
         errorSum = 0
 
-        while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) > STOP_DISTANCE_THRESHOLD or abs(xvel) > 5 or abs(yvel) > 5 or abs(tvel) > 5:
+        while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) > STOP_DISTANCE_THRESHOLD:
 
             if timestep > MAX_TIMESTEPS:
                 break
@@ -181,7 +200,7 @@ class PurePursuitRobot(GenericRobot):
             ci = self.findClosestPoint(points, x, y, ci, ci + 30)
         
             # Update lookahead distance
-            while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookahead:
+            while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookaheadSlider.value:
                 li += 1
 
              # Calculate target velocities
@@ -256,6 +275,8 @@ class PurePursuitRobot(GenericRobot):
 
         Utility.drawText(screen, Utility.getFont(20), "Curve: {}".format(round(p.curve, 3)), Utility.BLACK, 825, 195, 0)
         Utility.drawText(screen, Utility.getFont(20), "Error: {}\"".format(round(p.error, 3)), Utility.BLACK, 955, 195, 0)
-        
-        
+
+        self.lookaheadSlider.draw(screen, True)
+        self.kpSlider.draw(screen, True)
+        self.kdSlider.draw(screen, True)        
     
