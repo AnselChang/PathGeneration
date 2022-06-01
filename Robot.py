@@ -53,6 +53,10 @@ class GenericRobot:
     def computeSimulation(self, points):
         raise NotImplementedError("Must implement this function")
 
+    # By default, no calibration happens
+    def autoCalibrate(self):
+        return
+
     def restartSimulation(self, m, slider):
         self.startSimulation(m, slider, self.prevPoints)
 
@@ -115,11 +119,14 @@ class GenericRobot:
 
         return True
 
+    def totalTime(self):
+        return (len(self.simulation)-1) * STEP_TIME
+
     def drawPanel(self, screen):
 
         # Draw timestamp
         Utility.drawText(screen, Utility.getFont(30), "Avg. error: {}\"".format(round(self.error, 2)), Utility.BLACK, 865, 70, 0)
-        Utility.drawText(screen, Utility.getFont(30), "Time: {:.2f}s / {:.2f}s".format(self.pointIndex * STEP_TIME, (len(self.simulation)-1) * STEP_TIME), Utility.BLACK, 865, 100, 0)
+        Utility.drawText(screen, Utility.getFont(30), "Time: {:.2f}s / {:.2f}s".format(self.pointIndex * STEP_TIME, self.totalTime()), Utility.BLACK, 865, 100, 0)
         
 
 class IdealRobot(GenericRobot):
@@ -138,15 +145,62 @@ class PurePursuitRobot(GenericRobot):
     def __init__(self, width, height):
         super().__init__(width, height)
 
-        self.lookaheadSlider = Slider.Slider(830, 1070, 270, 1, 20, 6, "Lookahead (inches)")
-        self.kpSlider = Slider.Slider(830, 1070, 350, 1, 100, 30, "Translation KP")
-        self.kdSlider = Slider.Slider(830, 1070, 430, 0, 20, 5, "Translation KD")
+        self.lookaheadSlider = Slider.Slider(830, 1070, 270, 1, 20, 6, "Lookahead (inches)", 1)
+        self.kpSlider = Slider.Slider(830, 1070, 350, 1, 100, 30, "Translation KP", 1)
+        self.kdSlider = Slider.Slider(830, 1070, 430, 0, 20, 5, "Translation KD", 1)
 
     def handleSliders(self, m, slider):
         recalculate = self.lookaheadSlider.handleMouse() or self.kpSlider.handleMouse() or self.kdSlider.handleMouse()
         if recalculate:
             self.restartSimulation(m, slider)
 
+    # the lower the better
+    def staticEvaluation(self, offsets):
+
+        simulation, error = self.computeSimulation(self.prevPoints, lookaheadOffset = offsets[0], kpOffset = offsets[1], kdOffset = offsets[2]) # in inches
+        time = (len(simulation)-1) * STEP_TIME # in seconds
+        
+        errorImportance = 1
+        return time + error * error * errorImportance
+
+    def autoCalibrate(self, m, slider):
+        NUM_EPOCHS = 1
+        NUM_SAMPLES = 8
+        DELTA = 1
+
+        for epoch in range(NUM_EPOCHS):
+            for param in range(3):
+                print()
+                
+                minn = None
+                best = None
+                    
+                for offset in [-DELTA, 0, DELTA]:
+                    offsets = [0,0,0]
+                    offsets[param] = offset
+
+                    summ = 0
+                    for i in range(NUM_SAMPLES):
+                        summ += self.staticEvaluation(offsets)
+                    evalu = summ / NUM_SAMPLES # get average  eval over number of samples
+                    print("{} -> look: {}\tkp: {}\tkd: {}".format(round(evalu, 2), self.lookaheadSlider.value + offsets[0], self.kpSlider.value + offsets[1], self.kdSlider.value + offsets[2]))
+
+                    
+                    if minn is None or evalu < minn:
+                        print("update")
+                        minn = evalu
+                        best = offset
+
+                if param == 0:
+                    self.lookaheadSlider.increment(best)
+                elif param == 1:
+                    self.kpSlider.increment(best)
+                else:
+                    self.kdSlider.increment(best)
+                print ("Change to: {}, {}, {}".format(self.lookaheadSlider.value, self.kpSlider.value, self.kdSlider.value))
+
+        self.restartSimulation(m, slider)
+                
     # Find closest point to (x,y) in points, from index range [start, end)
     # Returns index of closest point in points lis
     def findClosestPoint(self, points, x, y, start, end):
@@ -167,9 +221,9 @@ class PurePursuitRobot(GenericRobot):
         return minIndex
 
     # starting x, y, theta
-    def computeSimulation(self, points):
+    def computeSimulation(self, points, lookaheadOffset = 0, kpOffset = 0, kdOffset = 0):
 
-        MAX_TIMESTEPS = 50000
+        MAX_TIMESTEPS = 10000
         timestep = 0
 
         simulation = []
@@ -179,8 +233,8 @@ class PurePursuitRobot(GenericRobot):
         y = points[0].y + 10 * random.triangular(-POSITION_NOISE, POSITION_NOISE)
         theta = points[0].theta
 
-        pidX = PID(self.kpSlider.value, 0, self.kdSlider.value)
-        pidY = PID(self.kpSlider.value, 0, self.kdSlider.value)
+        pidX = PID(self.kpSlider.value + kpOffset, 0, self.kdSlider.value + kdOffset)
+        pidY = PID(self.kpSlider.value + kpOffset, 0, self.kdSlider.value + kdOffset)
         pidRot = PID(2, 0, 0)
         
         xvel = 0 # velocities in inches/second
@@ -201,7 +255,7 @@ class PurePursuitRobot(GenericRobot):
         
             # Update lookahead distance
             li = ci
-            while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookaheadSlider.value:
+            while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookaheadSlider.value + lookaheadOffset:
                 li += 1
 
              # Calculate target velocities

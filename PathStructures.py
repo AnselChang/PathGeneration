@@ -176,6 +176,11 @@ class Path:
 
     def handleSimulation(self, m, slider):
 
+        # Handle auto-calibration
+        if m.simulating and m.keyEnter and len(self.points) > 0:
+            if isinstance(self.robot, Robot.PurePursuitRobot):
+                self.robot.autoCalibrate(m, slider)
+
         # Handle start simulation
         if m.pressedSpace and len(self.points) > 0:
             

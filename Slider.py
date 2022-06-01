@@ -8,7 +8,7 @@ def init(M):
 
 class Slider:
 
-    def __init__(self, x1, x2, y, low = 0, high = 100, value = 0, name = "None"):
+    def __init__(self, x1, x2, y, low = 0, high = 100, value = 0, name = "None", roundDigits = 0):
         self.y = y
         self.leftX = x1
         self.rightX = x2
@@ -20,6 +20,8 @@ class Slider:
         self.high = high
         self.value = value
         self.draggingSlider = False
+
+        self.round = roundDigits
 
         self.updateXFromIndex()
 
@@ -38,6 +40,13 @@ class Slider:
         self.value = 0
         self.updateXFromIndex()
 
+    def increment(self, offset):
+        su = round(self.value + offset, self.round)
+        if self.round == 0:
+            su = int(su)
+        self.value = Utility.clamp(su, self.low, self.high)
+        self.updateXFromIndex()
+
     # returns true if just released
     def handleMouse(self):
 
@@ -51,7 +60,9 @@ class Slider:
 
         if self.draggingSlider:
             x = min(self.rightX, max(self.leftX, m.x)) - self.leftX
-            self.value = self.low + round((self.high - self.low) * x / self.width)
+            self.value = self.low + round((self.high - self.low) * x / self.width, self.round)
+            if self.round == 0:
+                self.value = int(self.value)
             self.updateXFromIndex()
 
         return releasedSlider
