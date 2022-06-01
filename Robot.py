@@ -200,6 +200,7 @@ class PurePursuitRobot(GenericRobot):
             ci = self.findClosestPoint(points, x, y, ci, ci + 30)
         
             # Update lookahead distance
+            li = ci
             while li < len(points) - 1 and Utility.distance(points[li].x, points[li].y, points[ci].x, points[ci].y) < self.lookaheadSlider.value:
                 li += 1
 
