@@ -39,6 +39,8 @@ class Mouse:
         self.pressedSpace = False
         self.keySpace = False
         self.pressedC = False
+        self.keyEnter = False
+        self.pressedEnter = False
 
         self.startDragX = -1
         self.startDragY = -1
@@ -129,6 +131,8 @@ class Mouse:
         self.keyZ = self.getKey(pygame.K_z)
         self.pressedSpace = self.getKey(pygame.K_SPACE) and not self.keySpace
         self.keySpace = self.getKey(pygame.K_SPACE)
+        self.pressedEnter = self.getKey(pygame.K_RETURN) and not self.keyEnter
+        self.keyEnter = self.getKey(pygame.K_RETURN)
         
 
 
