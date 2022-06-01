@@ -287,7 +287,12 @@ class PurePursuitRobot(GenericRobot):
             theta += tvel * STEP_TIME
 
             # Add timestep to simulation
-            error = Utility.distance(x, y, points[ci].x, points[ci].y)
+            if ci == 0:
+                ox, oy = points[ci+1].x, points[ci+1].y
+            else:
+               ox, oy = points[ci-1].x, points[ci-1].y
+
+            error = Utility.distanceTwoPoints(x, y, points[ci].x, points[ci].y, ox, oy)
             errorSum += error
             sp = SimulationPoint(x, y, theta, xvel = xvel, yvel = yvel, tvel = tvel,
                                  cx = points[ci].x, cy = points[ci].y, lx = points[li].x, ly = points[li].y, curve = points[li].curve,
