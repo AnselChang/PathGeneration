@@ -50,7 +50,7 @@ class Pose:
         else:
             color = Utility.RED if self.isBreak else Utility.GREEN
 
-        p1 = m.inchToPixel(self.x - self.forward_x, self.y - self.forward_y)
+        p1 = m.inchToPixel(self.x + self.backward_x, self.y + self.backward_y)
         p2 = m.inchToPixel(self.x + self.forward_x , self.y + self.forward_y)
         Utility.drawVector(screen, *p1, *p2, m.getPartialZoom(0.75))
 
@@ -167,18 +167,18 @@ class Path:
                     anyHovered = True
                     pose.hovered = True
 
-                    if m.pressedR and not m.simulating:
+                    if m.getKeyPressed(pygame.K_z) and not m.simulating:
                         pose.isBreak = not pose.isBreak
                         self.interpolatePoints()
 
                     if not m.simulating and m.getKey(pygame.K_x) and not m.getKey(pygame.K_c):
                         self.deletePose(pose)
                         self.interpolatePoints()
-                    elif m.pressed and m.poseDragged is None:
-                        if (m.getKey(pygame.K_c) or m.getKey(pygame.K_v)) and not m.simulating:
+                    elif m.pressed or m.pressedR and m.poseDragged is None:
+                        if (m.getKey(pygame.K_c) or m.pressedR) and not m.simulating:
                             m.poseSelectHeading = pose
-                            m.selectVectorNotHeading = m.getKey(pygame.K_v)
-                        else:
+                            m.selectVectorNotHeading = m.pressedR
+                        elif m.pressed:
                             m.poseDragged = pose
                             m.startDragX = m.x
                             m.startDragY = m.y
@@ -222,7 +222,6 @@ class Path:
                 slider.updateXFromIndex()
 
     def handleMouse(self, m, slider):
-        # TODO EDIT THIS TO MAKE VECTOR PAIRS INSTEAD OF POINTS.
         self.handleSimulation(m, slider)
 
         # Handle scrolling the field
@@ -281,10 +280,10 @@ class Path:
 
         if not anyHovered and m.x < Utility.SCREEN_SIZE:
             if m.pressedR and not m.getKey(pygame.K_c) and not m.simulating:
-                working_zx = m.zx
-                working_zy = m.zy
-                self.addPose(working_zx, working_zy, m.zx + 3, m.zy + 3)
-                # TODO make it initialize forward_x and y from pose creation and not just editing.
+                self.addPose(m.zx, m.zy, m.zx + 3, m.zy + 3)
+                m.poseSelectHeading = self.poses[-1]
+                m.selectVectorNotHeading = True
+
             if m.pressed:
                 m.panning = True
                 
