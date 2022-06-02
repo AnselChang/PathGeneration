@@ -145,59 +145,55 @@ class PurePursuitRobot(GenericRobot):
     def __init__(self, width, height):
         super().__init__(width, height)
 
-        self.lookaheadSlider = Slider.Slider(830, 1070, 270, 1, 20, 6, "Lookahead (inches)", 1)
-        self.kpSlider = Slider.Slider(830, 1070, 350, 1, 100, 30, "Translation KP", 1)
-        self.kdSlider = Slider.Slider(830, 1070, 430, 0, 20, 5, "Translation KD", 1)
+        self.lookaheadSlider = Slider.Slider(830, 1070, 270, 1, 20, 6, "Lookahead (inches)", 2)
+        self.kpSlider = Slider.Slider(830, 1070, 350, 1, 100, 30, "Translation KP", 2)
+        self.kdSlider = Slider.Slider(830, 1070, 430, 0, 20, 5, "Translation KD", 2)
 
     def handleSliders(self, m, slider):
         recalculate = self.lookaheadSlider.handleMouse() or self.kpSlider.handleMouse() or self.kdSlider.handleMouse()
         if recalculate:
             self.restartSimulation(m, slider)
 
-    # the lower the better
-    def staticEvaluation(self, offsets):
+    def evaluate(self, simulation, error):
 
-        simulation, error = self.computeSimulation(self.prevPoints, lookaheadOffset = offsets[0], kpOffset = offsets[1], kdOffset = offsets[2]) # in inches
         time = (len(simulation)-1) * STEP_TIME # in seconds
-        
         errorImportance = 1
         return time + error * error * errorImportance
 
+    # the lower the better
+    def staticEvaluation(self, l, kp, kd):
+
+        simulation, error = self.computeSimulation(self.prevPoints, lookaheadOffset = l, kpOffset = kp, kdOffset = kd) # in inches
+        
+        return self.evaluate(simulation, error)
+        
+    # stochastic gradient descent
     def autoCalibrate(self, m, slider):
         NUM_EPOCHS = 1
-        NUM_SAMPLES = 8
-        DELTA = 1
+        NUM_SAMPLES = 5
+        H = 0.75 # the amount to change the parameter by to calculate slope. As H -> 0, slope is theoretically more accurate but gets more influenced by variance
+        LEARNING_RATE = 0.75
 
+        startScore = self.evaluate(self.simulation, self.error)
+        print("START:")
+        print("{} -> look: {}\tkp: {}\tkd: {}\n".format(round(startScore, 2), self.lookaheadSlider.value, self.kpSlider.value, self.kdSlider.value))
         for epoch in range(NUM_EPOCHS):
-            for param in range(3):
-                print()
+
+            derivatives = []
+            
+            for l, kp, kd in [[1,0,0], [0,1,0], [0,0,1]]:
+
+                score = sum([self.staticEvaluation(l, kp, kd) for i in range(NUM_SAMPLES)]) / NUM_SAMPLES # get average  eval over number of samples
+                print("{} -> look: {}\tkp: {}\tkd: {}".format(round(score, 2), self.lookaheadSlider.value + l*H, self.kpSlider.value + kp*H, self.kdSlider.value + kd*H))
                 
-                minn = None
-                best = None
-                    
-                for offset in [-DELTA, 0, DELTA]:
-                    offsets = [0,0,0]
-                    offsets[param] = offset
+                derivatives.append((score - startScore) / H) # approximate derivative through slope
 
-                    summ = 0
-                    for i in range(NUM_SAMPLES):
-                        summ += self.staticEvaluation(offsets)
-                    evalu = summ / NUM_SAMPLES # get average  eval over number of samples
-                    print("{} -> look: {}\tkp: {}\tkd: {}".format(round(evalu, 2), self.lookaheadSlider.value + offsets[0], self.kpSlider.value + offsets[1], self.kdSlider.value + offsets[2]))
-
-                    
-                    if minn is None or evalu < minn:
-                        print("update")
-                        minn = evalu
-                        best = offset
-
-                if param == 0:
-                    self.lookaheadSlider.increment(best)
-                elif param == 1:
-                    self.kpSlider.increment(best)
-                else:
-                    self.kdSlider.increment(best)
-                print ("Change to: {}, {}, {}".format(self.lookaheadSlider.value, self.kpSlider.value, self.kdSlider.value))
+            # We want to DESCENT the gradient, so go the opposite the direction of the partial derivative
+            self.lookaheadSlider.increment(-derivatives[0] * LEARNING_RATE) 
+            self.kpSlider.increment(-derivatives[1] * LEARNING_RATE)
+            self.kdSlider.increment(-derivatives[2] * LEARNING_RATE)
+            print ("Change to: {}, {}, {}".format(self.lookaheadSlider.value, self.kpSlider.value, self.kdSlider.value))
+            print("Derivatives: ", derivatives)
 
         self.restartSimulation(m, slider)
                 
