@@ -15,9 +15,9 @@ def getBezierPoint(t: float, p0: list, p1: list, p2: list, p3: list) -> list:
              t ** 3]
 
     tx = coefs[0] * p0[0] + coefs[1] * p1[0] + \
-        coefs[2] * p2[0] + coefs[3] * p3[0]
+         coefs[2] * p2[0] + coefs[3] * p3[0]
     ty = coefs[0] * p0[1] + coefs[1] * p1[1] + \
-        coefs[2] * p2[1] + coefs[3] * p3[1]
+         coefs[2] * p2[1] + coefs[3] * p3[1]
 
     return [tx, ty]
 
