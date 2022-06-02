@@ -283,7 +283,6 @@ class Path:
                 self.addPose(m.zx, m.zy, m.zx + 3, m.zy + 3)
                 m.poseSelectHeading = self.poses[-1]
                 m.selectVectorNotHeading = True
-                # TODO make it initialize forward_x and y from pose creation and not just editing.
             if m.pressed:
                 m.panning = True
                 
