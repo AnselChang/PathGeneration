@@ -142,11 +142,11 @@ def drawLine(screen, color, x1, y1, x2, y2, thickness = 1):
     pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
     pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
 
-def drawVectors(screen, x, y, fx, fy):
+def drawVector(screen, x1, y1, x2, y2, zoom = 1):
 
-    drawLine(screen, VECTORCOLOR, x - fx, y - fy, x + fx, y + fy, 2)
-    theta = math.atan(fy/fx)
-    drawPolarTriangle(screen, VECTORCOLOR, x + fx, y + fy, theta, 3, 2, .9)
+    drawLine(screen, VECTORCOLOR, x1, y1, x2, y2, 3 * zoom)
+    theta = math.atan2(y2-y1, x2-x1)
+    drawPolarTriangle(screen, VECTORCOLOR, x2, y2, theta, 5 * zoom, 2, 1.6)
 
 
 
