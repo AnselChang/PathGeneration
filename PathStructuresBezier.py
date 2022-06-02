@@ -222,7 +222,6 @@ class Path:
                 slider.updateXFromIndex()
 
     def handleMouse(self, m, slider):
-        # TODO EDIT THIS TO MAKE VECTOR PAIRS INSTEAD OF POINTS.
         self.handleSimulation(m, slider)
 
         # Handle scrolling the field
@@ -281,9 +280,9 @@ class Path:
 
         if not anyHovered and m.x < Utility.SCREEN_SIZE:
             if m.pressedR and not m.getKey(pygame.K_c) and not m.simulating:
-                working_zx = m.zx
-                working_zy = m.zy
-                self.addPose(working_zx, working_zy, m.zx + 3, m.zy + 3)
+                self.addPose(m.zx, m.zy, m.zx + 3, m.zy + 3)
+                m.poseSelectHeading = self.poses[-1]
+                m.selectVectorNotHeading = True
                 # TODO make it initialize forward_x and y from pose creation and not just editing.
             if m.pressed:
                 m.panning = True
