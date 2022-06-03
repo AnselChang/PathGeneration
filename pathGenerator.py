@@ -44,7 +44,7 @@ while True:
 
     # If pressed E key, export to csv
     if m.getKeyPressed(pygame.K_e):
-        path.export()
+        path.export2()
         
     # Rescale the field surface ONLY when there is a zoom update
     if z != m.zoom:

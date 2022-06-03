@@ -474,6 +474,28 @@ class Path:
 
         print("Exported with Pure Pursuit format at ", filename)
 
+    def export2(self):
+        filename = self.getSaveName("pp","txt")
+        os.makedirs(os.path.dirname(filename), exist_ok=True) # make saves file
+        with open(filename, "w") as file:
+
+            def r(num):
+                return str(round(num, 2))
+
+            file.write("{")
+            first = True
+            for p in self.points:
+                if not first:
+                    file.write(",")
+                file.write("{")
+                file.write(r(p.x)+",")
+                file.write(r(p.y)+",")
+                file.write(r(p.theta)+"}")
+                first = False
+            file.write("}")
+            
+            
+
     def save(self):
 
         if not self.pathChangedSinceLastSave:
