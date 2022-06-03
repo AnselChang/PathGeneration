@@ -76,8 +76,9 @@ while True:
     screen.blit(fieldSurface, (m.panX,m.panY)) # draw field
     if not m.simulating:
         path.drawPaths(screen, m)
-    path.drawRobot(screen, m, slider.value)
     path.drawPoints(screen, m)
+    path.drawRobot(screen, m, slider.value)
+    
     
     p = m.poseSelectHeading # Draw guide line for heading
     if p is not None and p.theta is not None: 

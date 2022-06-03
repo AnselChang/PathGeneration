@@ -241,7 +241,7 @@ class PurePursuitRobot(GenericRobot):
         errorSum = 0
 
         while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) > STOP_DISTANCE_THRESHOLD:
-;
+
             if timestep > MAX_TIMESTEPS:
                 break
 
