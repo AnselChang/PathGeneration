@@ -1,12 +1,12 @@
-import sys, pygame
+import sys, pygame, cProfile
 import MouseHandler, PathStructuresBezier, Utility, Slider
 
 screen = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
 pygame.display.set_caption("Path Generation by Ansel")
 
 rawFieldSurface = pygame.image.load("Images/squarefield.png")
-IMAGE_SIZE = 812
 fieldSurface = pygame.transform.smoothscale(rawFieldSurface, (Utility.SCREEN_SIZE, Utility.SCREEN_SIZE))
+IMAGE_SIZE = 812
 
 path = PathStructuresBezier.Path(0.5)
 m = MouseHandler.Mouse(pygame.mouse, pygame.key)
@@ -22,12 +22,15 @@ while True:
     mousewheel = 0
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            path.save()
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             key = event.key
         elif event.type == pygame.MOUSEWHEEL:
             mousewheel = event.y
+        elif event.type == pygame.DROPFILE:
+            path.load(event.file) # load file
     m.tick(key)
 
     zx,zy =m.zx, m.zy
@@ -97,5 +100,3 @@ while True:
 
     path.handlePlayback(m, slider)
     clock.tick(50) # limit to a 50 fps, or 20 ms per loop iteration
-
-

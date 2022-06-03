@@ -1,7 +1,6 @@
 from enum import Enum
-from termios import VT1
 import Utility
-import math
+import math, pickle, os
 import pygame
 import SplineCurves
 import BezierCurves
@@ -442,3 +441,24 @@ class Path:
 
     def handleRobotSliders(self, m, slider):
         self.robot.handleSliders(m, slider)
+
+    def save(self):
+        from datetime import datetime
+        now = datetime.now()
+        filename = now.strftime("saves/save_%Y%m%d_%H%M%S.spline")
+        data = [self.poses, self.robot.lookaheadSlider.value, self.robot.kpSlider.value, self.robot.kdSlider.value]
+
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        pickle.dump(data, open(filename, "wb"))
+        print("saved at ", filename)
+
+    def load(self, filename):
+
+        if not os.path.exists(filename):
+            print("No savefile")
+            return
+
+        print("File {} loaded".format(filename))
+        data = pickle.load(open(filename, "rb"))
+        self.poses, self.robot.lookaheadSlider.value, self.robot.kpSlider.value, self.robot.kdSlider.value = data
+        self.interpolatePoints()

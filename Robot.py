@@ -142,12 +142,12 @@ class PurePursuitRobot(GenericRobot):
 
     # lookahead in inches
     # acceleration limits in inches/seconds^2
-    def __init__(self, width, height):
+    def __init__(self, width, height, defLookahead = 6, defKP = 30, defKD = 5):
         super().__init__(width, height)
 
-        self.lookaheadSlider = Slider.Slider(830, 1070, 270, 1, 20, 6, "Lookahead (inches)", 2)
-        self.kpSlider = Slider.Slider(830, 1070, 350, 1, 100, 30, "Translation KP", 2)
-        self.kdSlider = Slider.Slider(830, 1070, 430, 0, 20, 5, "Translation KD", 2)
+        self.lookaheadSlider = Slider.Slider(830, 1070, 270, 1, 20, defLookahead, "Lookahead (inches)", 2)
+        self.kpSlider = Slider.Slider(830, 1070, 350, 1, 100, defKP, "Translation KP", 2)
+        self.kdSlider = Slider.Slider(830, 1070, 430, 0, 20, defKD, "Translation KD", 2)
 
     def handleSliders(self, m, slider):
         recalculate = self.lookaheadSlider.handleMouse() or self.kpSlider.handleMouse() or self.kdSlider.handleMouse()
