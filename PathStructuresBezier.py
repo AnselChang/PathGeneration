@@ -1,6 +1,6 @@
 from enum import Enum
 import Utility
-import math, pickle, os
+import math, pickle, os, csv
 import pygame
 import SplineCurves
 import BezierCurves
@@ -71,10 +71,10 @@ class Pose:
 
 # Each point is generated through interpolating between poses
 class Point:
-    def __init__(self, x: int, y: int, color):
+    def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
-        self.color = color
+        self.theta = 0
 
 
 class Path:
@@ -90,6 +90,8 @@ class Path:
         self.segmentDistance = segmentDistance
 
         self.pathIndex = -1
+
+        self.pathChangedSinceLastSave = False
 
     def getPoseIndex(self, pose):
         index = -1
@@ -347,7 +349,7 @@ class Path:
 
         while ns < 1:
             x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
-            self.points.append(Point(x, y, Utility.RED))
+            self.points.append(Point(x, y))
 
             dxds, dyds = BezierCurves.getBezierGradient(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
             dsdt = self.segmentDistance / Utility.hypo(dxds, dyds)
@@ -383,6 +385,8 @@ class Path:
 
     # Call this function to update self.points whenever there is a change in interpolation. Generates a list of points from the entire combined path
     def interpolatePoints(self) -> None:
+
+        self.pathChangedSinceLastSave = True
 
         self.points = []
         # for the purposes of interpolating theta after initially generating list of points
@@ -427,7 +431,7 @@ class Path:
                 p.px, p.py, p.theta, TANGENT_LENGTH * m.getPartialZoom(0.5)),  m.getPartialZoom(0.75))
 
         for p in self.points:
-            Utility.drawCircle(screen, p.px, p.py, p.color,
+            Utility.drawCircle(screen, p.px, p.py, Utility.RED,
                                POINT_SIZE * m.getPartialZoom(0.75))
 
     def drawRobot(self, screen, m, pointIndex):
@@ -442,14 +446,45 @@ class Path:
     def handleRobotSliders(self, m, slider):
         self.robot.handleSliders(m, slider)
 
-    def save(self):
+    def getSaveName(self, pre, ext):
         from datetime import datetime
         now = datetime.now()
-        filename = now.strftime("saves/save_%Y%m%d_%H%M%S.spline")
+        filename = now.strftime("saves/{}%Y%m%d_%H%M%S.{}".format(pre, ext))
+        os.makedirs(os.path.dirname(filename), exist_ok=True) # make saves file
+        return filename
+
+    def export(self):
+
+        filename = self.getSaveName("pp","csv")
+        with open(filename, mode='w') as file:
+
+            writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            # First three rows are lookahead, kp, kd
+            writer.writerow(["lookahead", str(self.robot.lookaheadSlider.value)])
+            writer.writerow(["kp", str(self.robot.kpSlider.value)])
+            writer.writerow(["kd", str(self.robot.kdSlider.value)])
+
+            def r(num):
+                return str(round(num, 2))
+
+            # Each subsequent row is (x, y, theta) rounded to two decimal places 
+            for p in self.points:
+                writer.writerow([r(p.x), r(p.y), r(p.theta)])
+
+        print("Exported with Pure Pursuit format at ", filename)
+
+    def save(self):
+
+        if not self.pathChangedSinceLastSave:
+            print("No changes to save.")
+            return
+
+        filename = self.getSaveName("save","spline")
         data = [self.poses, self.robot.lookaheadSlider.value, self.robot.kpSlider.value, self.robot.kdSlider.value]
 
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        pickle.dump(data, open(filename, "wb"))
+        with open(filename, "wb") as file:
+            pickle.dump(data, file)
         print("saved at ", filename)
 
     def load(self, filename):
@@ -459,6 +494,8 @@ class Path:
             return
 
         print("File {} loaded".format(filename))
-        data = pickle.load(open(filename, "rb"))
+        with open(filename, "rb") as file:
+            data = pickle.load(file)
         self.poses, self.robot.lookaheadSlider.value, self.robot.kpSlider.value, self.robot.kdSlider.value = data
         self.interpolatePoints()
+        self.pathChangedSinceLastSave = False

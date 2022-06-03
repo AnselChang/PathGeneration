@@ -41,6 +41,10 @@ while True:
         m.zoom -= 0.15 # zoom out
     m.zoom += mousewheel * 0.1
     m.zoom = Utility.clamp(m.zoom, 1, 3)
+
+    # If pressed E key, export to csv
+    if m.getKeyPressed(pygame.K_e):
+        path.export()
         
     # Rescale the field surface ONLY when there is a zoom update
     if z != m.zoom:
