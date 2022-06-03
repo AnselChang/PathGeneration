@@ -223,7 +223,6 @@ class PurePursuitRobot(GenericRobot):
         timestep = 0
 
         simulation = []
-
         # Start pose, which has inbuilt noise
         x = points[0].x + 10 * random.triangular(-POSITION_NOISE, POSITION_NOISE)
         y = points[0].y + 10 * random.triangular(-POSITION_NOISE, POSITION_NOISE)
@@ -242,7 +241,7 @@ class PurePursuitRobot(GenericRobot):
         errorSum = 0
 
         while li != len(points) - 1 or Utility.distance(points[-1].x, points[-1].y, x, y) > STOP_DISTANCE_THRESHOLD:
-
+;
             if timestep > MAX_TIMESTEPS:
                 break
 
