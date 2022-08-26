@@ -80,6 +80,7 @@ class Mouse:
         y += self.panY
         return [x, y]
 
+    # return whether key is currently being pressed
     def getKey(self, k):
         return self.allKeys[k]
 
@@ -90,6 +91,7 @@ class Mouse:
     def getPartialZoom(self, scalar):
         return (self.zoom - 1) * scalar + 1
 
+    # Restrict the panning range for the field as to keep the field in sight of the screen
     def boundFieldPan(self):
         self.panX = max(min(0, self.panX),  (1-self.zoom)*Utility.SCREEN_SIZE)
         self.panY = max(min(0, self.panY), (1-self.zoom)*Utility.SCREEN_SIZE)

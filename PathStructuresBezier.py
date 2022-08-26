@@ -6,7 +6,8 @@ import SplineCurves
 import BezierCurves
 import Robot
 
-
+# A user-defined waypoint that consists of the point itself, a heading,
+# and a vector to indicate "hidden" points before and after this point that shapes the beizer curve
 class Pose:
 
     RADIUS = 6
@@ -27,6 +28,7 @@ class Pose:
         # a break pose is a stopping pose where poses on one side of this pose don't affect the other
         self.isBreak = False
 
+    # update the "hidden point" vector based on forward_x_pt and forward_y_pt
     def setVectorOffset(self, forward_x_pt, forward_y_pt):
         
         self.forward_x = forward_x_pt - self.x
@@ -35,9 +37,11 @@ class Pose:
         self.forward_y = forward_y_pt - self.y
         self.backward_y = self.y - forward_y_pt
 
+    # Whether the mouse is toutching this pose
     def touching(self, m):
         return Utility.distance(self.x, self.y, m.zx, m.zy) <= (Pose.RADIUS - 1) / m.zoom
 
+    # Draw this pose on the screen. Default color is green unless forceOrange is true
     def draw(self, screen, m, forceOrange=False):
 
         r = (Pose.RADIUS + 2 if self.hovered else Pose.RADIUS) * \
@@ -76,7 +80,7 @@ class Point:
         self.y = y
         self.theta = 0
 
-
+# The entire path of the robot. It stores a list of poses that would be interpolated with bezier curves to be able to numerically generate points
 class Path:
 
     def __init__(self, segmentDistance):
@@ -85,7 +89,6 @@ class Path:
         self.points = []
 
         self.robot = Robot.PurePursuitRobot(50, 30)
-        #self.robot = Robot.IdealRobot(50, 30)
 
         self.segmentDistance = segmentDistance
 
@@ -93,6 +96,7 @@ class Path:
 
         self.pathChangedSinceLastSave = False
 
+    # Linearly search for the pose object's index in the pose array
     def getPoseIndex(self, pose):
         index = -1
         for i in range(len(self.poses)):
@@ -101,6 +105,7 @@ class Path:
                 break
         return index
 
+    # Delete the pose. The parameter index can either be the pose's index in the array or the pose object itself, in which a linear search is needed
     def deletePose(self, index):
         if type(index) is not int:
             index = self.getPoseIndex(index)
@@ -111,6 +116,7 @@ class Path:
             self.poses[1].theta = self.poses[0].theta
         del self.poses[index]
 
+    # Return the index of the segment the mouse is currently touching, or -1 if none
     def getTouchingPathIndex(self, x, y):
 
         if len(self.poses) == 0:
@@ -132,24 +138,25 @@ class Path:
 
         return -1
 
+    # Handle setting EITHER the heading of the pose OR the vector for hidden points based on the location of the mouse
     def handleMouseHeading(self, m):
 
         if not m.pressing:
             m.poseSelectHeading = None
 
-        # update heading for pose
+        # update heading for pose if a pose's heading is currently selected
         if m.poseSelectHeading is not None:
             p = m.poseSelectHeading
             px, py = m.inchToPixel(p.x, p.y)
 
-            if m.selectVectorNotHeading:
+            if m.selectVectorNotHeading: # In this case, we're setting the hidden points for the pose, NOT the heading
 
                 # Set control point to mouse
                 if Utility.distance(m.zx, m.zy, p.x, p.y) > 1: # control point must be at least one inch away from pose
                     p.setVectorOffset(m.zx, m.zy)
                     self.interpolatePoints()
                 
-            else: # Set robot heading to mouse
+            else: # in this case, we're setting the heading of the pose, NOT the hidden points
                 # for close distances, remove heading. But first MUST have heading
                 if p is not self.poses[0] and Utility.distance(m.x, m.y, px, py) < Pose.RADIUS*2:
                     p.theta = None
@@ -158,6 +165,7 @@ class Path:
 
                 self.interpolatePoints()
 
+    # State machine for handling changing the state of poses (setting isBreak, vector, heading, etc.)
     def handleHoveringOverPoses(self, m):
 
         anyHovered = False
@@ -189,7 +197,7 @@ class Path:
 
         return anyHovered
 
-
+    # Handle playing the simulation of the robot following the trajectory
     def handleSimulation(self, m, slider):
 
         # Handle auto-calibration
@@ -213,6 +221,7 @@ class Path:
         if m.getKey(pygame.K_ESCAPE):
             m.simulating = False
 
+    # Keep stepping through the simulation until the end is reached
     def handlePlayback(self, m, slider):
 
         if m.simulating and m.playingSimulation:
@@ -222,6 +231,7 @@ class Path:
                 slider.value += 1
                 slider.updateXFromIndex()
 
+    # State machine for handling mouse (creating and dragging poses, interacting with path segments, etc.)
     def handleMouse(self, m, slider):
         self.handleSimulation(m, slider)
 
@@ -291,6 +301,7 @@ class Path:
         
         return anyHovered
 
+    # The mouse can "snap" to segments when it is near segments. Return the position of the mouse after the "snap", if any
     def getMousePosePosition(self, x, y):
 
         if self.pathIndex == -1:
@@ -299,6 +310,7 @@ class Path:
             p1, p2 = self.poses[self.pathIndex], self.poses[self.pathIndex+1]
             return Utility.pointOnLineClosestToPoint(x, y, p1.x, p1.y, p2.x, p2.y)
 
+    # Create a new pose
     def addPose(self, x, y, fx, fy):
 
         px, py = self.getMousePosePosition(x, y)
@@ -314,17 +326,20 @@ class Path:
 
         self.interpolatePoints()
 
+    # Draw every pose and the segments between each pose
     def drawPaths(self, screen, m):
 
         if len(self.poses) == 0:
             return
 
+        # Draw pose segments
         for i in range(1, len(self.poses)):
             color = Utility.LINEDARKGREY if (
                 self.pathIndex == i-1) else Utility.LINEGREY
             Utility.drawLine(screen, color, *m.inchToPixel(self.poses[i-1].x, self.poses[i-1].y), *m.inchToPixel(
                 self.poses[i].x, self.poses[i].y), 3 * m.getPartialZoom(0.75))
 
+        # Draw poses
         first = True
         for pose in self.poses:
             pose.draw(screen, m, first)
