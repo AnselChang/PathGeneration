@@ -102,14 +102,10 @@ def main():
             path.drawPaths(screen, m)
         path.drawPoints(screen, m)
         path.drawRobot(screen, m, slider.value)
-        
-        # If the mouse is currently used to select the heading of a pose, draw a guide line from the pose to the mouse
-        p = m.poseSelectHeading
-        if p is not None and p.theta is not None: 
-            Utility.drawThinLine(screen, Utility.PURPLE, *m.inchToPixel(p.x, p.y), m.x, m.y)
+
 
         # If nothing is selected and not currently scrolling the field, draw a dot where the mouse is hovering to indicate a potential new pose
-        if not anyPoseHovered and not m.panning and not m.simulating and not m.poseSelectHeading: 
+        if not anyPoseHovered and not m.panning and not m.simulating: 
             Utility.drawCircle(screen, *m.inchToPixel(*path.getMousePosePosition(m.zx,m.zy)), Utility.GREEN, PathStructuresBezier.Pose.RADIUS * m.getPartialZoom(0.75), 100)
 
         # Draw panel background

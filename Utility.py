@@ -4,6 +4,9 @@ pygame.font.init()
 
 SCREEN_SIZE = 800
 PANEL_WIDTH = 300
+PIXELS_TO_FIELD_CORNER = 19
+FIELD_SIZE_IN_PIXELS = 766
+FIELD_SIZE_IN_INCHES = 144
 
 PANEL_GREY = (169, 169, 169)
 BORDER_GREY = (64, 64, 64)
@@ -24,8 +27,8 @@ def pixelsToInches(pixels):
 def pixelsToTiles(pixels):
     return (pixels / SCREEN_SIZE) * 6
 
-def clamp(value, mn, mx):
-    return max(mn, min(mx, value))
+def clamp(value: float, minBound: float, maxBound: float):
+    return max(minBound, min(maxBound, value))
 
 def hypo(s1, s2):
     return math.sqrt(s1*s1 + s2 * s2)

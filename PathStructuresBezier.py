@@ -78,7 +78,6 @@ class Point:
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
-        self.theta = 0
 
 # The entire path of the robot. It stores a list of poses that would be interpolated with bezier curves to be able to numerically generate points
 class Path:
@@ -138,39 +137,13 @@ class Path:
 
         return -1
 
-    # Handle setting EITHER the heading of the pose OR the vector for hidden points based on the location of the mouse
-    def handleMouseHeading(self, m):
-
-        if not m.pressing:
-            m.poseSelectHeading = None
-
-        # update heading for pose if a pose's heading is currently selected
-        if m.poseSelectHeading is not None:
-            p = m.poseSelectHeading
-            px, py = m.inchToPixel(p.x, p.y)
-
-            if m.selectVectorNotHeading: # In this case, we're setting the hidden points for the pose, NOT the heading
-
-                # Set control point to mouse
-                if Utility.distance(m.zx, m.zy, p.x, p.y) > 1: # control point must be at least one inch away from pose
-                    p.setVectorOffset(m.zx, m.zy)
-                    self.interpolatePoints()
-                
-            else: # in this case, we're setting the heading of the pose, NOT the hidden points
-                # for close distances, remove heading. But first MUST have heading
-                if p is not self.poses[0] and Utility.distance(m.x, m.y, px, py) < Pose.RADIUS*2:
-                    p.theta = None
-                else:  # Otherwise, get heading from normalized vector from center to mouse
-                    p.theta = math.atan2(m.y - py, m.x - px)
-
-                self.interpolatePoints()
 
     # State machine for handling changing the state of poses (setting isBreak, vector, heading, etc.)
     def handleHoveringOverPoses(self, m):
 
         anyHovered = False
 
-        if m.x < Utility.SCREEN_SIZE and m.poseDragged is None and m.poseSelectHeading is None:
+        if m.x < Utility.SCREEN_SIZE and m.poseDragged is None:
             for pose in self.poses:
                 if pose.touching(m):
                     anyHovered = True
@@ -184,10 +157,6 @@ class Path:
                         self.deletePose(pose)
                         self.interpolatePoints()
                     elif m.pressed or m.pressedR and m.poseDragged is None:
-                        if (m.getKey(pygame.K_c) or m.pressedR) and not m.simulating:
-                            m.poseSelectHeading = pose
-                            m.selectVectorNotHeading = m.pressedR
-                        elif m.pressed:
                             m.poseDragged = pose
                             m.startDragX = m.x
                             m.startDragY = m.y
@@ -244,7 +213,6 @@ class Path:
             m.panX += dx
             m.panY += dy
             m.boundFieldPan()
-        self.handleMouseHeading(m)
 
         # Update dragging and handle toggling showCoords
         if m.poseDragged is not None:
@@ -264,9 +232,7 @@ class Path:
 
         anyHovered = self.handleHoveringOverPoses(m)
 
-        self.pathIndex = -1 \
-            if (anyHovered or m.poseSelectHeading is not None) else self.getTouchingPathIndex(
-                m.zx, m.zy)
+        self.pathIndex = -1 if anyHovered else self.getTouchingPathIndex(m.zx, m.zy)
 
 
         if self.pathIndex != -1:
@@ -292,9 +258,6 @@ class Path:
         if not anyHovered and m.x < Utility.SCREEN_SIZE:
             if m.pressedR and not m.getKey(pygame.K_c) and not m.simulating:
                 self.addPose(m.zx, m.zy, m.zx + 3, m.zy + 3)
-                m.poseSelectHeading = self.poses[-1]
-                m.selectVectorNotHeading = True
-
             if m.pressed:
                 m.panning = True
                 
@@ -373,30 +336,6 @@ class Path:
         s = self.segmentDistance - Utility.distance(x,y,*P2)
         return s
 
-    # Interpolate between all the *given* thetas, as in some poses do not specify theta and should just be interpolated between the poses besides them
-    def interpolateTheta(self, knownThetaIndexes):
-
-        i1, theta1 = knownThetaIndexes[0]
-        assert i1 == 0
-        for ki in range(1, len(knownThetaIndexes)):
-            i2, theta2 = knownThetaIndexes[ki]
-
-            for i in range(0, i2-i1+1):
-                # Eliminate mod "wraparounds" by always finding the closest direction to spin
-                theta2adjusted = theta2
-                if theta2 - theta1 >= math.pi:
-                    theta2adjusted -= 2*math.pi
-                elif theta1 - theta2 >= math.pi:
-                    theta2adjusted += 2*math.pi
-                    
-                self.points[ i1 + i].theta = theta1 + (theta2adjusted - theta1) * (i / (i2-i1))    
-
-            i1 = i2
-            theta1 = theta2
-
-        # For all the points past the last known theta index, just set theta to the same number
-        for index in range(i1, len(self.points)):
-            self.points[index].theta = theta1
 
     # Call this function to update self.points whenever there is a change in interpolation. Generates a list of points from the entire combined path
     def interpolatePoints(self) -> None:
@@ -416,37 +355,19 @@ class Path:
             if self.poses[i].x == self.poses[i+1].x and self.poses[i].y == self.poses[i+1].y:
                 continue
 
-            # Mark point with theta if pose has specified theta
-            if self.poses[i].theta is not None:
-                knownThetaIndexes.append(
-                    [len(self.points), self.poses[i].theta])
-
             s = self.interpolateSplineCurve(i, s)
 
             # no spillovers at break points
             if self.poses[i+1].isBreak:
                 s = 0
 
-        # Mark last point with theta if it exists
-        if self.poses[-1].theta is not None:
-            knownThetaIndexes.append(
-                [len(self.points)-1, self.poses[-1].theta])
-
-        if len(self.poses) > 1:
-            self.interpolateTheta(knownThetaIndexes)
-
     def drawPoints(self, screen, m):
 
         POINT_SIZE = 1
-        TANGENT_LENGTH = 10
 
         for p in self.points:
-            p.px, p.py = m.inchToPixel(p.x, p.y)
-            Utility.drawLine(screen, Utility.PURPLE, p.px, p.py, *Utility.vector(
-                p.px, p.py, p.theta, TANGENT_LENGTH * m.getPartialZoom(0.5)),  m.getPartialZoom(0.75))
-
-        for p in self.points:
-            Utility.drawCircle(screen, p.px, p.py, Utility.RED,
+            xScreenRef, yScreenRef = m.inchToPixel(p.x, p.y)
+            Utility.drawCircle(screen, xScreenRef, yScreenRef, Utility.RED,
                                POINT_SIZE * m.getPartialZoom(0.75))
 
     def drawRobot(self, screen, m, pointIndex):

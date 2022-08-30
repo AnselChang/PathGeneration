@@ -26,8 +26,6 @@ class Mouse:
         self.prevY = 0
 
         self.poseDragged  = None
-        self.poseSelectHeading = None
-        self.selectVectorNotHeading = False
         
         self.scrolling = False
         self.simulating = False
@@ -45,41 +43,6 @@ class Mouse:
         self.panY = 0
 
 
-    # 19 785
-    def pixelToInch(self, x, y):
-        x -= self.panX
-        y -= self.panY
-        x /= self.zoom
-        y /= self.zoom
-
-        # x and y are now the pixels of the field. The field begins at 19 with a width of 766
-        x -= 19
-        y -= 19
-        x /= 766
-        y /= 766
-
-        # x and y are now between 0 and 1. Field has 144 inches
-        x *= 144
-        y *= 144
-        
-        return [x, y]
-
-    def inchToPixel(self, x, y):
-
-        x /= 144
-        y /= 144
-
-        x *= 766
-        y *= 766
-        x += 19
-        y += 19
-        
-        x *= self.zoom
-        y *= self.zoom
-        x += self.panX
-        y += self.panY
-        return [x, y]
-
     # return whether key is currently being pressed
     def getKey(self, k):
         return self.allKeys[k]
@@ -90,11 +53,6 @@ class Mouse:
     # To make objects grow slightly larger when zoom
     def getPartialZoom(self, scalar):
         return (self.zoom - 1) * scalar + 1
-
-    # Restrict the panning range for the field as to keep the field in sight of the screen
-    def boundFieldPan(self):
-        self.panX = max(min(0, self.panX),  (1-self.zoom)*Utility.SCREEN_SIZE)
-        self.panY = max(min(0, self.panY), (1-self.zoom)*Utility.SCREEN_SIZE)
 
     def tick(self, keyPressed):
 
