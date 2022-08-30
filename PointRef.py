@@ -10,7 +10,7 @@ To use this class, create a PointRef, and pass the fieldTransform object which h
 as well as the point location and reference frame:
     p = PointRef(fieldTransform, Enum.SCREEN, (40, 50))
 
-Now, through the decorator getter and setter methods, you can use the screen and frame reference frames interchangeably:
+Now, through the automatic getter and setter methods, you can use the screen and frame reference frames interchangeably:
     p.screenRef = (2,3)
     print(p.fieldRef)
     p.fieldRef = (1,-1)
@@ -23,7 +23,7 @@ class Ref(Enum):
 
 class PointRef:
 
-    def __init__(self, fieldTransform: FieldTransform.FieldTransform, referenceMode: Ref, point: tuple = (0,0)):
+    def __init__(self, fieldTransform: FieldTransform.FieldTransform, referenceMode: Ref = None, point: tuple = (0,0)):
         self.transform = FieldTransform
         if referenceMode == Ref.SCREEN:
             self._setScreenRef(point)

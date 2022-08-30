@@ -1,5 +1,5 @@
 import sys, pygame, cProfile
-import MouseHandler, PathStructuresBezier, Utility, Slider
+import UserInput, PathStructuresBezier, Utility, Slider
 
 # Handle A and S keys to zoom in and out, as well as mousewheel. Returns true if zoom has been changed
 def handleZoom(m, mousewheel, currentfieldSurface, rawFieldSurface):
@@ -58,7 +58,7 @@ def main():
     IMAGE_SIZE = 812
 
     path = PathStructuresBezier.Path(0.5)
-    m = MouseHandler.Mouse(pygame.mouse, pygame.key)
+    m = UserInput.Mouse(pygame.mouse, pygame.key)
 
     Slider.init(m)
     slider = Slider.Slider(830, 1070, 730)
