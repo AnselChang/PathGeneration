@@ -1,8 +1,9 @@
 from enum import Enum
 import PointRef, FieldTransform, Utility, Draggable
 
-"""PathPoint objects are control points that are on the path, and are associated with two "control" points not on 
-the actual path, in order to specify angle.
+"""PathPoint objects are user-controllable points that consist of a main control point that is on the path, and 
+two "control" points not on  the actual path, in order to specify angle.
+
 In this implementation, a PathPoint is the owner of two control points, and the position of two control points are
 defined relative to the location of the PathPoint.
 A PathPoint can be toggled to either SMOOTH or SHARP, with SHARP implying a point turn at that point instead
