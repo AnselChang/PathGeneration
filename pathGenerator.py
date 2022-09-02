@@ -55,7 +55,6 @@ def main():
 
     rawFieldSurface = pygame.image.load("Images/squarefield.png")
     fieldSurface = pygame.transform.smoothscale(rawFieldSurface, (Utility.SCREEN_SIZE, Utility.SCREEN_SIZE))
-    IMAGE_SIZE = 812
 
     path = PathStructuresBezier.Path(0.5)
     m = UserInput.Mouse(pygame.mouse, pygame.key)

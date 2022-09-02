@@ -1,8 +1,9 @@
-import pygame, Utility, PointRef, FieldTransform
+import pygame, Utility, PointRef
+from FieldTransform import FieldTransform
     
 
 class UserInput:
-    def __init__(self, transform: FieldTransform.FieldTransform, pygameMouseObject, pygameKeyObject):
+    def __init__(self, transform: FieldTransform, pygameMouseObject, pygameKeyObject):
         
         # Singleton state objects
         self._mouse = pygameMouseObject
@@ -10,32 +11,25 @@ class UserInput:
         self._transform = transform
 
         # Position of the mouse in both screen and field reference frames
-        self._mousePosition = PointRef.PointRef(self._transform)
+        self.mousePosition = PointRef.PointRef(self._transform)
 
         # Key that was just pressed this frame
         self.keyJustPressed = None
+        
+        # Amount of shift on the mousewheel
+        self.mousewheelDelta = 0
+
+        # The file object if a loaded file was dragged onto the screen this frame
+        self.loadedFile = None
+
+        # If the quit button was dragged onto the screen
+        self.isQuit = False
 
         # For left/right mouse button pressing/releasing
-        self._isCtrlPressing = False
-        self.pressingLeft = False
-        self.pressingRight = False
-        self.pressingLeftPrevious = False
-        self.pressingRightPrevious = False
-
-        # old state stuff that hasn't been refactored yet
-        self.poseDragged  = None
-        self.scrolling = False
-        self.simulating = False
-        self.playingSimulation = False
-        self.draggingSlider = False
+        self.leftPressed = False
+        self.rightPressed = False
+        self.mouseReleased = False
         
-    # Get the mouse coordinates from the screen reference frame
-    def mouseScreenRef(self) -> tuple:
-        return self._mousePosition.screenRef
-
-    # Get the mouse coordinates from the field reference frame
-    def mouseFieldRef(self) -> tuple:
-        return self._mousePosition.fieldRef
 
     # return whether the key is currently being pressed. The key parameter is a pygame key constant
     def isKeyPressing(self, key):
@@ -45,37 +39,37 @@ class UserInput:
     def isKeyPressed(self, key):
         return self.keyJustPressed == key
 
-    # If the left mouse button was just pressed on this frame
-    def isMousePressedLeft(self):
-        return not self._isCtrlPressing and self.pressingLeft and not self.pressingLeftPrevious
-
-    # If the right mouse button was just pressed on this frame
-    def isMousePressedRight(self):
-        controlClick = self._isCtrlPressing and self.pressingLeft and not self.pressingLeftPrevious
-        return controlClick or self.pressingRight and not self.pressingRightPrevious
-
-    # If the left mouse button was just released on this frame
-    def isMouseReleasedLeft(self):
-        return not self.pressingLeft and self.pressingLeftPrevious    
 
     # Update the UserInput state machine. keyJustPressed is the key pressed starting in this frame, or None if none exists.
     # Call this at the start of every frame
-    def getUserInput(self, keyJustPressed):
+    def getUserInput(self):
+
+        # handle events
+        self.keyJustPressed = None
+        self.isQuit = False
+        self.mousewheelDelta = 0
+        self.leftPressed = False
+        self.rightPressed = False
+        self.mouseReleased = False
+        self.loadedFile = None
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.isQuit = True
+            elif event.type == pygame.KEYDOWN:
+                self.keyJustPressed = event.key
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Control key pressed for right click
+                if self.isKeyPressing(pygame.K_LCTRL) or self.isKeyPressing(pygame.K_RCTRL):
+                    self.rightPressed = True
+                else:
+                    self.leftPressed = True
+            elif event.type == pygame.MOUSEWHEEL:
+                self.mousewheelDelta = event.y
+            elif event.type == pygame.DROPFILE:
+                self.loadedFile = event.file
 
         # Update mouse position
-        self._mousePosition.screenRef = self._mouse.get_pos()
-
-        # Update  key just pressed
-        self.keyJustPressed = keyJustPressed
-
-        # Update left aand right mouse that just got clicked or release
-        self._isCtrlPressing = self.isKeyPressing(pygame.K_LCTRL) or self.isKeyPressing(pygame.K_RCTRL)
-        self.pressingLeftPrevious = self.pressingLeft
-        self.pressingRightPrevious = self.pressingRight
-        self.pressingLeft = self._mouse.get_pressed()[0]
-        self.pressingRight = self._mouse.get_pressed()[1]
-        
-
+        self.mousePosition.screenRef = self._mouse.get_pos()
 
         
 
