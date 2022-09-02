@@ -1,5 +1,5 @@
 import Utility
-import FieldTransform
+from FieldTransform import FieldTransform
 from enum import Enum
 
 """
@@ -23,15 +23,15 @@ class Ref(Enum):
 
 class PointRef:
 
-    def __init__(self, fieldTransform: FieldTransform.FieldTransform, referenceMode: Ref = None, point: tuple = (0,0)):
-        self.transform = FieldTransform
+    def __init__(self, fieldTransform: FieldTransform, referenceMode: Ref = None, point: tuple = (0,0)):
+        self.transform = fieldTransform
         if referenceMode == Ref.SCREEN:
             self._setScreenRef(point)
         else:
             self._setFieldRef(point)
 
     def _setScreenRef(self, point: tuple) -> None:
-        self._xs, self._ys = tuple
+        self._xs, self._ys = point
 
         # undo the panning and zooming
         panX, panY = self.transform.pan
@@ -49,13 +49,14 @@ class PointRef:
     screenRef = property(_getScreenRef, _setScreenRef)
     
     def _setFieldRef(self, point: tuple) -> None:
-        self._xf, self._yf = tuple
+        self._xf, self._yf = point
 
         # convert to normalized (pre-zoom and pre-panning) coordinates
         normalizedScreenX = self._xf / Utility.FIELD_SIZE_IN_INCHES * Utility.FIELD_SIZE_IN_PIXELS + Utility.PIXELS_TO_FIELD_CORNER
         normalizedScreenY = self._yf / Utility.FIELD_SIZE_IN_INCHES * Utility.FIELD_SIZE_IN_PIXELS + Utility.PIXELS_TO_FIELD_CORNER
 
         # convert to screen reference frame
+        print(self.transform.pan)
         panX, panY = self.transform.pan
         self._xs = normalizedScreenX * self.transform.zoom + panX
         self._ys = normalizedScreenY * self.transform.zoom + panY
@@ -65,3 +66,15 @@ class PointRef:
 
     # getter and setter for point in field reference frame
     fieldRef = property(_getFieldRef, _setFieldRef)
+
+    def __str__(self):
+        return "Point object:\nScreen: ({},{})\nField: ({},{})".format(self._xs, self._ys, self._xf, self._yf)
+
+# Testing code
+if __name__ == "__main__":
+    f = FieldTransform(2, (0,0))
+    p = PointRef(f, Ref.FIELD, (10,10))
+    p.screenRef = (0,0)
+    print(p)
+    p.fieldRef = (0,0)
+    print(p)

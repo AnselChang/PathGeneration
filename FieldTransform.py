@@ -20,9 +20,9 @@ class FieldTransform:
 
     # Restrict the panning range for the field as to keep the field in sight of the screen
     def _boundFieldPan(self):
-        maxPan = (1-self._zoom)*Utility.SCREEN_SIZE
-        self._panX = Utility.clamp(self._panX, 0, maxPan)
-        self._panY = Utility.clamp(self._panY, 0, maxPan)
+        minPan = (1-self._zoom)*Utility.SCREEN_SIZE
+        self._panX = Utility.clamp(self._panX, minPan, 0)
+        self._panY = Utility.clamp(self._panY, minPan, 0)
 
     # A setter function for self.zoom, which bounds zoom and pan after zoom is updated to keep the field in sight of hte screen
     def _getZoom(self):
@@ -50,3 +50,14 @@ class FieldTransform:
     # objects grow when zooming in, but at a slower rate than the zoom (when 0 < scalar < 1)
     def getPartialZoom(self, scalar):
         return (self.zoom - 1) * scalar + 1
+
+    def __str__(self):
+        return "FieldTransform object\nzoom: {}\npan: ({},{})".format(self._zoom, self._panX, self._panY)
+
+# Testing code
+if __name__ == "__main__":
+    f = FieldTransform()
+    print(f)
+    f.zoom = 4
+    f.pan = -10000, 1000
+    print(f)

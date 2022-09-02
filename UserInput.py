@@ -29,11 +29,21 @@ class UserInput:
         self.playingSimulation = False
         self.draggingSlider = False
         
+    # Get the mouse coordinates from the screen reference frame
+    def mouseScreenRef(self) -> tuple:
+        return self._mousePosition.screenRef
 
+    # Get the mouse coordinates from the field reference frame
+    def mouseFieldRef(self) -> tuple:
+        return self._mousePosition.fieldRef
 
     # return whether the key is currently being pressed. The key parameter is a pygame key constant
     def isKeyPressing(self, key):
-        return self.key.get_pressed()[k]
+        return self.key.get_pressed()[key]
+
+    # return whether the key has just been pressed (rising edge)
+    def isKeyPressed(self, key):
+        return self.keyJustPressed == key
 
     # If the left mouse button was just pressed on this frame
     def isMousePressedLeft(self):
@@ -48,8 +58,9 @@ class UserInput:
     def isMouseReleasedLeft(self):
         return not self.pressingLeft and self.pressingLeftPrevious    
 
-    # Update the UserInput state machine. keyJustPressed is the key pressed starting in this frame, or None if none exists
-    def tick(self, keyJustPressed):
+    # Update the UserInput state machine. keyJustPressed is the key pressed starting in this frame, or None if none exists.
+    # Call this at the start of every frame
+    def getUserInput(self, keyJustPressed):
 
         # Update mouse position
         self._mousePosition.screenRef = self._mouse.get_pos()

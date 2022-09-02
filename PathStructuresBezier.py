@@ -2,7 +2,6 @@ from enum import Enum
 import Utility
 import math, pickle, os, csv
 import pygame
-import SplineCurves
 import BezierCurves
 import Robot
 
