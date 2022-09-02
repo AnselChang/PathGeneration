@@ -27,14 +27,20 @@ def pixelsToInches(pixels):
 def pixelsToTiles(pixels):
     return (pixels / SCREEN_SIZE) * 6
 
-def clamp(value: float, minBound: float, maxBound: float):
+def clamp(value: float, minBound: float, maxBound: float) -> float:
     return max(minBound, min(maxBound, value))
 
+def clamp2D(point: tuple, minX: float, minY: float, maxX: float, maxY: float) -> tuple:
+    return clamp(tuple[0], minX, maxX), clamp(tuple[1], minY, maxY)
+
 def hypo(s1, s2):
-    return math.sqrt(s1*s1 + s2 * s2)
+    return math.sqrt(s1*s1 + s2*s2)
+
+def distanceTuple(vector: tuple):
+    return hypo(*vector)
 
 def distance(x1,y1,x2,y2):
-    return math.sqrt( ((x1-x2)**2)+((y1-y2)**2) )
+    return hypo(y2-y1, x2-x1)
 
 # Distance between point (x0, y0) and line (x1, y1,),(x2,y2)
 def distanceTwoPoints(x0, y0, x1, y1, x2, y2):

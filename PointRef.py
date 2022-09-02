@@ -1,3 +1,4 @@
+import re
 import Utility
 from FieldTransform import FieldTransform
 from enum import Enum
@@ -67,8 +68,40 @@ class PointRef:
     # getter and setter for point in field reference frame
     fieldRef = property(_getFieldRef, _setFieldRef)
 
+    # Return position with specified reference frame
+    def get(self, referenceMode: Ref) -> tuple:
+        return self.fieldRef if referenceMode == Ref.FIELD else self.screenRef
+
+    # Return (this - otherPoint) in terms of the referenceMode reference frame
+    # Does not modify either object
+    def subtract(self, otherPoint: 'PointRef', referenceMode: Ref) -> tuple:
+        if referenceMode == Ref.FIELD:
+            return (self._xf - otherPoint._xf, self._yf - otherPoint._yf)
+        else:
+            return (self._xs - otherPoint._xs, self._ys - otherPoint._ys)
+
+    # Add some offset to this point, modifying the object. Must specify reference frame
+    def addInPlace(self, offset: tuple, referenceMode: Ref) -> None:
+        if referenceMode == Ref.FIELD:
+            self.fieldRef = (self.fieldRef[0] + tuple[0], self.fieldRef[1] + tuple[1])
+        else:
+            self.screenRef = (self.screenRef[0] + tuple[0], self.screenRef[1] + tuple[1])
+
+    # Create a deep copy of the object and return the copy
+    def copy(self) -> 'PointRef':
+        return PointRef(self.transform, Ref.FIELD, self.fieldRef)
+
+
     def __str__(self):
         return "Point object:\nScreen: ({},{})\nField: ({},{})".format(self._xs, self._ys, self._xf, self._yf)
+
+# Return a new PointRef object that translates the given PointRef by deltaPosition given by the referenceFrame (field/screen)
+# Does not modify existing PointRef
+def translateByVector(point: PointRef, deltaPosition: tuple, referenceFrame: Ref) -> PointRef:
+
+    oldPosition = point.get(referenceFrame)
+    newPosition: tuple = (oldPosition[0] + deltaPosition[0], oldPosition[1] + deltaPosition[1])
+    return PointRef(point.transform, referenceFrame, newPosition)
 
 # Testing code
 if __name__ == "__main__":

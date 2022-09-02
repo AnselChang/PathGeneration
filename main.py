@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys
 import FieldTransform, SoftwareState, PointRef, UserInput, Utility
 
 def main():
@@ -15,7 +15,10 @@ def main():
 
         userInput.getUserInput()
 
-        # ... handle userInput
+        if userInput.isQuit:
+            pygame.quit()
+            sys.exit()
+        
 
 
         if state.objectDragged is not None:
