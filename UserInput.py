@@ -34,11 +34,12 @@ class UserInput:
         self.leftPressed = False
         self.rightPressed = False
         self.mouseReleased = False
+        self.isMousePressing = False
         
 
     # return whether the key is currently being pressed. The key parameter is a pygame key constant
     def isKeyPressing(self, key):
-        return self.key.get_pressed()[key]
+        return self._key.get_pressed()[key]
 
     # return whether the key has just been pressed (rising edge)
     def isKeyPressed(self, key):
@@ -70,11 +71,14 @@ class UserInput:
                     self.rightPressed = True
                 else:
                     self.leftPressed = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.mouseReleased = True
             elif event.type == pygame.MOUSEWHEEL:
                 self.mousewheelDelta = event.y
             elif event.type == pygame.DROPFILE:
                 self.loadedFile = event.file
 
         # Update mouse position
+        self.isMousePressing = self._mouse.get_pressed()[0]
         self.mousePosition.screenRef = self._mouse.get_pos()
         self.isMouseOnField = self.mousePosition.screenRef[0] < Utility.SCREEN_SIZE

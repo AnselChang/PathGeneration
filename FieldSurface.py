@@ -5,7 +5,7 @@ It implements Draggable, meaning that the mouse can drag the field to pan the sc
 in that panning the screen will change panning values in FieldTransform and therefore pan every other object on the field.
 """
 
-class FieldSurface(Draggable):
+class FieldSurface(Draggable.Draggable):
 
     def __init__(self, fieldTransform: FieldTransform.FieldTransform):
         self.transform = fieldTransform
@@ -28,6 +28,8 @@ class FieldSurface(Draggable):
     # on where the mouse is
     def beDraggedByMouse(self, mousePosition: PointRef.PointRef):
 
+        print("dragging")
+
         deltaX = mousePosition.screenRef[0] - self.previousMouseX
         deltaY = mousePosition.screenRef[1] - self.previousMouseY
 
@@ -43,3 +45,6 @@ class FieldSurface(Draggable):
     # Draw the scaled field with the stored pan
     def draw(self, screen: pygame.Surface):
         screen.blit(self.scaledFieldSurface, self.transform.pan)
+
+    def __str__(self):
+        return "FieldSurface with transform: {}".format(self.transform)

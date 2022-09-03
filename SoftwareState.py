@@ -16,5 +16,8 @@ class SoftwareState:
         self.objectHovering: object = None # object the mouse is currently hovering over
         self.objectDragged: Draggable = None # object the mouse is currently dragging
 
+    def __str__(self):
+        return "Software State:\nHovering: {}\nDragged: {}".format(self.objectHovering, self.objectDragged)
+
     
 

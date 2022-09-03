@@ -130,3 +130,6 @@ class PathPoint(Draggable.Draggable):
         px, py = self.position.fieldRef
         newBPosition = px - (ax - px), py - (ay - py)
         self.contolPositionB = PointRef.PointRef(self.transform, PointRef.Ref.FIELD, newBPosition)
+
+    def __str__(self):
+        return "PathPoint with position {}".format(self.position)
