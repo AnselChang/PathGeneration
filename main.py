@@ -64,20 +64,24 @@ def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: Fie
 def getMouseHoveringObject(path: FullPath.FullPath, userInput: UserInput.UserInput) -> object:
     
     # Figure out what the mouse is hovering over
-        if userInput.isMouseOnField: # if mouse is on the field (instead of the panel)
-            
-            # Check if mouse is hovering over PathPoint
-            hoveringPathPoint = path.getMouseHoveringPoint(userInput.mousePosition)
-            if hoveringPathPoint is not None:
-                return hoveringPathPoint
+    if userInput.isMouseOnField: # if mouse is on the field (instead of the panel)
+        
+        # Check if mouse is hovering over PathPoint
+        hoveringPathPoint = path.getMouseHoveringPoint(userInput.mousePosition)
+        if hoveringPathPoint is not None:
+            return hoveringPathPoint
 
-            # Check if mouse is hovering over segment
-            pass
-            
-        else:
-            # Mouse is on the panel (instead of the field)
-            # Check for sliders
-            pass
+        # Check if mouse is hovering over segment
+        hoveringSegment = path.getMouseHoveringSegment(userInput.mousePosition)
+        if hoveringSegment is not None:
+            return hoveringSegment
+        
+    else:
+        # Mouse is on the panel (instead of the field)
+        # Check for sliders
+        pass
+
+    return None # no hovering object found
 
 
 # Called when the mouse was just pressed and we want to see if a new object is about to be dragged

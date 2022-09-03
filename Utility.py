@@ -55,14 +55,14 @@ def distanceTwoPoints(x0, y0, x1, y1, x2, y2):
 def vector(x0, y0, theta, magnitude):
     return [x0 + magnitude*math.cos(theta), y0 + magnitude*math.sin(theta)]
 
-def pointTouchingLine(x, y, x1, y1, x2, y2, lineThickness):
+def pointTouchingLine(mouseX: int, mouseY: int, x1: int, y1: int, x2: int, y2: int, lineThickness: int):
 
     if x1 == x2 and y1 == y2:
         return False
     
-    if distanceTwoPoints(x,y, x1, y1, x2, y2) <=  lineThickness:
+    if distanceTwoPoints(mouseX,mouseY, x1, y1, x2, y2) <=  lineThickness:
         dist = distance(x1, y1, x2, y2)
-        if distance(x, y, x1, y1) < dist and distance(x, y, x2, y2) < dist:
+        if distance(mouseX, mouseY, x1, y1) < dist and distance(mouseX, mouseY, x2, y2) < dist:
             return True
     return False
 
