@@ -10,7 +10,7 @@ A PathPoint can be toggled to either SMOOTH or SHARP, with SHARP implying a poin
 of following a continouous beizer curve. When SMOOTH, the two control points are linked as two opposite vectors relative
 from PathPoint.
 The location of the PathPoint itself and the two control points are stored as PointRefs. But, moving the PathPoint
-by some delta will also shit the control points the same amount.
+by some delta will also shift the control points the same amount.
 """
 
 class Shape(Enum):
@@ -68,10 +68,15 @@ class PathPoint(Draggable.Draggable):
     # This function should only be called when the mouse is hovering over this object and the mouse was just pressed
     def startDragging(self, mousePosition: PointRef.PointRef):
         if self.pointHovered is None:
-            raise Exception("A point must be hovered for this function to be called")
+            raise Exception("Error: trying to drag an nonexistent object.")
+
+        # At the moment, the object will simply "snap" to the mouse when dragging it. If we want to drag the object
+        # relative to where the mouse clicked the object, we'd need to store the starting mouse position here
         self.pointDragged = self.pointHovered
 
+
     # Implementing Draggable interface
+    # Called when the mouse has released the object
     def stopDragging(self):
         self.pointDragged = None
 
@@ -82,7 +87,7 @@ class PathPoint(Draggable.Draggable):
         if self.pointDragged == _Type.NONE:
             # At this point, SoftwareState is indicating this object is being dragged, but this object disagrees.
             # This should be impossible; it is guaranteed a bug exists somewhere...
-            raise Exception("Inconsistent internal state.")
+            raise Exception("Error: unsure if object is being dragged.")
         
         # Clamp position to within the bounds of the field
         newPos = Utility.clamp2D(mousePosition.fieldRef, 0, 0, Utility.FIELD_SIZE_IN_INCHES, Utility.FIELD_SIZE_IN_INCHES)

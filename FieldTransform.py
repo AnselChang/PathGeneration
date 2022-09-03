@@ -1,4 +1,3 @@
-import pygame
 import Utility
 
 """This class is used for storing the field transformations (zooming and panning) relative to the screen, as well as
@@ -19,13 +18,6 @@ class FieldTransform:
     def __init__(self, fieldZoom: float = 1, xyFieldPanInPixels: tuple = (0,0)):
         self._zoom = fieldZoom
         self._panX, self._panY = xyFieldPanInPixels
-        self.rawFieldSurface = pygame.image.load("Images/squarefield.png")
-        self.updateScaledSurface()
-
-    # Whenever the zoom is changed, this function should be called to scale the raw surface into the scaled one
-    def updateScaledSurface(self):
-        self.scaledFieldSurface = pygame.transform.smoothscale(
-            self.rawFieldSurface, [Utility.SCREEN_SIZE * self._zoom, Utility.SCREEN_SIZE * self._zoom])
 
     # Restrict the panning range for the field as to keep the field in sight of the screen
     def _boundFieldPan(self):
@@ -59,10 +51,6 @@ class FieldTransform:
     # objects grow when zooming in, but at a slower rate than the zoom (when 0 < scalar < 1)
     def getPartialZoom(self, scalar):
         return (self.zoom - 1) * scalar + 1
-
-    # Draw the scaled field with the stored pan
-    def drawField(self, screen: pygame.Surface):
-        screen.blit(self.scaledFieldSurface, self.pan)
 
     def __str__(self):
         return "FieldTransform object\nzoom: {}\npan: ({},{})".format(self._zoom, self._panX, self._panY)

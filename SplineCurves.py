@@ -1,3 +1,5 @@
+"""Code generously provided by Yusef Simsek"""
+
 # Return position at t, 0 < t < 1
 def getSplinePoint(t, p1, p2, p3, p4):
     tt = t * t
