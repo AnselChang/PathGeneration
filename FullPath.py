@@ -1,5 +1,5 @@
 
-import PathPoint, PointRef, pygame
+import PathPoint, PointRef, Utility, pygame
 
 
 """Store the full path of the robot. This consists of a list of PathPoint objects, as well as the interpolatedPoint objects
@@ -25,6 +25,22 @@ class FullPath:
     def createPathPoint(self, position: PointRef.PointRef):
         self.pathPoints.append(PathPoint.PathPoint(position.copy()))
 
+    # Draw a segment from each path to the next. This will be drawn under the points themselves
+    def drawPathSegments(self, screen: pygame.Surface):
+        
+        # Handle no-point case
+        if len(self.pathPoints) == 0:
+            return
+        
+        positionA = self.pathPoints[0].position.screenRef
+        for point in self.pathPoints[1:]:
+            positionB = point.position.screenRef
+
+            # Draw line from position A to B
+            Utility.drawLine(screen, Utility.LINEGREY, *positionA, *positionB, 3)
+
+            positionA = positionB
+
     # Iterate through each PathPoint and draw it
     def drawPathPoints(self, screen: pygame.Surface):
         index = 0
@@ -34,5 +50,6 @@ class FullPath:
 
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments
     def draw(self, screen: pygame.Surface):
+        self.drawPathSegments(screen)
         self.drawPathPoints(screen)
     

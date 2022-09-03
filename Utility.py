@@ -45,6 +45,9 @@ def distanceTuple(vector: tuple):
 def distance(x1,y1,x2,y2):
     return hypo(y2-y1, x2-x1)
 
+def distanceTuples(vector1: tuple, vector2: tuple):
+    return distance(*vector1, *vector2)
+
 # Distance between point (x0, y0) and line (x1, y1,),(x2,y2)
 def distanceTwoPoints(x0, y0, x1, y1, x2, y2):
     return abs((x2-x1)*(y1-y0)- (x1-x0)*(y2-y1)) / distance(x1, y1, x2, y2)
@@ -136,7 +139,7 @@ def drawPolygon(screen, color, points, width = 1):
     if width > 1:
         pygame.draw.polygon(screen, color, points, width = width)
 
-def drawLine(screen, color, x1, y1, x2, y2, thickness = 1):
+def drawLine(screen: pygame.Surface, color: tuple, x1: int, y1: int, x2: int, y2: int, thickness: int = 1):
 
     thickness = round(thickness)
 

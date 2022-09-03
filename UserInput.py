@@ -108,8 +108,8 @@ class UserInput:
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.mouseReleased = True
 
-                # If the mouse button was pressed and released at the same location, that constitutes a click
-                if (self._mouse.get_pos() == self._mousePressPosition):
+                # If the mouse button was pressed and released at roughly the same location, that constitutes a click
+                if (Utility.distanceTuples(self._mouse.get_pos(), self._mousePressPosition)) < 5:
                     if self._lastMousePress == _RIGHT:
                         self.rightClicked = True
                     elif self._lastMousePress == _LEFT:
