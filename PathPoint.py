@@ -60,7 +60,20 @@ class PathPoint(Draggable.Draggable):
              self.pointHovered = _Type.CONTROL_B
              return True
         else:
+            self.pointHovered = None
             return False
+
+    # Implementing Draggable interface
+    # Now that the object is being dragged, specify that point being dragged
+    # This function should only be called when the mouse is hovering over this object and the mouse was just pressed
+    def startDragging(self, mousePosition: PointRef.PointRef):
+        if self.pointHovered is None:
+            raise Exception("A point must be hovered for this function to be called")
+        self.pointDragged = self.pointHovered
+
+    # Implementing Draggable interface
+    def stopDragging(self):
+        self.pointDragged = None
 
     # Implementing Draggable interface
     # Check which of the three points in the object is being dragged, and change its position accordingly

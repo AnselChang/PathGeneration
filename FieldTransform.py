@@ -61,7 +61,7 @@ class FieldTransform:
         return (self.zoom - 1) * scalar + 1
 
     # Draw the scaled field with the stored pan
-    def drawField(self, screen):
+    def drawField(self, screen: pygame.Surface):
         screen.blit(self.scaledFieldSurface, self.pan)
 
     def __str__(self):
