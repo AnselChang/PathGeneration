@@ -46,7 +46,6 @@ class PathPoint(Draggable.Draggable):
     def checkMouseHovering(self, mousePosition: PointRef.PointRef) -> bool:
 
         def closeToMouse(position: PointRef.PointRef):
-            print(position)
             return Utility.distanceTuple(mousePosition.subtract(position, PointRef.Ref.SCREEN)) <= 5 # in pixels
 
         if closeToMouse(self.position):

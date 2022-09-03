@@ -23,7 +23,7 @@ class FullPath:
 
     # Append a PathPoint at the end of the path at the specified position
     def createPathPoint(self, position: PointRef.PointRef):
-        self.pathPoints.append(PathPoint.PathPoint(position))
+        self.pathPoints.append(PathPoint.PathPoint(position.copy()))
 
     # Iterate through each PathPoint and draw it
     def drawPathPoints(self, screen: pygame.Surface):
