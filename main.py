@@ -16,21 +16,26 @@ def main():
 
     # Main software loop
     while True:
-
         userInput.getUserInput()
-
         if userInput.isQuit:
             pygame.quit()
             sys.exit()
         
-        handleMousewheel(fieldSurface, fieldTransform, userInput)
+        if not fieldSurface.isCurrentlyDragging:
+            handleMousewheel(fieldSurface, fieldTransform, userInput)
         
         
         state.objectHovering = getMouseHoveringObject(path, userInput)
         handleDragging(userInput, state, fieldSurface)
 
         drawEverything(screen, fieldSurface)
-        print(state)
+        
+        #print(state)
+
+        if userInput.leftClicked:
+            print("left")
+        elif userInput.rightClicked:
+            print("right")
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: FieldTransform.FieldTransform, userInput: UserInput.UserInput) -> None:
@@ -121,8 +126,6 @@ def drawEverything(screen: pygame.Surface, fieldSurface: FieldSurface.FieldSurfa
     border = 5
     pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
     pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
-
-    
     
     pygame.display.update()
 

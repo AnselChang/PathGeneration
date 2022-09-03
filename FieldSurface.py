@@ -1,3 +1,4 @@
+from operator import truediv
 import FieldTransform, PointRef, Draggable, Utility, pygame
 
 """A class that stores the scaled surface of the vex field, and contains a draw() method to draw it onto the screen.
@@ -12,7 +13,10 @@ class FieldSurface(Draggable.Draggable):
         self.rawFieldSurface: pygame.Surface = pygame.image.load("Images/squarefield.png")
         self.updateScaledSurface()
 
-        self.previousMouseX, self.previousMouseY = None, None # For calculating mouse dragging delta to determine panning amount
+        self.isCurrentlyDragging = False
+
+        self.startDragX, self.startDragY = None, None # For calculating mouse dragging delta to determine panning amount
+        self.startPanX, self.startPanY = None, None
 
     # Whenever the zoom is changed, this function should be called to scale the raw surface into the scaled one
     def updateScaledSurface(self):
@@ -20,26 +24,26 @@ class FieldSurface(Draggable.Draggable):
             self.rawFieldSurface, [Utility.SCREEN_SIZE * self.transform.zoom, Utility.SCREEN_SIZE * self.transform.zoom])
 
     
-    # Called when the field was just pressed at the start of the drag
+    # Called when the field was just pressed at the start of the drag.
+    # Get the current mouse and pan position so that new pan based on changes in mouse position can be calculated
     def startDragging(self, mousePosition: PointRef.PointRef):
-        self.previousMouseX, self.previousMouseY = mousePosition.screenRef
+        self.isCurrentlyDragging = True
+        self.startDragX, self.startDragY = mousePosition.screenRef
+        self.startPanX, self.startPanY = self.transform.pan
 
-    # Called every frame that the object is being dragged. Most likely used to update the position of the object based
-    # on where the mouse is
+    # Called every frame that the object is being dragged.
+    # Compute pan based on mouse position delta
     def beDraggedByMouse(self, mousePosition: PointRef.PointRef):
 
+        # Calculate delta in mouse position
+        deltaX = mousePosition.screenRef[0] - self.startDragX
+        deltaY = mousePosition.screenRef[1] - self.startDragY
 
-        deltaX = mousePosition.screenRef[0] - self.previousMouseX
-        deltaY = mousePosition.screenRef[1] - self.previousMouseY
-
-        panX, panY = self.transform.pan
-        self.transform.pan = panX + deltaX, panY + deltaY
-
-        self.previousMouseX, self.previousMouseY = mousePosition.screenRef # update previous mouse position to current frame
+        self.transform.pan = self.startPanX + deltaX, self.startPanY + deltaY
 
     # Called when the dragged object was just released
     def stopDragging(self):
-        self.previousMouseX, self.previousMouseY = None, None
+        self.isCurrentlyDragging = False
 
     # Draw the scaled field with the stored pan
     def draw(self, screen: pygame.Surface):

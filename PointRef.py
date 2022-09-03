@@ -48,7 +48,6 @@ class PointRef:
         normalizedScreenY = self._yf / Utility.FIELD_SIZE_IN_INCHES * Utility.FIELD_SIZE_IN_PIXELS + Utility.PIXELS_TO_FIELD_CORNER
 
         # convert to screen reference frame
-        print(self.transform.pan)
         panX, panY = self.transform.pan
         xs = normalizedScreenX * self.transform.zoom + panX
         ys = normalizedScreenY * self.transform.zoom + panY

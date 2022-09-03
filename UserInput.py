@@ -6,6 +6,11 @@ It handles all events and stores things like whether the left mouse button was p
 To use, call getUserInput() at the beginning of every tick to read user input events, then this object's data
 can be read for the rest of the fraame
 """
+
+# Buttons
+_LEFT = 1
+_RIGHT = 3
+
 class UserInput:
     def __init__(self, transform: FieldTransform, pygameMouseObject, pygameKeyObject):
         
@@ -35,6 +40,14 @@ class UserInput:
         self.rightPressed = False
         self.mouseReleased = False
         self.isMousePressing = False
+
+        # Used to compare mouse press and mouse release positions to determine if a mouse release constitutes a "click"
+        self._mousePressPosition = (0,0)
+        self._lastMousePress = _LEFT
+
+        # Clicking is defined as press then release without movement of mouse position
+        self.leftClicked = False
+        self.rightClicked = False
         
 
     # return whether the key is currently being pressed. The key parameter is a pygame key constant
@@ -45,19 +58,29 @@ class UserInput:
     def isKeyPressed(self, key):
         return self.keyJustPressed == key
 
+    # Reset user input state at the start of each frame
+    def resetState(self):
+        self.keyJustPressed = None
+        self.isQuit = False
+
+        self.mousewheelDelta = 0
+
+        self.leftPressed = False
+        self.rightPressed = False
+
+        self.leftClicked = False
+        self.rightClicked = False
+
+        self.mouseReleased = False
+
+        self.loadedFile = None
 
     # Update the UserInput state machine. keyJustPressed is the key pressed starting in this frame, or None if none exists.
     # Call this at the start of every frame
     def getUserInput(self):
 
         # handle events
-        self.keyJustPressed = None
-        self.isQuit = False
-        self.mousewheelDelta = 0
-        self.leftPressed = False
-        self.rightPressed = False
-        self.mouseReleased = False
-        self.loadedFile = None
+        self.resetState()
 
         for event in pygame.event.get():
 
@@ -66,13 +89,33 @@ class UserInput:
             elif event.type == pygame.KEYDOWN:
                 self.keyJustPressed = event.key
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                # Control key pressed for right click
-                if self.isKeyPressing(pygame.K_LCTRL) or self.isKeyPressing(pygame.K_RCTRL):
+
+                ctrlKey: bool= self.isKeyPressing(pygame.K_LCTRL) or self.isKeyPressing(pygame.K_RCTRL)
+
+                # Determine if it was a left or right press and update which mouse button was pressed.
+                # Store position to be able to see if, when the mouse is released, it constitutes a "click"
+                if (event.button == _LEFT and ctrlKey) or event.button == _RIGHT:
+                    self._lastMousePress = _RIGHT
                     self.rightPressed = True
-                else:
+                    self._mousePressPosition = self._mouse.get_pos()
+                elif event.button == _LEFT:
+                    self._lastMousePress = _LEFT
                     self.leftPressed = True
+                    self._mousePressPosition = self._mouse.get_pos()
+                else:
+                    self._lastMousePress = None
+                
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.mouseReleased = True
+
+                # If the mouse button was pressed and released at the same location, that constitutes a click
+                if (self._mouse.get_pos() == self._mousePressPosition):
+                    if self._lastMousePress == _RIGHT:
+                        self.rightClicked = True
+                    elif self._lastMousePress == _LEFT:
+                        self.leftClicked = True
+                self._lastMousePress = None
+
             elif event.type == pygame.MOUSEWHEEL:
                 self.mousewheelDelta = event.y
             elif event.type == pygame.DROPFILE:
