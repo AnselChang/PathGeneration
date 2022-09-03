@@ -39,6 +39,8 @@ class PathPoint(Draggable.Draggable):
         self.pointHovered = None # either PathPoint, controlA, or controlB being hovered over
         self.pointDragged = _Type.NONE # either PathPoint, controlA, or controlB being dragged
 
+    #def draw(self, screen)
+
     # Check whether the mouse is hovering over one of the three points in this object
     # Additionally, store internal state as to which point it is hovering
     def checkMouseHovering(self, mousePosition: PointRef.PointRef) -> bool:

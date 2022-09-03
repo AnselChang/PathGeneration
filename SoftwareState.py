@@ -10,6 +10,7 @@ class SoftwareState:
 
     def __init__(self):
         self.mode = Mode.EDIT
+        self.objectHovering = None
         self.objectDragged: Draggable = None
 
     
