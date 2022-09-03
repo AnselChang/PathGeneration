@@ -39,6 +39,9 @@ class PathPoint(Draggable.Draggable):
         self.pointHovered = None # either PathPoint, controlA, or controlB being hovered over
         self.pointDragged = _Type.NONE # either PathPoint, controlA, or controlB being dragged
 
+        self.DRAW_RADIUS = 10 # in pixels
+        self.HOVER_RADIUS = 13 # in pixels
+
     #def draw(self, screen)
 
     # Check whether the mouse is hovering over one of the three points in this object
@@ -46,7 +49,7 @@ class PathPoint(Draggable.Draggable):
     def checkMouseHovering(self, mousePosition: PointRef.PointRef) -> bool:
 
         def closeToMouse(position: PointRef.PointRef):
-            return Utility.distanceTuple(mousePosition.subtract(position, PointRef.Ref.SCREEN)) <= 5 # in pixels
+            return Utility.distanceTuple(mousePosition.subtract(position, PointRef.Ref.SCREEN)) <= self.HOVER_RADIUS # in pixels
 
         if closeToMouse(self.position):
              # hovering over PathPoint
@@ -133,7 +136,7 @@ class PathPoint(Draggable.Draggable):
         self.controlPositionB = PointRef.PointRef(self.transform, PointRef.Ref.FIELD, newBPosition)
 
     def draw(self, screen: pygame.Surface):
-        Utility.drawCircle(screen, *self.position.screenRef, Utility.GREEN, radius = 5)
+        Utility.drawCircle(screen, *self.position.screenRef, Utility.GREEN, self.DRAW_RADIUS)
 
     def __str__(self):
         return "PathPoint with position {}".format(self.position)
