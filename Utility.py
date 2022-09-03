@@ -31,7 +31,7 @@ def clamp(value: float, minBound: float, maxBound: float) -> float:
     return max(minBound, min(maxBound, value))
 
 def clamp2D(point: tuple, minX: float, minY: float, maxX: float, maxY: float) -> tuple:
-    return clamp(tuple[0], minX, maxX), clamp(tuple[1], minY, maxY)
+    return clamp(point[0], minX, maxX), clamp(point[1], minY, maxY)
 
 def hypo(s1, s2):
     return math.sqrt(s1*s1 + s2*s2)
@@ -89,7 +89,7 @@ def drawText(surface, font, string, color, x, y, s = 0.5):
 def drawThinLine(screen, color, x1, y1, x2, y2):
     pygame.draw.aaline(screen, color, (x1,y1), (x2,y2))
 
-def drawCircle(screen, x, y, color, radius, alpha = 255):
+def drawCircle(screen: pygame.Surface, x: int, y: int, color: tuple, radius: int, alpha: int = 255):
     x = int(x)
     y = int(y)
     radius = int(radius)

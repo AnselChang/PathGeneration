@@ -1,6 +1,7 @@
+from queue import Full
 import pygame, sys
 from Draggable import Draggable
-import FieldTransform, FieldSurface, SoftwareState, FullPath, UserInput, Utility
+import FieldTransform, FieldSurface, SoftwareState, FullPath, UserInput, PointRef, Utility
 
 def main():
 
@@ -22,20 +23,23 @@ def main():
             sys.exit()
         
         if not fieldSurface.isCurrentlyDragging:
-            handleMousewheel(fieldSurface, fieldTransform, userInput)
-        
+            handleMousewheel(fieldSurface, fieldTransform, userInput)        
         
         state.objectHovering = getMouseHoveringObject(path, userInput)
         handleDragging(userInput, state, fieldSurface)
 
-        drawEverything(screen, fieldSurface)
+        if userInput.leftClicked and userInput.isMouseOnField:
+            handleLeftClick(userInput.mousePosition, path)
+
+        drawEverything(screen, fieldSurface, path)
         
         #print(state)
 
-        if userInput.leftClicked:
-            print("left")
-        elif userInput.rightClicked:
-            print("right")
+# Handle left clicks for dealing with the field
+def handleLeftClick(mousePosition: PointRef.PointRef, path: FullPath.FullPath):
+
+    # If nothing is hovered, create a new PathPoint at that location
+    path.createPathPoint(mousePosition)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: FieldTransform.FieldTransform, userInput: UserInput.UserInput) -> None:
@@ -85,7 +89,7 @@ def handleStartingDraggingObject(userInput: UserInput.UserInput, state: Software
         # If the object is draggable and the mouse is down on that object, drag that object!
         if isinstance(state.objectHovering, Draggable):
             state.objectDragged = state.objectHovering
-            state.objectDragged.startDragging()
+            state.objectDragged.startDragging(userInput.mousePosition)
 
     elif userInput.isMouseOnField: # The mouse pressed on the field but not on any particular object.
         # We want the mouse to control panning in this case.
@@ -117,7 +121,7 @@ def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.Software
         state.objectDragged.beDraggedByMouse(userInput.mousePosition)
 
 
-def drawEverything(screen: pygame.Surface, fieldSurface: FieldSurface.FieldSurface) -> None:
+def drawEverything(screen: pygame.Surface, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath) -> None:
     
 
     fieldSurface.draw(screen)
@@ -127,6 +131,8 @@ def drawEverything(screen: pygame.Surface, fieldSurface: FieldSurface.FieldSurfa
     pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
     pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
     
+    path.draw(screen)
+
     pygame.display.update()
 
 main()

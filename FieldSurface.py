@@ -1,4 +1,3 @@
-from operator import truediv
 import FieldTransform, PointRef, Draggable, Utility, pygame
 
 """A class that stores the scaled surface of the vex field, and contains a draw() method to draw it onto the screen.

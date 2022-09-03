@@ -1,5 +1,5 @@
 from enum import Enum
-import PointRef, FieldTransform, Utility, Draggable
+import PointRef, FieldTransform, Utility, Draggable, pygame
 
 """PathPoint objects are user-controllable points that consist of a main control point that is on the path, and 
 two "control" points not on  the actual path, in order to specify angle.
@@ -45,17 +45,19 @@ class PathPoint(Draggable.Draggable):
     # Additionally, store internal state as to which point it is hovering
     def checkMouseHovering(self, mousePosition: PointRef.PointRef) -> bool:
 
-        MAX_HOVERING_DISTANCE = 5
+        def closeToMouse(position: PointRef.PointRef):
+            print(position)
+            return Utility.distanceTuple(mousePosition.subtract(position, PointRef.Ref.SCREEN)) <= 5 # in pixels
 
-        if Utility.distTuple(mousePosition.subtract(self.position)) <= MAX_HOVERING_DISTANCE:
+        if closeToMouse(self.position):
              # hovering over PathPoint
             self.pointHovered = _Type.PATH_POINT
             return True
-        elif Utility.distTuple(mousePosition.subtract(self.controlPositionA)) <= MAX_HOVERING_DISTANCE:
+        elif closeToMouse(self.controlPositionA):
             # hovering over control A
             self.pointHovered = _Type.CONTROL_A
             return True
-        elif Utility.distTuple(mousePosition.subtract(self.controlPositionB)) <= MAX_HOVERING_DISTANCE:
+        elif closeToMouse(self.controlPositionB):
              # hovering over control B
              self.pointHovered = _Type.CONTROL_B
              return True
@@ -96,10 +98,10 @@ class PathPoint(Draggable.Draggable):
         if self.pointDragged == _Type.PATH_POINT:
 
             # Move PathPoint, controlA, and controlB at the same time since controlA and controlB are attached to PathPoint
-            delta = newPoint.subtract(self.pointDragged) # get how much PathPoint will move
+            delta = newPoint.subtract(self.position, PointRef.Ref.FIELD) # get how much PathPoint will move
             self.position = newPoint
-            self.controlPositionA.addInPlace(delta)
-            self.contolPositionB.addInPlace(delta)
+            self.controlPositionA.addInPlace(delta, PointRef.Ref.FIELD)
+            self.controlPositionB.addInPlace(delta, PointRef.Ref.FIELD)
 
         elif self.pointDragged == _Type.CONTROL_A:
 
@@ -121,7 +123,7 @@ class PathPoint(Draggable.Draggable):
         bx, by = self.controlPositionB.fieldRef
         px, py = self.position.fieldRef
         newAPosition = px - (bx - px), py - (by - py)
-        self.contolPositionB = PointRef.PointRef(self.transform, PointRef.Ref.FIELD, newAPosition)
+        self.controlPositionB = PointRef.PointRef(self.transform, PointRef.Ref.FIELD, newAPosition)
 
     # Given an updated control position A, update control position B to be directly opposite across self.position
     def _syncControlBFromA(self):
@@ -129,7 +131,10 @@ class PathPoint(Draggable.Draggable):
         ax, ay = self.controlPositionA.fieldRef
         px, py = self.position.fieldRef
         newBPosition = px - (ax - px), py - (ay - py)
-        self.contolPositionB = PointRef.PointRef(self.transform, PointRef.Ref.FIELD, newBPosition)
+        self.controlPositionB = PointRef.PointRef(self.transform, PointRef.Ref.FIELD, newBPosition)
+
+    def draw(self, screen: pygame.Surface):
+        Utility.drawCircle(screen, *self.position.screenRef, Utility.GREEN, radius = 5)
 
     def __str__(self):
         return "PathPoint with position {}".format(self.position)

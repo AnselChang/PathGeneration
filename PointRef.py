@@ -86,9 +86,9 @@ class PointRef:
     # Add some offset to this point, modifying the object. Must specify reference frame
     def addInPlace(self, offset: tuple, referenceMode: Ref) -> None:
         if referenceMode == Ref.FIELD:
-            self.fieldRef = (self.fieldRef[0] + tuple[0], self.fieldRef[1] + tuple[1])
+            self.fieldRef = (self.fieldRef[0] + offset[0], self.fieldRef[1] + offset[1])
         else:
-            self.screenRef = (self.screenRef[0] + tuple[0], self.screenRef[1] + tuple[1])
+            self.screenRef = (self.screenRef[0] + offset[0], self.screenRef[1] + offset[1])
 
     # Create a deep copy of the object and return the copy
     def copy(self) -> 'PointRef':
