@@ -21,6 +21,9 @@ LINEDARKGREY = (75, 75, 75)
 TEXTCOLOR = (30, 30, 30)
 VECTORCOLOR = (34, 185, 151)
 
+def scaleTuple(nums: tuple, scalar: float):
+    return [i * scalar for i in nums]
+
 def pixelsToInches(pixels):
     return (pixels / SCREEN_SIZE) * 144
 
@@ -82,9 +85,12 @@ def getFont(size):
     else:
         return FONT40
 
-def drawText(surface, font, string, color, x, y, s = 0.5):
+# align = 0 -> align left/top
+# align = 0.5 -> align mid
+# align = 1 -> align right/bottom
+def drawText(surface: pygame.Surface, font: pygame.font, string: str, color: tuple, x: int, y: int, alignX: float = 0.5, alignY: float = 0.5):
     text = font.render(string, True, color)
-    surface.blit(text, [x - text.get_width()*s, y])
+    surface.blit(text, [x - text.get_width()*alignX, y - text.get_height()*alignY])
 
 def drawThinLine(screen, color, x1, y1, x2, y2):
     pygame.draw.aaline(screen, color, (x1,y1), (x2,y2))

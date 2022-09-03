@@ -29,17 +29,18 @@ def main():
         handleDragging(userInput, state, fieldSurface)
 
         if userInput.leftClicked and userInput.isMouseOnField:
-            handleLeftClick(userInput.mousePosition, path)
+            handleLeftClick(state, userInput.mousePosition, path)
 
         drawEverything(screen, fieldSurface, path)
         
         #print(state)
 
 # Handle left clicks for dealing with the field
-def handleLeftClick(mousePosition: PointRef.PointRef, path: FullPath.FullPath):
+def handleLeftClick(state: SoftwareState.SoftwareState, mousePosition: PointRef.PointRef, path: FullPath.FullPath):
 
     # If nothing is hovered, create a new PathPoint at that location
-    path.createPathPoint(mousePosition)
+    if state.objectHovering is None:
+        path.createPathPoint(mousePosition)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: FieldTransform.FieldTransform, userInput: UserInput.UserInput) -> None:
