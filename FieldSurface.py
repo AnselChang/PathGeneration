@@ -28,7 +28,6 @@ class FieldSurface(Draggable.Draggable):
     # on where the mouse is
     def beDraggedByMouse(self, mousePosition: PointRef.PointRef):
 
-        print("dragging")
 
         deltaX = mousePosition.screenRef[0] - self.previousMouseX
         deltaY = mousePosition.screenRef[1] - self.previousMouseY

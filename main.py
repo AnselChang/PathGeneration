@@ -22,7 +22,8 @@ def main():
         if userInput.isQuit:
             pygame.quit()
             sys.exit()
-        fieldTransform.zoom += userInput.mousewheelDelta * 0.1 # zoom from mousewheel
+        
+        handleMousewheel(fieldSurface, fieldTransform, userInput)
         
         
         state.objectHovering = getMouseHoveringObject(path, userInput)
@@ -31,7 +32,23 @@ def main():
         drawEverything(screen, fieldSurface)
         print(state)
         
+# Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
+def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: FieldTransform.FieldTransform, userInput: UserInput.UserInput) -> None:
+    
+    if userInput.mousewheelDelta != 0:
 
+        oldMouseX, oldMouseY = userInput.mousePosition.screenRef
+
+        zoomDelta = userInput.mousewheelDelta * 0.1
+        fieldTransform.zoom += zoomDelta
+
+        # Pan to adjust for the translate that would result from the zoom
+        panX, panY = fieldTransform.pan
+        newMouseX, newMouseY = userInput.mousePosition.screenRef
+        fieldTransform.pan = (panX + oldMouseX - newMouseX, panY + oldMouseY - newMouseY)
+
+
+        fieldSurface.updateScaledSurface()
 
 # Figure out what object, if any, the mouse is hovering over
 def getMouseHoveringObject(path: FullPath.FullPath, userInput: UserInput.UserInput) -> object:
@@ -76,16 +93,16 @@ def handleStartingDraggingObject(userInput: UserInput.UserInput, state: Software
 # If the mouse is dragging but not on any particular object, it will pan the field
 def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface) -> None:
 
-    if userInput.leftPressed: # left mouse button just pressed
+    if userInput.leftPressed and userInput.mousewheelDelta == 0: # left mouse button just pressed
 
         # When the mouse has just clicked on the object, nothing should have been dragging before
         if state.objectDragged is not None:
-            print("Error", state.objectDragged)
+            print("Error", userInput.leftPressed)
             raise Exception("objectDragged should always be None if the mouse was up before this frame.")
         else:
             handleStartingDraggingObject(userInput, state, fieldSurface)   
     
-    elif not userInput.isMousePressing: # mouse up, so nothing should be dragged
+    elif userInput.mouseReleased: # released, so nothing should be dragged
         if state.objectDragged is not None: # there was an object being dragged, so release that
             state.objectDragged.stopDragging()
             state.objectDragged = None
@@ -97,7 +114,15 @@ def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.Software
 
 def drawEverything(screen: pygame.Surface, fieldSurface: FieldSurface.FieldSurface) -> None:
     
+
     fieldSurface.draw(screen)
+
+    # Draw panel background
+    border = 5
+    pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
+    pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
+
+    
     
     pygame.display.update()
 

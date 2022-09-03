@@ -32,26 +32,17 @@ class PointRef:
             self._setFieldRef(point)
 
     def _setScreenRef(self, point: tuple) -> None:
-        self._xs, self._ys = point
 
         # undo the panning and zooming
         panX, panY = self.transform.pan
-        normalizedScreenX = (self._xs - panX) / self.transform.zoom
-        normalizedScreenY = (self._ys - panY) / self.transform.zoom
+        normalizedScreenX = (point[0] - panX) / self.transform.zoom
+        normalizedScreenY = (point[1] - panY) / self.transform.zoom
 
         # convert to field reference frame
         self._xf = (normalizedScreenX - Utility.PIXELS_TO_FIELD_CORNER) / Utility.FIELD_SIZE_IN_PIXELS * Utility.FIELD_SIZE_IN_INCHES
         self._yf = (normalizedScreenY - Utility.PIXELS_TO_FIELD_CORNER) / Utility.FIELD_SIZE_IN_PIXELS * Utility.FIELD_SIZE_IN_INCHES
 
     def _getScreenRef(self) -> tuple:
-        return self._xs, self._ys
-
-    # getter and setter for point in screen reference frame
-    screenRef = property(_getScreenRef, _setScreenRef)
-    
-    def _setFieldRef(self, point: tuple) -> None:
-        self._xf, self._yf = point
-
         # convert to normalized (pre-zoom and pre-panning) coordinates
         normalizedScreenX = self._xf / Utility.FIELD_SIZE_IN_INCHES * Utility.FIELD_SIZE_IN_PIXELS + Utility.PIXELS_TO_FIELD_CORNER
         normalizedScreenY = self._yf / Utility.FIELD_SIZE_IN_INCHES * Utility.FIELD_SIZE_IN_PIXELS + Utility.PIXELS_TO_FIELD_CORNER
@@ -59,8 +50,17 @@ class PointRef:
         # convert to screen reference frame
         print(self.transform.pan)
         panX, panY = self.transform.pan
-        self._xs = normalizedScreenX * self.transform.zoom + panX
-        self._ys = normalizedScreenY * self.transform.zoom + panY
+        xs = normalizedScreenX * self.transform.zoom + panX
+        ys = normalizedScreenY * self.transform.zoom + panY
+
+        return xs, ys
+
+    # getter and setter for point in screen reference frame
+    screenRef = property(_getScreenRef, _setScreenRef)
+    
+    def _setFieldRef(self, point: tuple) -> None:
+        self._xf, self._yf = point
+
         
     def _getFieldRef(self) -> tuple:
         return self._xf, self._yf
@@ -76,9 +76,13 @@ class PointRef:
     # Does not modify either object
     def subtract(self, otherPoint: 'PointRef', referenceMode: Ref) -> tuple:
         if referenceMode == Ref.FIELD:
-            return (self._xf - otherPoint._xf, self._yf - otherPoint._yf)
+            x, y = self.fieldRef
+            ox, oy = otherPoint.fieldRef
         else:
-            return (self._xs - otherPoint._xs, self._ys - otherPoint._ys)
+            x, y = self.screenRef
+            ox, oy = otherPoint.screenRef
+        
+        return (x - ox, y - oy)
 
     # Add some offset to this point, modifying the object. Must specify reference frame
     def addInPlace(self, offset: tuple, referenceMode: Ref) -> None:
@@ -93,7 +97,7 @@ class PointRef:
 
 
     def __str__(self):
-        return "Point object:\nScreen: ({},{})\nField: ({},{})".format(self._xs, self._ys, self._xf, self._yf)
+        return "Point object:\nScreen: ({},{})\nField: ({},{})".format(*self.screenRef, *self.fieldRef)
 
 # Return a new PointRef object that translates the given PointRef by deltaPosition given by the referenceFrame (field/screen)
 # Does not modify existing PointRef
