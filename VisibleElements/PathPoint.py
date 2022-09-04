@@ -1,5 +1,6 @@
 from enum import Enum
-import SingletonState.ReferenceFrame as ReferenceFrame, SingletonState.FieldTransform as FieldTransform
+from SingletonState.ReferenceFrame import PointRef, Ref
+from SingletonState.FieldTransform import FieldTransform
 import ControlPoint, Utility, Draggable, pygame
 
 """PathPoint objects are user-controllable points that consist of a main control point that is on the path, and 
@@ -21,7 +22,7 @@ class Shape(Enum):
 
 class PathPoint(Draggable.Draggable):
 
-    def __init__(self, spawnPosition: ReferenceFrame.PointRef):
+    def __init__(self, spawnPosition: PointRef):
         self.position = spawnPosition
         self.transform = spawnPosition.transform
         self.controlA: ControlPoint.ControlPoint = ControlPoint.ControlPoint(self.transform, self, 5, 5)
@@ -44,16 +45,16 @@ class PathPoint(Draggable.Draggable):
 
     # Check whether the mouse is hovering over one of the three points in this object
     # Additionally, store internal state as to which point it is hovering
-    def checkMouseHovering(self, mousePosition: ReferenceFrame.PointRef) -> bool:
+    def checkMouseHovering(self, mousePosition: PointRef) -> bool:
 
-        return Utility.distanceTuple(mousePosition.subtract(self.position, ReferenceFrame.Ref.SCREEN)) <= self.HOVER_RADIUS
+        return Utility.distanceTuple(mousePosition.subtract(self.position, Ref.SCREEN)) <= self.HOVER_RADIUS
 
 
 
     # Implementing Draggable interface
     # Now that the object is being dragged, specify that point being dragged
     # This function should only be called when the mouse is hovering over this object and the mouse was just pressed
-    def startDragging(self, mousePosition: ReferenceFrame.PointRef):
+    def startDragging(self, mousePosition: PointRef):
         if self.pointHovered is None:
             raise Exception("Error: trying to drag an nonexistent object.")
 
@@ -69,7 +70,7 @@ class PathPoint(Draggable.Draggable):
 
     # Implementing Draggable interface
     # Check which of the three points in the object is being dragged, and change its position accordingly
-    def beDraggedByMouse(self, mousePosition: ReferenceFrame.PointRef):
+    def beDraggedByMouse(self, mousePosition: PointRef):
 
         if self.pointDragged == _Type.NONE:
             # At this point, SoftwareState is indicating this object is being dragged, but this object disagrees.
@@ -78,15 +79,15 @@ class PathPoint(Draggable.Draggable):
         
         # Clamp position to within the bounds of the field
         newPos = Utility.clamp2D(mousePosition.fieldRef, 0, 0, Utility.FIELD_SIZE_IN_INCHES, Utility.FIELD_SIZE_IN_INCHES)
-        newPoint = ReferenceFrame.PointRef(self.transform, ReferenceFrame.Ref.FIELD, newPos)
+        newPoint = PointRef(self.transform, Ref.FIELD, newPos)
         
         if self.pointDragged == _Type.PATH_POINT:
 
             # Move PathPoint, controlA, and controlB at the same time since controlA and controlB are attached to PathPoint
-            delta = newPoint.subtract(self.position, ReferenceFrame.Ref.FIELD) # get how much PathPoint will move
+            delta = newPoint.subtract(self.position, Ref.FIELD) # get how much PathPoint will move
             self.position = newPoint
-            self.controlPositionA.addInPlace(delta, ReferenceFrame.Ref.FIELD)
-            self.controlPositionB.addInPlace(delta, ReferenceFrame.Ref.FIELD)
+            self.controlPositionA.addInPlace(delta, Ref.FIELD)
+            self.controlPositionB.addInPlace(delta, Ref.FIELD)
 
         elif self.pointDragged == _Type.CONTROL_A:
 
@@ -108,7 +109,7 @@ class PathPoint(Draggable.Draggable):
         bx, by = self.controlPositionB.fieldRef
         px, py = self.position.fieldRef
         newAPosition = px - (bx - px), py - (by - py)
-        self.controlPositionB = ReferenceFrame.PointRef(self.transform, ReferenceFrame.Ref.FIELD, newAPosition)
+        self.controlPositionB = PointRef(self.transform, Ref.FIELD, newAPosition)
 
     # Given an updated control position A, update control position B to be directly opposite across self.position
     def _syncControlBFromA(self):
@@ -116,7 +117,7 @@ class PathPoint(Draggable.Draggable):
         ax, ay = self.controlPositionA.fieldRef
         px, py = self.position.fieldRef
         newBPosition = px - (ax - px), py - (ay - py)
-        self.controlPositionB = ReferenceFrame.PointRef(self.transform, ReferenceFrame.Ref.FIELD, newBPosition)
+        self.controlPositionB = PointRef(self.transform, Ref.FIELD, newBPosition)
 
     def draw(self, screen: pygame.Surface, index: int):
 

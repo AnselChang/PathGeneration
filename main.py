@@ -1,19 +1,26 @@
-from queue import Full
 import pygame, sys
 from Draggable import Draggable
-import FieldTransform, FieldSurface, SoftwareState, FullPath, UserInput, ReferenceFrame, Utility
+from SingletonState.FieldTransform import FieldTransform
+from SingletonState.ReferenceFrame import PointRef
+from SingletonState.SoftwareState import SoftwareState
+from SingletonState.UserInput import UserInput
+from VisibleElements.FieldSurface import FieldSurface
+from FullPath import FullPath
+
+
+import Utility
 
 def main():
 
     screen: pygame.Surface = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
     pygame.display.set_caption("Path Generation 2.0 by Ansel")
 
-    fieldTransform: FieldTransform.FieldTransform = FieldTransform.FieldTransform()
-    fieldSurface: FieldSurface.FieldSurface = FieldSurface.FieldSurface(fieldTransform)
-    userInput: UserInput.UserInput = UserInput.UserInput(fieldTransform, pygame.mouse, pygame.key)
+    fieldTransform: FieldTransform = FieldTransform()
+    fieldSurface: FieldSurface = FieldSurface(fieldTransform)
+    userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
 
-    state: SoftwareState.SoftwareState = SoftwareState.SoftwareState()
-    path: FullPath.FullPath = FullPath.FullPath(fieldTransform)
+    state: SoftwareState = SoftwareState()
+    path: FullPath = FullPath(fieldTransform)
 
     # Main software loop
     while True:
@@ -37,14 +44,14 @@ def main():
         #print(state)
 
 # Handle left clicks for dealing with the field
-def handleLeftClick(state: SoftwareState.SoftwareState, shadowPointRef: ReferenceFrame.PointRef, path: FullPath.FullPath):
+def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, path: FullPath):
 
     # If nothing is hovered, create a new PathPoint at that location
     if state.objectHovering is None or isinstance(state.objectHovering, FullPath.Segment):
         path.createPathPoint(shadowPointRef)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
-def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: FieldTransform.FieldTransform, userInput: UserInput.UserInput) -> None:
+def handleMousewheel(fieldSurface:FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:
     
     if userInput.mousewheelDelta != 0:
 
@@ -62,7 +69,7 @@ def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: Fie
         fieldSurface.updateScaledSurface()
 
 # Figure out what object, if any, the mouse is hovering over
-def getMouseHoveringObject(path: FullPath.FullPath, userInput: UserInput.UserInput) -> object:
+def getMouseHoveringObject(path: FullPath, userInput: UserInput) -> object:
     
     # Figure out what the mouse is hovering over
     if userInput.isMouseOnField: # if mouse is on the field (instead of the panel)
@@ -87,7 +94,7 @@ def getMouseHoveringObject(path: FullPath.FullPath, userInput: UserInput.UserInp
 
 # Called when the mouse was just pressed and we want to see if a new object is about to be dragged
 # This will try to drag either some object on the screen, or pan the entire field if no object is selected
-def handleStartingDraggingObject(userInput: UserInput.UserInput, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface) -> None:
+def handleStartingDraggingObject(userInput: UserInput, state: SoftwareState, fieldSurface: FieldSurface) -> None:
 
     # if the mouse is down on some object, try to drag that object
     if state.objectHovering is not None:
@@ -106,7 +113,7 @@ def handleStartingDraggingObject(userInput: UserInput.UserInput, state: Software
 
 # Determine what object is being dragged based on the mouse's rising and falling edges, and actually drag the object in question
 # If the mouse is dragging but not on any particular object, it will pan the field
-def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface) -> None:
+def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: FieldSurface) -> None:
 
     if userInput.leftPressed and userInput.mousewheelDelta == 0: # left mouse button just pressed
 
@@ -127,7 +134,7 @@ def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.Software
         state.objectDragged.beDraggedByMouse(userInput.mousePosition)
 
 
-def drawEverything(screen: pygame.Surface, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath, userInput: UserInput.UserInput, shadowPointRef: ReferenceFrame.PointRef) -> None:
+def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath, userInput: UserInput, shadowPointRef: PointRef) -> None:
     
     # Draw the vex field
     fieldSurface.draw(screen)

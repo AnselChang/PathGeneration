@@ -1,6 +1,11 @@
 
 from pathlib import Path
-import FieldTransform, PathPoint, ReferenceFrame, Utility, pygame
+from SingletonState.FieldTransform import FieldTransform
+from SingletonState.ReferenceFrame import PointRef, Ref
+from VisibleElements.PathPoint import PathPoint
+from VisibleElements.ControlPoint import ControlPoint
+from VisibleElements.PathSegment import PathSegment
+import Utility, pygame
 
 
 """Store the full path of the robot. This consists of a list of PathPoint objects, as well as the interpolatedPoint objects
@@ -9,17 +14,19 @@ PathPoint change."""
 
 class FullPath:
 
-    def __init__(self, transform: FieldTransform.FieldTransform):
+    def __init__(self, transform: FieldTransform):
         self.transform = transform
-        self.pathPoints: list[PathPoint.PathPoint] = [] # The user-defined points
-        self.interpolatedPoints: list[ReferenceFrame.PointRef] = [] # the beizer-interpolated points generated from the user-defined points
+        self.pathPoints: list[PathPoint] = [] # The user-defined points
+        self.controlPoints: list[ControlPoint] = []
+        self.segments = list[PathSegment] = []
+        self.interpolatedPoints: list[PointRef] = [] # the beizer-interpolated points generated from the user-defined points
 
         self.hoveringSegment = None
 
 
     # Return the PathPoint object that the mouse is hovering on, simply by iterating through the array asking each object
     # if it is being hovered. Return None if no such object exists
-    def getMouseHoveringPoint(self, mousePosition: ReferenceFrame.PointRef) -> PathPoint.PathPoint:
+    def getMouseHoveringPoint(self, mousePosition: PointRef) -> PathPoint:
 
         for pathPoint in self.pathPoints:
             if pathPoint.checkMouseHovering(mousePosition):
@@ -27,7 +34,7 @@ class FullPath:
         return None
 
     # Return the Segment object that the mouse is hovering on, which is just a thin wrapper for the segment index
-    def getMouseHoveringSegment(self, mousePosition: ReferenceFrame.PointRef) -> Segment:
+    def getMouseHoveringSegment(self, mousePosition: PointRef) -> PathSegment:
 
         # No segments for paths with under two points
         if (len(self.pathPoints) < 2):
@@ -40,7 +47,7 @@ class FullPath:
 
             # Check for mouse intersection with segment
             if Utility.pointTouchingLine(*mousePosition.screenRef, *positionA, *positionB, self.SEGMENT_HITBOX_THICKNESS):
-                self.hoveringSegment = Segment(index)
+                self.hoveringSegment = PathSegment(index)
                 return self.hoveringSegment
 
             positionA = positionB
@@ -53,7 +60,7 @@ class FullPath:
     # Return the location of the shadow PathPoint where the mouse is.
     # This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
     # but if the mouse is near a segment the shadow will "snap" to it
-    def getShadowPosition(self, mousePosition: ReferenceFrame.PointRef):
+    def getShadowPosition(self, mousePosition: PointRef):
 
         if not self.hoveringSegment:
             return mousePosition
@@ -62,10 +69,10 @@ class FullPath:
             positionA = self.pathPoints[index].position.screenRef
             positionB = self.pathPoints[index+1].position.screenRef
             positionScreenRef = Utility.pointOnLineClosestToPoint(*mousePosition.screenRef, *positionA, *positionB)
-            return ReferenceFrame.PointRef(self.transform, ReferenceFrame.Ref.SCREEN, positionScreenRef)
+            return PointRef(self.transform, Ref.SCREEN, positionScreenRef)
 
     # Append a PathPoint at the end of the path at the specified position
-    def createPathPoint(self, position: ReferenceFrame.PointRef):
+    def createPathPoint(self, position: PointRef):
         print("new")
         newPathPoint = PathPoint.PathPoint(position.copy())
         if self.hoveringSegment is None:
