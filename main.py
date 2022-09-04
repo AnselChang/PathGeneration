@@ -13,7 +13,7 @@ def main():
     userInput: UserInput.UserInput = UserInput.UserInput(fieldTransform, pygame.mouse, pygame.key)
 
     state: SoftwareState.SoftwareState = SoftwareState.SoftwareState()
-    path: FullPath.FullPath = FullPath.FullPath()
+    path: FullPath.FullPath = FullPath.FullPath(fieldTransform)
 
     # Main software loop
     while True:
@@ -23,24 +23,25 @@ def main():
             sys.exit()
         
         if not fieldSurface.isCurrentlyDragging:
-            handleMousewheel(fieldSurface, fieldTransform, userInput)        
+            handleMousewheel(fieldSurface, fieldTransform, userInput)
         
         state.objectHovering = getMouseHoveringObject(path, userInput)
+        shadowPointRef = path.getShadowPosition(userInput.mousePosition)
         handleDragging(userInput, state, fieldSurface)
 
         if userInput.leftClicked and userInput.isMouseOnField:
-            handleLeftClick(state, userInput.mousePosition, path)
+            handleLeftClick(state, shadowPointRef, path)
 
-        drawEverything(screen, state, fieldSurface, path, userInput)
+        drawEverything(screen, state, fieldSurface, path, userInput, shadowPointRef)
         
         #print(state)
 
 # Handle left clicks for dealing with the field
-def handleLeftClick(state: SoftwareState.SoftwareState, mousePosition: PointRef.PointRef, path: FullPath.FullPath):
+def handleLeftClick(state: SoftwareState.SoftwareState, shadowPointRef: PointRef.PointRef, path: FullPath.FullPath):
 
     # If nothing is hovered, create a new PathPoint at that location
-    if state.objectHovering is None:
-        path.createPathPoint(mousePosition)
+    if state.objectHovering is None or isinstance(state.objectHovering, FullPath.Segment):
+        path.createPathPoint(shadowPointRef)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface:FieldSurface.FieldSurface, fieldTransform: FieldTransform.FieldTransform, userInput: UserInput.UserInput) -> None:
@@ -126,7 +127,7 @@ def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.Software
         state.objectDragged.beDraggedByMouse(userInput.mousePosition)
 
 
-def drawEverything(screen: pygame.Surface, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath, userInput: UserInput.UserInput) -> None:
+def drawEverything(screen: pygame.Surface, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath, userInput: UserInput.UserInput, shadowPointRef: PointRef.PointRef) -> None:
     
     # Draw the vex field
     fieldSurface.draw(screen)
@@ -136,9 +137,7 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState.SoftwareState, f
 
     # Draw PathPoint shadow at mouse
     if userInput.isMouseOnField:
-        if state.objectHovering is None:
-            Utility.drawCircle(screen, *userInput.mousePosition.screenRef, Utility.GREEN, 10, 140)
-        elif isinstance(state.objectHovering, FullPath.Segment):
+        Utility.drawCircle(screen, *shadowPointRef.screenRef, Utility.GREEN, 10, 140)
             
 
     # Draw panel background

@@ -1,5 +1,5 @@
 
-import PathPoint, PointRef, Utility, pygame
+import FieldTransform, PathPoint, PointRef, Utility, pygame
 
 
 """Store the full path of the robot. This consists of a list of PathPoint objects, as well as the interpolatedPoint objects
@@ -12,7 +12,8 @@ class Segment:
 
 class FullPath:
 
-    def __init__(self):
+    def __init__(self, transform: FieldTransform.FieldTransform):
+        self.transform = transform
         self.pathPoints: list[PathPoint.PathPoint] = [] # The user-defined points
         self.interpolatedPoints: list[PointRef.PointRef] = [] # the beizer-interpolated points generated from the user-defined points
 
@@ -59,16 +60,23 @@ class FullPath:
     # but if the mouse is near a segment the shadow will "snap" to it
     def getShadowPosition(self, mousePosition: PointRef.PointRef):
 
-        if self.hoveringSegment:
+        if not self.hoveringSegment:
             return mousePosition
         else:
-            positionA = self.pathPoints[0].position.screenRef
-            positionB = self.pathPoints[1].position.screenRef
-            return Utility.pointOnLineClosestToPoint(*mousePosition, *positionA, *positionB)
+            index = self.hoveringSegment.index
+            positionA = self.pathPoints[index].position.screenRef
+            positionB = self.pathPoints[index+1].position.screenRef
+            positionScreenRef = Utility.pointOnLineClosestToPoint(*mousePosition.screenRef, *positionA, *positionB)
+            return PointRef.PointRef(self.transform, PointRef.Ref.SCREEN, positionScreenRef)
 
     # Append a PathPoint at the end of the path at the specified position
     def createPathPoint(self, position: PointRef.PointRef):
-        self.pathPoints.append(PathPoint.PathPoint(position.copy()))
+        print("new")
+        newPathPoint = PathPoint.PathPoint(position.copy())
+        if self.hoveringSegment is None:
+            self.pathPoints.append(newPathPoint)
+        else:
+            self.pathPoints.insert(self.hoveringSegment.index+1, newPathPoint)
 
     # Draw a segment from each path to the next. This will be drawn under the points themselves
     def drawPathSegments(self, screen: pygame.Surface):
