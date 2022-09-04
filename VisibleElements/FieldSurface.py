@@ -1,4 +1,4 @@
-import FieldTransform, PointRef, Draggable, Utility, pygame
+import SingletonState.FieldTransform as FieldTransform, SingletonState.ReferenceFrame as ReferenceFrame, Draggable, Utility, pygame
 
 """A class that stores the scaled surface of the vex field, and contains a draw() method to draw it onto the screen.
 It implements Draggable, meaning that the mouse can drag the field to pan the screen. This is coupled with FieldTransform,
@@ -25,14 +25,14 @@ class FieldSurface(Draggable.Draggable):
     
     # Called when the field was just pressed at the start of the drag.
     # Get the current mouse and pan position so that new pan based on changes in mouse position can be calculated
-    def startDragging(self, mousePosition: PointRef.PointRef):
+    def startDragging(self, mousePosition: ReferenceFrame.PointRef):
         self.isCurrentlyDragging = True
         self.startDragX, self.startDragY = mousePosition.screenRef
         self.startPanX, self.startPanY = self.transform.pan
 
     # Called every frame that the object is being dragged.
     # Compute pan based on mouse position delta
-    def beDraggedByMouse(self, mousePosition: PointRef.PointRef):
+    def beDraggedByMouse(self, mousePosition: ReferenceFrame.PointRef):
 
         # Calculate delta in mouse position
         deltaX = mousePosition.screenRef[0] - self.startDragX

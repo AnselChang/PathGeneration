@@ -1,7 +1,7 @@
 from queue import Full
 import pygame, sys
 from Draggable import Draggable
-import FieldTransform, FieldSurface, SoftwareState, FullPath, UserInput, PointRef, Utility
+import FieldTransform, FieldSurface, SoftwareState, FullPath, UserInput, ReferenceFrame, Utility
 
 def main():
 
@@ -37,7 +37,7 @@ def main():
         #print(state)
 
 # Handle left clicks for dealing with the field
-def handleLeftClick(state: SoftwareState.SoftwareState, shadowPointRef: PointRef.PointRef, path: FullPath.FullPath):
+def handleLeftClick(state: SoftwareState.SoftwareState, shadowPointRef: ReferenceFrame.PointRef, path: FullPath.FullPath):
 
     # If nothing is hovered, create a new PathPoint at that location
     if state.objectHovering is None or isinstance(state.objectHovering, FullPath.Segment):
@@ -127,7 +127,7 @@ def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.Software
         state.objectDragged.beDraggedByMouse(userInput.mousePosition)
 
 
-def drawEverything(screen: pygame.Surface, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath, userInput: UserInput.UserInput, shadowPointRef: PointRef.PointRef) -> None:
+def drawEverything(screen: pygame.Surface, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath, userInput: UserInput.UserInput, shadowPointRef: ReferenceFrame.PointRef) -> None:
     
     # Draw the vex field
     fieldSurface.draw(screen)

@@ -1,47 +1,25 @@
 
 from pathlib import Path
-import FieldTransform, PathPoint, PointRef, Utility, pygame
+import FieldTransform, PathPoint, ReferenceFrame, Utility, pygame
 
 
 """Store the full path of the robot. This consists of a list of PathPoint objects, as well as the interpolatedPoint objects
 that would be generated as a bezier curve through all the PathPoints. The interpolatedPoints array will be recalculated at each
 PathPoint change."""
 
-class PathSegment:
-    def __init__(self, pointA: PathPoint.PathPoint, pointB: PathPoint.PathPoint):
-        self.pointA: PathPoint.PathPoint = pointA
-        self.pointB: PathPoint.PathPoint = pointB
-
-        self.SEGMENT_THICKNESS = 3
-        self.SEGMENT_HITBOX_THICKNESS = 10
-
-    def isTouchingMouse(self, mousePosition: PointRef):
-        return Utility.pointTouchingLine(*mousePosition.screenRef, *positionA, *positionB, self.SEGMENT_HITBOX_THICKNESS)
-
-    def draw(self, screen: pygame.Surface):
-        # Line becomes thicker and darker if hovered
-        if self.hoveringSegment is not None and index == self.hoveringSegment.index:
-            color = Utility.LINEDARKGREY
-        else:
-            color = Utility.LINEGREY
-
-        # Draw line from position A to B
-        Utility.drawLine(screen, color, *self.pointA.position.screenRef, *self.pointB.position.screenRef, self.SEGMENT_THICKNESS)
-
-
 class FullPath:
 
     def __init__(self, transform: FieldTransform.FieldTransform):
         self.transform = transform
         self.pathPoints: list[PathPoint.PathPoint] = [] # The user-defined points
-        self.interpolatedPoints: list[PointRef.PointRef] = [] # the beizer-interpolated points generated from the user-defined points
+        self.interpolatedPoints: list[ReferenceFrame.PointRef] = [] # the beizer-interpolated points generated from the user-defined points
 
         self.hoveringSegment = None
 
 
     # Return the PathPoint object that the mouse is hovering on, simply by iterating through the array asking each object
     # if it is being hovered. Return None if no such object exists
-    def getMouseHoveringPoint(self, mousePosition: PointRef.PointRef) -> PathPoint.PathPoint:
+    def getMouseHoveringPoint(self, mousePosition: ReferenceFrame.PointRef) -> PathPoint.PathPoint:
 
         for pathPoint in self.pathPoints:
             if pathPoint.checkMouseHovering(mousePosition):
@@ -49,7 +27,7 @@ class FullPath:
         return None
 
     # Return the Segment object that the mouse is hovering on, which is just a thin wrapper for the segment index
-    def getMouseHoveringSegment(self, mousePosition: PointRef.PointRef) -> Segment:
+    def getMouseHoveringSegment(self, mousePosition: ReferenceFrame.PointRef) -> Segment:
 
         # No segments for paths with under two points
         if (len(self.pathPoints) < 2):
@@ -75,7 +53,7 @@ class FullPath:
     # Return the location of the shadow PathPoint where the mouse is.
     # This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
     # but if the mouse is near a segment the shadow will "snap" to it
-    def getShadowPosition(self, mousePosition: PointRef.PointRef):
+    def getShadowPosition(self, mousePosition: ReferenceFrame.PointRef):
 
         if not self.hoveringSegment:
             return mousePosition
@@ -84,10 +62,10 @@ class FullPath:
             positionA = self.pathPoints[index].position.screenRef
             positionB = self.pathPoints[index+1].position.screenRef
             positionScreenRef = Utility.pointOnLineClosestToPoint(*mousePosition.screenRef, *positionA, *positionB)
-            return PointRef.PointRef(self.transform, PointRef.Ref.SCREEN, positionScreenRef)
+            return ReferenceFrame.PointRef(self.transform, ReferenceFrame.Ref.SCREEN, positionScreenRef)
 
     # Append a PathPoint at the end of the path at the specified position
-    def createPathPoint(self, position: PointRef.PointRef):
+    def createPathPoint(self, position: ReferenceFrame.PointRef):
         print("new")
         newPathPoint = PathPoint.PathPoint(position.copy())
         if self.hoveringSegment is None:

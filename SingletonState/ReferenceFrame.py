@@ -71,7 +71,7 @@ class PointRef:
         return self.fieldRef if referenceMode == Ref.FIELD else self.screenRef
 
     # PointRef + VectorRef = PointRef
-    def __add__(self, other) -> 'PointRef':
+    def __add__(self, other: 'VectorRef') -> 'PointRef':
         return PointRef(self.transform, Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))
 
     # PointRef - VectorRef = PointRef
