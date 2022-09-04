@@ -1,4 +1,5 @@
 
+from pathlib import Path
 import FieldTransform, PathPoint, PointRef, Utility, pygame
 
 
@@ -6,9 +7,27 @@ import FieldTransform, PathPoint, PointRef, Utility, pygame
 that would be generated as a bezier curve through all the PathPoints. The interpolatedPoints array will be recalculated at each
 PathPoint change."""
 
-class Segment:
-    def __init__(self, index: int):
-        self.index = index
+class PathSegment:
+    def __init__(self, pointA: PathPoint.PathPoint, pointB: PathPoint.PathPoint):
+        self.pointA: PathPoint.PathPoint = pointA
+        self.pointB: PathPoint.PathPoint = pointB
+
+        self.SEGMENT_THICKNESS = 3
+        self.SEGMENT_HITBOX_THICKNESS = 10
+
+    def isTouchingMouse(self, mousePosition: PointRef):
+        return Utility.pointTouchingLine(*mousePosition.screenRef, *positionA, *positionB, self.SEGMENT_HITBOX_THICKNESS)
+
+    def draw(self, screen: pygame.Surface):
+        # Line becomes thicker and darker if hovered
+        if self.hoveringSegment is not None and index == self.hoveringSegment.index:
+            color = Utility.LINEDARKGREY
+        else:
+            color = Utility.LINEGREY
+
+        # Draw line from position A to B
+        Utility.drawLine(screen, color, *self.pointA.position.screenRef, *self.pointB.position.screenRef, self.SEGMENT_THICKNESS)
+
 
 class FullPath:
 
@@ -19,8 +38,6 @@ class FullPath:
 
         self.hoveringSegment = None
 
-        self.SEGMENT_THICKNESS = 3
-        self.SEGMENT_HITBOX_THICKNESS = 10
 
     # Return the PathPoint object that the mouse is hovering on, simply by iterating through the array asking each object
     # if it is being hovered. Return None if no such object exists

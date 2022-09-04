@@ -24,6 +24,10 @@ class _Type(Enum):
     CONTROL_B = 3
     NONE = 4
 
+class ControlPoint(Draggable.Draggable):
+
+    def __init__(self, parent,)
+
 class PathPoint(Draggable.Draggable):
 
     def __init__(self, spawnPosition: PointRef.PointRef):
@@ -65,6 +69,7 @@ class PathPoint(Draggable.Draggable):
         else:
             self.pointHovered = None
             return False
+
 
     # Implementing Draggable interface
     # Now that the object is being dragged, specify that point being dragged

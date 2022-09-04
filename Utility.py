@@ -24,6 +24,14 @@ VECTORCOLOR = (34, 185, 151)
 def scaleTuple(nums: tuple, scalar: float):
     return [i * scalar for i in nums]
 
+def addTuples(tupleA: tuple, tupleB: tuple):
+    assert len(tupleA) == len(tupleB)
+    return [a+b for a,b in zip(tupleA, tupleB)]
+
+def subtractTuples(tupleA: tuple, tupleB: tuple):
+    assert len(tupleA) == len(tupleB)
+    return [a-b for a,b in zip(tupleA, tupleB)]
+
 def pixelsToInches(pixels):
     return (pixels / SCREEN_SIZE) * 144
 
@@ -55,12 +63,12 @@ def distanceTwoPoints(x0, y0, x1, y1, x2, y2):
 def vector(x0, y0, theta, magnitude):
     return [x0 + magnitude*math.cos(theta), y0 + magnitude*math.sin(theta)]
 
-def pointTouchingLine(mouseX: int, mouseY: int, x1: int, y1: int, x2: int, y2: int, lineThickness: int):
+def pointTouchingLine(mouseX: int, mouseY: int, x1: int, y1: int, x2: int, y2: int, lineHitboxThickness: int):
 
     if x1 == x2 and y1 == y2:
         return False
     
-    if distanceTwoPoints(mouseX,mouseY, x1, y1, x2, y2) <=  lineThickness:
+    if distanceTwoPoints(mouseX,mouseY, x1, y1, x2, y2) <=  lineHitboxThickness:
         dist = distance(x1, y1, x2, y2)
         if distance(mouseX, mouseY, x1, y1) < dist and distance(mouseX, mouseY, x2, y2) < dist:
             return True
