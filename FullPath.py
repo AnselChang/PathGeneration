@@ -54,6 +54,18 @@ class FullPath:
         self.hoveringSegment = None
         return None
 
+    # Return the location of the shadow PathPoint where the mouse is.
+    # This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
+    # but if the mouse is near a segment the shadow will "snap" to it
+    def getShadowPosition(self, mousePosition: PointRef.PointRef):
+
+        if self.hoveringSegment:
+            return mousePosition
+        else:
+            positionA = self.pathPoints[0].position.screenRef
+            positionB = self.pathPoints[1].position.screenRef
+            return Utility.pointOnLineClosestToPoint(*mousePosition, *positionA, *positionB)
+
     # Append a PathPoint at the end of the path at the specified position
     def createPathPoint(self, position: PointRef.PointRef):
         self.pathPoints.append(PathPoint.PathPoint(position.copy()))

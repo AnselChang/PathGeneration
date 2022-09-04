@@ -31,7 +31,7 @@ def main():
         if userInput.leftClicked and userInput.isMouseOnField:
             handleLeftClick(state, userInput.mousePosition, path)
 
-        drawEverything(screen, fieldSurface, path)
+        drawEverything(screen, state, fieldSurface, path, userInput)
         
         #print(state)
 
@@ -126,17 +126,25 @@ def handleDragging(userInput: UserInput.UserInput, state: SoftwareState.Software
         state.objectDragged.beDraggedByMouse(userInput.mousePosition)
 
 
-def drawEverything(screen: pygame.Surface, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath) -> None:
+def drawEverything(screen: pygame.Surface, state: SoftwareState.SoftwareState, fieldSurface: FieldSurface.FieldSurface, path: FullPath.FullPath, userInput: UserInput.UserInput) -> None:
     
-
+    # Draw the vex field
     fieldSurface.draw(screen)
+
+    # Draw the entire path with segments and PathPoints
+    path.draw(screen)
+
+    # Draw PathPoint shadow at mouse
+    if userInput.isMouseOnField:
+        if state.objectHovering is None:
+            Utility.drawCircle(screen, *userInput.mousePosition.screenRef, Utility.GREEN, 10, 140)
+        elif isinstance(state.objectHovering, FullPath.Segment):
+            
 
     # Draw panel background
     border = 5
     pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
     pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
-    
-    path.draw(screen)
 
     pygame.display.update()
 
