@@ -1,7 +1,7 @@
 from re import U
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.UserInput import UserInput
-from VisibleElements.Point import Point
+from VisibleElements.Point import Point, Shape
 from SingletonState.ReferenceFrame import VectorRef, Ref
 import Utility, pygame
 
@@ -20,7 +20,7 @@ class ControlPoint(Point):
         self.vector = VectorRef(self.transform, Ref.FIELD, (deltaX, deltaY))
         
         self.DRAW_RADIUS = 5
-        super().__init__(hoverRadius = 10, circleColor = Utility.BLUE, drawRadius = 5, drawRadiusBig = 6)
+        super().__init__(hoverRadius = 10, drawRadius = 5, drawRadiusBig = 6)
 
     # When the location of this control point has moved, update the other control point also associated with the PathPoint
     # pathPoint.controlA = 0 - pathPoint.controlB (opposite sides of pathPoint)
@@ -39,18 +39,22 @@ class ControlPoint(Point):
         if userInput.isMouseOnField:
             self.vector = (userInput.mousePosition - self.parent.position)
 
+            # If we're in continuous mode, we need to keep both control points opposite one another
+            if self.parent.shape == Shape.SMOOTH:
+                self.updateOtherVector()
+
     def drawOwnershipLine(self, screen: pygame.Surface):
 
         # store position as an instance variable to be access by self.draw() after PathPoint is drawn
         self.cachePosition = (self.parent.position + self.vector).screenRef
 
         # Draw line to parent to show ownership
-        Utility.drawThinLine(screen, self.CIRCLE_COLOR, *self.cachePosition, *self.parent.position.screenRef)
+        Utility.drawThinLine(screen, Utility.BLUE, *self.cachePosition, *self.parent.position.screenRef)
 
     def draw(self, screen: pygame.Surface):
         
         # Draw circle
-        super().draw(screen, self.cachePosition)
+        super().draw(screen, self.cachePosition, Utility.BLUE)
 
     def __str__(self):
         return "Control Point, {}".format(self.isHovering)

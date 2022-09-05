@@ -33,7 +33,7 @@ def main():
         
         # Find the hovered object out of all the possible hoverable objects
         handleHoverables(state, userInput, path, fieldSurface)
-        print(state.objectHovering)
+        #print(state.objectHovering)
         
         # Now that the hovered object is computed, handle what object is being dragged and then actually dragging the object
         handleDragging(userInput, state, fieldSurface)
@@ -41,9 +41,13 @@ def main():
         # get the shadow point based on the mouse position
         shadowPointRef = path.getShadowPosition(userInput.mousePosition)
 
-        # Handle all left click functionality
-        if userInput.leftClicked and userInput.isMouseOnField:
-            handleLeftClick(state, shadowPointRef, fieldSurface, path)
+
+        # Handle all field left click functionality
+        if userInput.isMouseOnField:
+            if userInput.leftClicked:
+                handleLeftClick(state, shadowPointRef, fieldSurface, path)
+            elif userInput.rightClicked:
+                handleRightClick(state)
 
         # Draw everything on the screen
         drawEverything(screen, state, fieldSurface, path, userInput, shadowPointRef)

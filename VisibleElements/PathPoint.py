@@ -1,6 +1,5 @@
-from enum import Enum
 from SingletonState.ReferenceFrame import PointRef, Ref
-from VisibleElements.Point import Point
+from VisibleElements.Point import Point, Shape
 from SingletonState.UserInput import UserInput
 from VisibleElements.ControlPoint import ControlPoint
 import Utility, pygame
@@ -17,11 +16,6 @@ The location of the PathPoint itself and the two control points are stored as Po
 by some delta will also shift the control points the same amount.
 """
 
-class Shape(Enum):
-    SMOOTH = 1
-    SHARP = 2
-
-
 class PathPoint(Point):
 
     def __init__(self, spawnPosition: PointRef):
@@ -33,7 +27,7 @@ class PathPoint(Point):
         # By default, self.controlPositionA and self.controlPositionB are linked and the curve is continuous
         self.shape = Shape.SMOOTH
 
-        super().__init__(hoverRadius = 20, circleColor = Utility.GREEN, drawRadius = 10, drawRadiusBig = 12)
+        super().__init__(hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
 
     # Given one of the points, return the other one. Useful when called from one of the control points
     def other(self, control: ControlPoint) -> ControlPoint:
@@ -42,6 +36,14 @@ class PathPoint(Point):
         elif control is self.controlB:
             return self.controlA
         raise Exception("Given ControlPoint object not found in PathPoint")
+
+    # Toggle the shape of the point (whether control points and synced and whether to point turn or curve)
+    def toggleShape(self):
+        if self.shape == Shape.SMOOTH:
+            self.shape = Shape.SHARP
+        else:
+            self.shape = Shape.SMOOTH
+            self.controlA.updateOtherVector()
 
     # Implementing Hoverable
     # Check whether the mouse is hovering over object
@@ -58,7 +60,8 @@ class PathPoint(Point):
     def draw(self, screen: pygame.Surface, index: int):
 
         position = self.position.screenRef
-        super().draw(screen, position) # draw circle
+        color: tuple = Utility.ORANGE if self.shape == Shape.SHARP else Utility.GREEN
+        super().draw(screen, position, color) # draw circle
         Utility.drawText(screen, Utility.FONT20, str(index), Utility.BLACK, *position)
 
 

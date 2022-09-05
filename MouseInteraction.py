@@ -1,4 +1,3 @@
-from dataclasses import field
 from Hoverable import Hoverable
 from SingletonState.SoftwareState import SoftwareState
 from SingletonState.UserInput import UserInput
@@ -7,8 +6,8 @@ from SingletonState.ReferenceFrame import PointRef
 from VisibleElements.FieldSurface import FieldSurface
 from VisibleElements.FullPath import FullPath
 from VisibleElements.PathSegment import PathSegment
+from VisibleElements.PathPoint import PathPoint
 from Draggable import Draggable
-import itertools
 
 # Handle left clicks for dealing with the field
 def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface: FieldSurface, path: FullPath):
@@ -16,6 +15,14 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
     # If nothing is hovered, create a new PathPoint at that location
     if state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment):
         path.createPathPoint(shadowPointRef)
+
+# Handle right clicks for dealing with the field
+def handleRightClick(state: SoftwareState):
+    print("Right click")
+    # Right clicking PathPoint toggles its shape
+    if isinstance(state.objectHovering, PathPoint):
+        state.objectHovering.toggleShape()
+
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:

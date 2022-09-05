@@ -2,6 +2,12 @@ from Draggable import Draggable
 from SingletonState.UserInput import UserInput
 from SingletonState.ReferenceFrame import Ref, PointRef
 import Utility, pygame
+from enum import Enum
+
+
+class Shape(Enum):
+    SMOOTH = 1
+    SHARP = 2
 
 """
 Abstract class defined as a draggable point drawn on the screen
@@ -10,9 +16,8 @@ Implemented by PathPoint and ControlPoint
 class Point(Draggable):
 
 
-    def __init__(self, hoverRadius: int, circleColor: tuple, drawRadius: int, drawRadiusBig: int):
+    def __init__(self, hoverRadius: int, drawRadius: int, drawRadiusBig: int):
 
-        self.CIRCLE_COLOR = circleColor
         self.HOVER_RADIUS = hoverRadius
         self.DRAW_RADIUS = drawRadius
         self.DRAW_RADIUS_BIG = drawRadiusBig
@@ -35,13 +40,12 @@ class Point(Draggable):
         pass
 
     # Draw circle
-    def draw(self, screen: pygame.Surface, position: tuple):
+    def draw(self, screen: pygame.Surface, position: tuple, color: tuple):
 
         # Draw PathPoint
         if self.isHovering:
             radius = self.DRAW_RADIUS_BIG
-            color = Utility.scaleTuple(self.CIRCLE_COLOR, 0.85)
+            color = Utility.scaleTuple(color, 0.85)
         else:
             radius = self.DRAW_RADIUS
-            color = self.CIRCLE_COLOR
         Utility.drawCircle(screen, *position, color, radius)
