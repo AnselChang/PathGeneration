@@ -46,7 +46,7 @@ class PathPoint(Point):
     # Implementing Hoverable
     # Check whether the mouse is hovering over object
     def checkIfHovering(self, userInput: UserInput) -> bool:
-        return (userInput.mousePosition - self.position).magnitude(Ref.SCREEN) <= self.HOVER_RADIUS
+        return super().checkIfHovering(userInput.mousePosition, self.position)
 
     # Implementing Draggable interface
     def beDraggedByMouse(self, userInput: UserInput):

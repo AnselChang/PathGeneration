@@ -5,7 +5,7 @@ from SingletonState.UserInput import UserInput
 """Python "Interface" for objects that are draggable by the mouse. This adds a layer of abstraction with the mouse
 able to store which object is being dragged without knowing its exact type, only that it is draggable.
 
-This is a abstract subclass of Hoverable, meaning that all draggable objects are hoverable
+This is a abstract subclass of Hoverable, meaning that all Draggable objects are Hoverable
 
 Useful for FieldTransform, PathPoint, and Slider."""
 

@@ -6,8 +6,6 @@ from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
-
-
 import Utility
 
 def main():

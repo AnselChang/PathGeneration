@@ -1,6 +1,6 @@
 from Draggable import Draggable
 from SingletonState.UserInput import UserInput
-from SingletonState.ReferenceFrame import Ref
+from SingletonState.ReferenceFrame import Ref, PointRef
 import Utility, pygame
 
 """
@@ -18,6 +18,11 @@ class Point(Draggable):
         self.DRAW_RADIUS_BIG = drawRadiusBig
 
         super().__init__()
+
+    # Implementing Hoverable
+    # Check whether the mouse is hovering over object
+    def checkIfHovering(self, mousePosition: PointRef, myPosition: PointRef) -> bool:
+        return (mousePosition - myPosition).magnitude(Ref.SCREEN) <= self.HOVER_RADIUS
 
     # Implementing Draggable interface
     # This function should only be called when the mouse is hovering over this object and the mouse was just pressed

@@ -31,7 +31,7 @@ class ControlPoint(Point):
     # Check whether the mouse is hovering over object
     def checkIfHovering(self, userInput: UserInput) -> bool:
 
-        return (userInput.mousePosition - (self.parent.position+self.vector)).magnitude(Ref.SCREEN) <= self.HOVER_RADIUS
+        return super().checkIfHovering(userInput.mousePosition, self.parent.position + self.vector)
 
     # Implementing Draggable interface
     # Set position to be vector going from the parent point to the mouse
