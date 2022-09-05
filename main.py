@@ -28,15 +28,16 @@ def main():
             sys.exit()
         
         # Handle zooming with mousewheel
-        if not fieldSurface.isCurrentlyDragging:
-            handleMousewheel(fieldSurface, fieldTransform, userInput)
+        handleMousewheel(fieldSurface, fieldTransform, userInput)
         
         # Find the hovered object out of all the possible hoverable objects
         handleHoverables(state, userInput, path, fieldSurface)
-        #print(state.objectHovering)
         
         # Now that the hovered object is computed, handle what object is being dragged and then actually dragging the object
         handleDragging(userInput, state, fieldSurface)
+
+        # If the X key is pressed, delete hovered PathPoint/segment
+        handleDeleting(userInput, state, path)
 
         # get the shadow point based on the mouse position
         shadowPointRef = path.getShadowPosition(userInput.mousePosition)

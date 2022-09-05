@@ -27,15 +27,6 @@ class FullPath:
 
         return mousePosition # temporary
 
-    # Given a segment object, find its location in self.segments and return its index
-    def getSegmentIndex(self, segment: PathSegment):
-        index = 0
-        for s in self.segments:
-            if segment is s:
-                return index
-            index += 1
-        return -1
-
     # Append a PathPoint at at the specified position.
     # A segment will also need to be inserted somewhere.
     def createPathPoint(self, position: PointRef, index: int = -1):
@@ -53,7 +44,22 @@ class FullPath:
         else: # added a node between two segments
             self.segments[index-1].pointB = newPoint
             self.segments.insert(index, PathSegment(newPoint, self.pathPoints[index+1]))
+
+    def deletePathPoint(self, point: PathPoint):
         
+        index = self.pathPoints.index(point)
+        del self.pathPoints[index]
+        
+        if len(self.segments) == 0: # don't delete anything if no segments
+            pass
+        elif index == 0: # deleting first item, easiest case and just delete first segment as well
+            del self.segments[0]
+        elif index == len(self.pathPoints): # deleting last item, just delete last segment
+            del self.segments[-1]
+        else: # delete some intermediate item, need to merge two segments together
+            self.segments[index-1].pointB = self.segments[index].pointB
+            del self.segments[index]
+
 
     # Draw a segment from each path to the next. This will be drawn under the points themselves
     def drawPathSegments(self, screen: pygame.Surface):

@@ -8,6 +8,7 @@ from VisibleElements.FullPath import FullPath
 from VisibleElements.PathSegment import PathSegment
 from VisibleElements.PathPoint import PathPoint
 from Draggable import Draggable
+import pygame
 
 # Handle left clicks for dealing with the field
 def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface: FieldSurface, path: FullPath):
@@ -16,7 +17,7 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
     if state.objectHovering is fieldSurface:
         path.createPathPoint(shadowPointRef)
     elif isinstance(state.objectHovering, PathSegment):
-        index = path.getSegmentIndex(state.objectHovering) + 1
+        index = path.segments.index(state.objectHovering) + 1
         path.createPathPoint(shadowPointRef, index)
 
 # Handle right clicks for dealing with the field
@@ -30,7 +31,7 @@ def handleRightClick(state: SoftwareState):
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:
     
-    if userInput.mousewheelDelta != 0:
+    if not fieldSurface.isCurrentlyDragging and userInput.mousewheelDelta != 0:
 
         oldMouseX, oldMouseY = userInput.mousePosition.screenRef
 
@@ -44,6 +45,23 @@ def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform,
 
 
         fieldSurface.updateScaledSurface()
+
+
+# If X is pressed and hovering over PathPoint/PathSegment, delete it
+def handleDeleting(userInput: UserInput, state: SoftwareState, path: FullPath):
+
+    # Obviously, if X is not pressed, we're not deleting anything
+    if not userInput.isKeyPressing(pygame.K_x):
+        return
+
+    if isinstance(state.objectHovering, PathPoint): # Delete pathPoint
+        path.deletePathPoint(state.objectHovering)
+
+    elif isinstance(state.objectHovering, PathSegment): # Delete segment
+        path.deletePathPoint(state.objectHovering.pointA)
+        path.deletePathPoint(state.objectHovering.pointB)
+
+
 
 # A generator to iterate through all the hoverable objects to determine which object is being hovered by the mouse in order
 def getHoverables(userInput: UserInput, path: FullPath, fieldSurface: FieldSurface):
