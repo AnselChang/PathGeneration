@@ -36,9 +36,8 @@ class ControlPoint(Point):
     # Implementing Draggable interface
     # Set position to be vector going from the parent point to the mouse
     def beDraggedByMouse(self, userInput: UserInput):
-
         if userInput.isMouseOnField:
-            self.position = (userInput.mousePosition - self.parent.position)
+            self.vector = (userInput.mousePosition - self.parent.position)
 
 
     def draw(self, screen: pygame.Surface):
