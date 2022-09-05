@@ -1,4 +1,5 @@
-import FieldTransform, Utility
+from SingletonState.FieldTransform import FieldTransform
+import Utility
 from enum import Enum
 
 """
@@ -22,7 +23,7 @@ class Ref(Enum):
 
 class PointRef:
 
-    def __init__(self, fieldTransform: FieldTransform.FieldTransform, referenceMode: Ref = None, point: tuple = (0,0)):
+    def __init__(self, fieldTransform: FieldTransform, referenceMode: Ref = None, point: tuple = (0,0)):
         self.transform = fieldTransform
         self._xf, self._yf = None, None
         if referenceMode == Ref.SCREEN:
@@ -99,8 +100,8 @@ VectorRef - VectorRef = VectorRef
 """
 class VectorRef:
 
-    def __init__(self, fieldTransform: FieldTransform.FieldTransform, referenceMode: Ref = None, vector: tuple = (0,0)):
-        self.transform: FieldTransform.FieldTransform = fieldTransform
+    def __init__(self, fieldTransform: FieldTransform, referenceMode: Ref = None, vector: tuple = (0,0)):
+        self.transform: FieldTransform = fieldTransform
         self._vxf, self._vyf = None, None
         if referenceMode == Ref.SCREEN:
             self.screenRef = vector
@@ -120,11 +121,17 @@ class VectorRef:
         self._vxf = vector[0] * scalar
         self._vyf = vector[0] * scalar
 
-    def _getScreenRef(self, vector: tuple):
+    def _getScreenRef(self):
         scalar = self.transform.zoom * Utility.FIELD_SIZE_IN_PIXELS / Utility.FIELD_SIZE_IN_INCHES
-        return self._vxf * scalar, self._xyf * scalar
+        return self._vxf * scalar, self._vyf * scalar
 
     screenRef = property(_getScreenRef, _getFieldRef)
+
+    def magnitude(self, referenceFrame: Ref):
+        if referenceFrame == Ref.FIELD:
+            return Utility.distanceTuple(self.fieldRef)
+        else:
+            return Utility.distanceTuple(self.screenRef)
 
     def __add__(self, other: 'VectorRef') -> 'VectorRef':
         return VectorRef(self.transform, Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))

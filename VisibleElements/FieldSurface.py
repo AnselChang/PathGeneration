@@ -1,5 +1,6 @@
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
+from SingletonState.UserInput import UserInput
 import Draggable, Utility, pygame
 
 """A class that stores the scaled surface of the vex field, and contains a draw() method to draw it onto the screen.
@@ -23,6 +24,10 @@ class FieldSurface(Draggable.Draggable):
     def updateScaledSurface(self):
         self.scaledFieldSurface: pygame.Surface = pygame.transform.smoothscale(
             self.rawFieldSurface, [Utility.SCREEN_SIZE * self.transform.zoom, Utility.SCREEN_SIZE * self.transform.zoom])
+
+
+    def checkIfHovering(self, userInput: UserInput) -> bool:
+        return True
 
     
     # Called when the field was just pressed at the start of the drag.

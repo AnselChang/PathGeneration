@@ -1,5 +1,6 @@
 from enum import Enum
 
+from Hoverable import Hoverable
 from Draggable import Draggable
 
 
@@ -13,7 +14,7 @@ class SoftwareState:
 
     def __init__(self):
         self.mode: Mode = Mode.EDIT # edit or simulation mode
-        self.objectHovering: object = None # object the mouse is currently hovering over
+        self.objectHovering: Hoverable = None # object the mouse is currently hovering over
         self.objectDragged: Draggable = None # object the mouse is currently dragging
 
     def __str__(self):

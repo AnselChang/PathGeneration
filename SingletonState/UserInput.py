@@ -1,5 +1,6 @@
-import pygame, Utility, ReferenceFrame
-from FieldTransform import FieldTransform
+import pygame, Utility
+from SingletonState.ReferenceFrame import PointRef
+from SingletonState.FieldTransform import FieldTransform
     
 """A class that encapsulates all the mouse and keyboard input into one object.
 It handles all events and stores things like whether the left mouse button was pressed.
@@ -20,7 +21,7 @@ class UserInput:
         self._transform = transform
 
         # Position of the mouse in both screen and field reference frames
-        self.mousePosition = ReferenceFrame.PointRef(self._transform)
+        self.mousePosition = PointRef(self._transform)
         self.isMouseOnField = True # whether mouse is on the field, as opposed to the panel
 
         # Key that was just pressed this frame
