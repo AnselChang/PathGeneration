@@ -103,7 +103,7 @@ def drawText(surface: pygame.Surface, font: pygame.font, string: str, color: tup
     text = font.render(string, True, color)
     surface.blit(text, [x - text.get_width()*alignX, y - text.get_height()*alignY])
 
-def drawThinLine(screen, color, x1, y1, x2, y2):
+def drawThinLine(screen: pygame.Surface, color: tuple, x1: int, y1: int, x2: int, y2: int):
     pygame.draw.aaline(screen, color, (x1,y1), (x2,y2))
 
 def drawCircle(screen: pygame.Surface, x: int, y: int, color: tuple, radius: int, alpha: int = 255):

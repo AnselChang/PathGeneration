@@ -53,7 +53,15 @@ class FullPath:
     def drawPathPoints(self, screen: pygame.Surface):
         index = 0
         for pathPoint in self.pathPoints:
+            
+            # draw line that goes from control to path point
+            pathPoint.controlA.drawOwnershipLine(screen)
+            pathPoint.controlB.drawOwnershipLine(screen)
+
+            # Draw the path point itself
             pathPoint.draw(screen, index)
+
+            # Then draw the control point on top
             pathPoint.controlA.draw(screen)
             pathPoint.controlB.draw(screen)
             index += 1

@@ -39,11 +39,18 @@ class ControlPoint(Point):
         if userInput.isMouseOnField:
             self.vector = (userInput.mousePosition - self.parent.position)
 
+    def drawOwnershipLine(self, screen: pygame.Surface):
+
+        # store position as an instance variable to be access by self.draw() after PathPoint is drawn
+        self.cachePosition = (self.parent.position + self.vector).screenRef
+
+        # Draw line to parent to show ownership
+        Utility.drawThinLine(screen, self.CIRCLE_COLOR, *self.cachePosition, *self.parent.position.screenRef)
 
     def draw(self, screen: pygame.Surface):
-        position = (self.parent.position + self.vector).screenRef
-        super().draw(screen, position)
-        Utility.drawCircle(screen, *position, Utility.BLUE, self.DRAW_RADIUS)
+        
+        # Draw circle
+        super().draw(screen, self.cachePosition)
 
     def __str__(self):
         return "Control Point, {}".format(self.isHovering)
