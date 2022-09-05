@@ -39,11 +39,11 @@ class FieldSurface(Draggable.Draggable):
 
     # Called every frame that the object is being dragged.
     # Compute pan based on mouse position delta
-    def beDraggedByMouse(self, mousePosition: PointRef):
+    def beDraggedByMouse(self, userInput: UserInput):
 
         # Calculate delta in mouse position
-        deltaX = mousePosition.screenRef[0] - self.startDragX
-        deltaY = mousePosition.screenRef[1] - self.startDragY
+        deltaX = userInput.mousePosition.screenRef[0] - self.startDragX
+        deltaY = userInput.mousePosition.screenRef[1] - self.startDragY
 
         self.transform.pan = self.startPanX + deltaX, self.startPanY + deltaY
 

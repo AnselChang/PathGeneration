@@ -2,13 +2,13 @@
 from VisibleElements.PathPoint import PathPoint
 from SingletonState.UserInput import UserInput
 from SingletonState.ReferenceFrame import PointRef, Ref
-from Draggable import Draggable
+from Hoverable import Hoverable
 import Utility, pygame
 
 """ A class containing references to two PathPoint objects. The class stores hovered and dragging state, and handles
 mouse detection and drawing the segment.
 """
-class PathSegment(Draggable):
+class PathSegment(Hoverable):
 
     def __init__(self, pointA: PathPoint, pointB: PathPoint):
 

@@ -33,9 +33,7 @@ class PathPoint(Point):
         # By default, self.controlPositionA and self.controlPositionB are linked and the curve is continuous
         self.shape = Shape.SMOOTH
 
-        self.DRAW_RADIUS = 10 # in pixels
-        self.DRAW_RADIUS_HOVER_MUTLIPLIER = 1.15
-        super().__init__(hoverRadius = 20)
+        super().__init__(hoverRadius = 20, circleColor = Utility.GREEN, drawRadius = 10, drawRadiusBig = 12)
 
     # Given one of the points, return the other one. Useful when called from one of the control points
     def other(self, control: ControlPoint) -> ControlPoint:
@@ -48,7 +46,6 @@ class PathPoint(Point):
     # Implementing Hoverable
     # Check whether the mouse is hovering over object
     def checkIfHovering(self, userInput: UserInput) -> bool:
-
         return (userInput.mousePosition - self.position).magnitude(Ref.SCREEN) <= self.HOVER_RADIUS
 
     # Implementing Draggable interface
@@ -60,20 +57,10 @@ class PathPoint(Point):
 
     def draw(self, screen: pygame.Surface, index: int):
 
-        # Draw PathPoint
-        color = Utility.GREEN
-        if self.isHovering:
-            radius = self.DRAW_RADIUS_HOVER_MUTLIPLIER * self.DRAW_RADIUS 
-            color = Utility.scaleTuple(Utility.GREEN, 0.85)
-        else:
-            radius = self.DRAW_RADIUS
-            color = Utility.GREEN
         position = self.position.screenRef
-        Utility.drawCircle(screen, *position, color, radius)
+        super().draw(screen, position) # draw circle
         Utility.drawText(screen, Utility.FONT20, str(index), Utility.BLACK, *position)
 
-        self.controlA.draw(screen)
-        self.controlB.draw(screen)
 
     def __str__(self):
         return "PathPoint with position {}".format(self.position)

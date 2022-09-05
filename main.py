@@ -29,21 +29,31 @@ def main():
             pygame.quit()
             sys.exit()
         
+        # Handle zooming with mousewheel
         if not fieldSurface.isCurrentlyDragging:
             handleMousewheel(fieldSurface, fieldTransform, userInput)
         
-        state.objectHovering = handleHoverables(state, userInput, path, fieldSurface)
-        shadowPointRef = path.getShadowPosition(userInput.mousePosition)
+        # Find the hovered object out of all the possible hoverable objects
+        handleHoverables(state, userInput, path, fieldSurface)
+        print(state.objectHovering)
+        
+        # Now that the hovered object is computed, handle what object is being dragged and then actually dragging the object
         handleDragging(userInput, state, fieldSurface)
 
+        # get the shadow point based on the mouse position
+        shadowPointRef = path.getShadowPosition(userInput.mousePosition)
+
+        # Handle all left click functionality
         if userInput.leftClicked and userInput.isMouseOnField:
-            handleLeftClick(state, shadowPointRef, path)
+            handleLeftClick(state, shadowPointRef, fieldSurface, path)
 
+        # Draw everything on the screen
         drawEverything(screen, state, fieldSurface, path, userInput, shadowPointRef)
+
         
-        #print(state)
+        
 
-
+# Draw the vex field, full path, and panel
 def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath, userInput: UserInput, shadowPointRef: PointRef) -> None:
     
     # Draw the vex field
@@ -53,10 +63,9 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     path.draw(screen)
 
     # Draw PathPoint shadow at mouse
-    if userInput.isMouseOnField:
+    if userInput.isMouseOnField and state.objectHovering is fieldSurface:
         Utility.drawCircle(screen, *shadowPointRef.screenRef, Utility.GREEN, 10, 140)
             
-
     # Draw panel background
     border = 5
     pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])

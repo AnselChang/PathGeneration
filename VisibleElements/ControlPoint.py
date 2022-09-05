@@ -20,7 +20,7 @@ class ControlPoint(Point):
         self.vector = VectorRef(self.transform, Ref.FIELD, (deltaX, deltaY))
         
         self.DRAW_RADIUS = 5
-        super().__init__(hoverRadius = 10)
+        super().__init__(hoverRadius = 10, circleColor = Utility.BLUE, drawRadius = 5, drawRadiusBig = 6)
 
     # When the location of this control point has moved, update the other control point also associated with the PathPoint
     # pathPoint.controlA = 0 - pathPoint.controlB (opposite sides of pathPoint)
@@ -42,5 +42,9 @@ class ControlPoint(Point):
 
 
     def draw(self, screen: pygame.Surface):
-        absolutePosition = (self.parent.position + self.vector).screenRef
-        Utility.drawCircle(screen, *absolutePosition, Utility.BLUE, self.DRAW_RADIUS)
+        position = (self.parent.position + self.vector).screenRef
+        super().draw(screen, position)
+        Utility.drawCircle(screen, *position, Utility.BLUE, self.DRAW_RADIUS)
+
+    def __str__(self):
+        return "Control Point, {}".format(self.isHovering)

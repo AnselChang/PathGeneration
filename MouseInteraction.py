@@ -6,14 +6,15 @@ from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
 from VisibleElements.FieldSurface import FieldSurface
 from VisibleElements.FullPath import FullPath
+from VisibleElements.PathSegment import PathSegment
 from Draggable import Draggable
 import itertools
 
 # Handle left clicks for dealing with the field
-def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, path: FullPath):
+def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface: FieldSurface, path: FullPath):
 
     # If nothing is hovered, create a new PathPoint at that location
-    if state.objectHovering is None or isinstance(state.objectHovering, FullPath.Segment):
+    if state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment):
         path.createPathPoint(shadowPointRef)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
@@ -53,6 +54,9 @@ def getHoverables(userInput: UserInput, path: FullPath, fieldSurface: FieldSurfa
         # If nothing has been hovered, then finally check fieldSurface
         yield fieldSurface
 
+    else: # hoverable panel objects
+        pass # no panel yet!
+
     # weird python hack to make it return an empty iterator if nothing hoverable
     return
     yield
@@ -67,6 +71,7 @@ def handleHoverables(state: SoftwareState, userInput: UserInput, path: FullPath,
     for hoverableObject in getHoverables(userInput, path, fieldSurface):
         obj: Hoverable = hoverableObject # just for type hinting
         if obj.checkIfHovering(userInput):
+            state.objectHovering = obj
             obj.setHoveringObject()
             break
 
@@ -100,4 +105,4 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
 
     # Now that we know what's being dragged, actually drag the object
     if state.objectDragged is not None:
-        state.objectDragged.beDraggedByMouse(userInput.mousePosition)
+        state.objectDragged.beDraggedByMouse(userInput)

@@ -47,13 +47,15 @@ class FullPath:
     def drawPathSegments(self, screen: pygame.Surface):
         
         for segment in self.segments:
-            segment.draw()
+            segment.draw(screen)
 
     # Iterate through each PathPoint and draw it
     def drawPathPoints(self, screen: pygame.Surface):
         index = 0
         for pathPoint in self.pathPoints:
             pathPoint.draw(screen, index)
+            pathPoint.controlA.draw(screen)
+            pathPoint.controlB.draw(screen)
             index += 1
 
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments
