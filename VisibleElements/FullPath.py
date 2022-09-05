@@ -20,8 +20,6 @@ class FullPath:
         self.segments: list[PathSegment] = []
         self.interpolatedPoints: list[PointRef] = [] # the beizer-interpolated points generated from the user-defined points
 
-
-
     # Return the location of the shadow PathPoint where the mouse is.
     # This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
     # but if the mouse is near a segment the shadow will "snap" to it
@@ -29,18 +27,32 @@ class FullPath:
 
         return mousePosition # temporary
 
-    # Append a PathPoint at the end of the path at the specified position
+    # Given a segment object, find its location in self.segments and return its index
+    def getSegmentIndex(self, segment: PathSegment):
+        index = 0
+        for s in self.segments:
+            if segment is s:
+                return index
+            index += 1
+        return -1
+
+    # Append a PathPoint at at the specified position.
+    # A segment will also need to be inserted somewhere.
     def createPathPoint(self, position: PointRef, index: int = -1):
 
         if index == -1:
             index = len(self.pathPoints)
 
-        self.pathPoints.insert(index, PathPoint(position.copy()))
+        newPoint = PathPoint(position.copy())
+        self.pathPoints.insert(index, newPoint)
 
         if len(self.pathPoints) == 1: # no segment
             return
         elif index == len(self.pathPoints) - 1: # added a node at the end, so segment links last two nodes
             self.segments.append(PathSegment(self.pathPoints[-2], self.pathPoints[-1]))
+        else: # added a node between two segments
+            self.segments[index-1].pointB = newPoint
+            self.segments.insert(index, PathSegment(newPoint, self.pathPoints[index+1]))
         
 
     # Draw a segment from each path to the next. This will be drawn under the points themselves

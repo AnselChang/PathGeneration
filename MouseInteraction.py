@@ -13,8 +13,11 @@ from Draggable import Draggable
 def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface: FieldSurface, path: FullPath):
 
     # If nothing is hovered, create a new PathPoint at that location
-    if state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment):
+    if state.objectHovering is fieldSurface:
         path.createPathPoint(shadowPointRef)
+    elif isinstance(state.objectHovering, PathSegment):
+        index = path.getSegmentIndex(state.objectHovering) + 1
+        path.createPathPoint(shadowPointRef, index)
 
 # Handle right clicks for dealing with the field
 def handleRightClick(state: SoftwareState):
