@@ -24,6 +24,9 @@ VECTORCOLOR = (34, 185, 151)
 def scaleTuple(nums: tuple, scalar: float):
     return [i * scalar for i in nums]
 
+def divideTuple(nums: tuple, scalar: float):
+    return [i / scalar for i in nums]
+
 def addTuples(tupleA: tuple, tupleB: tuple):
     assert len(tupleA) == len(tupleB)
     return [a+b for a,b in zip(tupleA, tupleB)]

@@ -1,3 +1,4 @@
+from typing import Tuple
 from SingletonState.ReferenceFrame import PointRef, Ref
 from VisibleElements.Point import Point, Shape
 from SingletonState.UserInput import UserInput
@@ -18,11 +19,12 @@ by some delta will also shift the control points the same amount.
 
 class PathPoint(Point):
 
-    def __init__(self, spawnPosition: PointRef):
+    def __init__(self, spawnPosition: PointRef, spawnVector: tuple):
         self.position = spawnPosition
         self.transform = spawnPosition.transform
-        self.controlA: ControlPoint = ControlPoint(self.transform, self, 5, 5)
-        self.controlB: ControlPoint = ControlPoint(self.transform, self, -5, -5)
+        self.controlA: ControlPoint = ControlPoint(self.transform, self, *spawnVector)
+        self.controlB: ControlPoint = ControlPoint(self.transform, self, 0, 0)
+        self.controlA.updateOtherVector()
 
         # By default, self.controlPositionA and self.controlPositionB are linked and the curve is continuous
         self.shape = Shape.SMOOTH

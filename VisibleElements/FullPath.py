@@ -36,7 +36,18 @@ class FullPath:
         if index == -1:
             index = len(self.pathPoints)
 
-        newPoint = PathPoint(position.copy())
+        if index == 0: # insert at beginning, so just default control point position
+            controlVector = (3,3)
+        elif index == 1:
+            vectorAwayFromPrev = (position - self.pathPoints[index-1].position).normalize()
+            controlVector = (vectorAwayFromPrev * 10).fieldRef
+        else:
+            vectorAwayFromPrev = (position - self.pathPoints[index-1].position).normalize()
+            vectorAwayFromPrev2 = (position - self.pathPoints[index-2].position).normalize()
+            controlVector = ((vectorAwayFromPrev - vectorAwayFromPrev2).normalize() * 10).fieldRef
+
+        newPoint = PathPoint(position.copy(), controlVector)
+
         self.pathPoints.insert(index, newPoint)
 
         if len(self.pathPoints) == 1: # no segment
@@ -64,7 +75,7 @@ class FullPath:
             del self.segments[index]
 
     
-    # Interpolate pose[i] to pose[i+1] using Catmull-Rom spline curve with s spillover
+    # Interpolate between two given PathPoints and their ControlPoints using bezier spline curve
     def interpolateSplineCurve(self, point1: PathPoint, point2: PathPoint, spillover: float) -> int:
 
         P1 = point1.position.fieldRef
@@ -110,6 +121,7 @@ class FullPath:
             if (self.pathPoints[i+1].position - self.pathPoints[i].position).magnitude(Ref.FIELD) < 0.1:
                 continue
 
+            # Actually interpolate between these two points
             spillover = self.interpolateSplineCurve(self.pathPoints[i], self.pathPoints[i+1], spillover)
 
             # no spillovers between two pure pursuit paths (separated by a point turn)

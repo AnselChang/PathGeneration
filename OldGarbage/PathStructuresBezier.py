@@ -1,8 +1,8 @@
 from enum import Enum
-import Utility
+import Math.Utility as Utility
 import math, pickle, os, csv
 import pygame
-import BezierCurves
+import Math.BezierCurves as BezierCurves
 import Robot
 
 # A user-defined waypoint that consists of the point itself, a heading,

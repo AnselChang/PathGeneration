@@ -133,11 +133,18 @@ class VectorRef:
         else:
             return Utility.distanceTuple(self.screenRef)
 
+    def normalize(self):
+        mag = self.magnitude(Ref.FIELD)
+        return VectorRef(self.transform, Ref.FIELD, Utility.divideTuple(self.fieldRef, mag))
+
     def __add__(self, other: 'VectorRef') -> 'VectorRef':
         return VectorRef(self.transform, Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))
 
     def __sub__(self, other: 'VectorRef') -> 'VectorRef':
         return VectorRef(self.transform, Ref.FIELD, Utility.subtractTuples(self.fieldRef, other.fieldRef))
+
+    def __mul__(self, scalar: float) -> 'VectorRef':
+        return VectorRef(self.transform, Ref.FIELD, Utility.scaleTuple(self.fieldRef, scalar))
 
 
 # Return a new PointRef object that translates the given PointRef by deltaPosition given by the referenceFrame (field/screen)
