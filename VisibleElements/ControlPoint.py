@@ -35,13 +35,18 @@ class ControlPoint(Point):
 
     # Implementing Draggable interface
     # Set position to be vector going from the parent point to the mouse
-    def beDraggedByMouse(self, userInput: UserInput):
+    # Return whether it has been moved
+    def beDraggedByMouse(self, userInput: UserInput) -> bool:
         if userInput.isMouseOnField:
             self.vector = (userInput.mousePosition - self.parent.position)
 
             # If we're in continuous mode, we need to keep both control points opposite one another
             if self.parent.shape == Shape.SMOOTH:
                 self.updateOtherVector()
+
+            return True
+
+        return False
 
     def drawOwnershipLine(self, screen: pygame.Surface):
 

@@ -17,6 +17,8 @@ class SoftwareState:
         self.objectHovering: Hoverable = None # object the mouse is currently hovering over
         self.objectDragged: Draggable = None # object the mouse is currently dragging
 
+        self.recomputeInterpolation = False # Whether to recompute bezier interpolation from modifying path
+
     def __str__(self):
         return "Software State:\nHovering: {}\nDragged: {}".format(self.objectHovering, self.objectDragged)
 

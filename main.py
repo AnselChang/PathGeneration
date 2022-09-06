@@ -22,6 +22,9 @@ def main():
 
     # Main software loop
     while True:
+
+        state.recomputeInterpolation = False
+
         userInput.getUserInput()
         if userInput.isQuit:
             pygame.quit()
@@ -42,13 +45,16 @@ def main():
         # get the shadow point based on the mouse position
         shadowPointRef = path.getShadowPosition(userInput.mousePosition)
 
-
         # Handle all field left click functionality
         if userInput.isMouseOnField:
             if userInput.leftClicked:
                 handleLeftClick(state, shadowPointRef, fieldSurface, path)
             elif userInput.rightClicked:
                 handleRightClick(state)
+
+        # Whenever the path is modified, the interpolated beizer points have to be recomputed again
+        if state.recomputeInterpolation:
+            path.calculateInterpolatedPoints()
 
         # Draw everything on the screen
         drawEverything(screen, state, fieldSurface, path, userInput, shadowPointRef)

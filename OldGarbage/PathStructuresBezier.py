@@ -309,7 +309,7 @@ class Path:
 
 
     # Interpolate pose[i] to pose[i+1] using Catmull-Rom spline curve with s spillover
-    def interpolateSplineCurve(self, i: int, s: int) -> int:
+    def interpolateSplineCurve(self, i: int, s: float) -> int:
         P1 = [self.poses[i].x, self.poses[i].y]
         V1 = [self.poses[i].forward_x, self.poses[i].forward_y]
         V2 = [self.poses[i+1].backward_x, self.poses[i+1].backward_y]

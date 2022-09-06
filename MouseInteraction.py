@@ -7,6 +7,7 @@ from VisibleElements.FieldSurface import FieldSurface
 from VisibleElements.FullPath import FullPath
 from VisibleElements.PathSegment import PathSegment
 from VisibleElements.PathPoint import PathPoint
+from VisibleElements.Point import Point
 from Draggable import Draggable
 import pygame
 
@@ -16,9 +17,11 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
     # If nothing is hovered, create a new PathPoint at that location
     if state.objectHovering is fieldSurface:
         path.createPathPoint(shadowPointRef)
+        state.recomputeInterpolation = True
     elif isinstance(state.objectHovering, PathSegment):
         index = path.segments.index(state.objectHovering) + 1
         path.createPathPoint(shadowPointRef, index)
+        state.recomputeInterpolation = True
 
 # Handle right clicks for dealing with the field
 def handleRightClick(state: SoftwareState):
@@ -26,7 +29,7 @@ def handleRightClick(state: SoftwareState):
     # Right clicking PathPoint toggles its shape
     if isinstance(state.objectHovering, PathPoint):
         state.objectHovering.toggleShape()
-
+        state.recomputeInterpolation = True
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:
@@ -56,10 +59,12 @@ def handleDeleting(userInput: UserInput, state: SoftwareState, path: FullPath):
 
     if isinstance(state.objectHovering, PathPoint): # Delete pathPoint
         path.deletePathPoint(state.objectHovering)
+        state.recomputeInterpolation = True
 
     elif isinstance(state.objectHovering, PathSegment): # Delete segment
         path.deletePathPoint(state.objectHovering.pointA)
         path.deletePathPoint(state.objectHovering.pointB)
+        state.recomputeInterpolation = True
 
 
 
@@ -133,4 +138,6 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
 
     # Now that we know what's being dragged, actually drag the object
     if state.objectDragged is not None:
-        state.objectDragged.beDraggedByMouse(userInput)
+        changed = state.objectDragged.beDraggedByMouse(userInput)
+        if changed and (isinstance(state.objectDragged, Point)):
+            state.recomputeInterpolation = True

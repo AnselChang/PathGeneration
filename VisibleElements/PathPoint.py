@@ -51,10 +51,13 @@ class PathPoint(Point):
         return super().checkIfHovering(userInput.mousePosition, self.position)
 
     # Implementing Draggable interface
-    def beDraggedByMouse(self, userInput: UserInput):
+    # Return if the point was actually moved
+    def beDraggedByMouse(self, userInput: UserInput) -> bool:
 
         if userInput.isMouseOnField:
             self.position = userInput.mousePosition.copy()
+            return True
+        return False
 
 
     def draw(self, screen: pygame.Surface, index: int):

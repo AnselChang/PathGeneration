@@ -2,10 +2,10 @@
 from pathlib import Path
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef, Ref
-from VisibleElements.PathPoint import PathPoint
+from VisibleElements.PathPoint import PathPoint, Shape
 from VisibleElements.ControlPoint import ControlPoint
 from VisibleElements.PathSegment import PathSegment
-import Utility, pygame
+import BezierCurves, Utility, pygame
 
 
 """Store the full path of the robot. This consists of a list of PathPoint objects, as well as the interpolatedPoint objects
@@ -19,6 +19,8 @@ class FullPath:
         self.pathPoints: list[PathPoint] = [] # The user-defined points
         self.segments: list[PathSegment] = []
         self.interpolatedPoints: list[PointRef] = [] # the beizer-interpolated points generated from the user-defined points
+
+        self.INTERPOLATED_POINT_DISTANCE = 0.75 # distance in inches between each interpolated bezier point
 
     # Return the location of the shadow PathPoint where the mouse is.
     # This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
@@ -45,6 +47,7 @@ class FullPath:
             self.segments[index-1].pointB = newPoint
             self.segments.insert(index, PathSegment(newPoint, self.pathPoints[index+1]))
 
+    # Delete a path point given the point object. Finds and deeltes the segment as well
     def deletePathPoint(self, point: PathPoint):
         
         index = self.pathPoints.index(point)
@@ -59,6 +62,60 @@ class FullPath:
         else: # delete some intermediate item, need to merge two segments together
             self.segments[index-1].pointB = self.segments[index].pointB
             del self.segments[index]
+
+    
+    # Interpolate pose[i] to pose[i+1] using Catmull-Rom spline curve with s spillover
+    def interpolateSplineCurve(self, point1: PathPoint, point2: PathPoint, spillover: float) -> int:
+
+        P1 = point1.position.fieldRef
+        V1 = point1.controlA.vector.fieldRef
+        P2 = point2.position.fieldRef
+        V2 = point2.controlB.vector.fieldRef
+        
+        if spillover == 0:
+            ns = 0
+        else:
+            dxds,dyds = BezierCurves.getBezierGradient(0, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
+            dsdt = spillover / Utility.hypo(dxds, dyds)
+            ns = dsdt # s normalized from 0 to 1 for this specific spline
+            if ns > 1:
+                return ns - 1 # no points on this spline segment
+
+        while ns < 1:
+            x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
+            self.interpolatedPoints.append(PointRef(self.transform, Ref.FIELD, (x,y)))
+
+            dxds, dyds = BezierCurves.getBezierGradient(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
+            dsdt = self.INTERPOLATED_POINT_DISTANCE / Utility.hypo(dxds, dyds)
+            ns += dsdt
+
+        spillover = self.INTERPOLATED_POINT_DISTANCE - Utility.distance(x,y,*P2)
+        return spillover
+
+
+    # Based on the location of the PathPoint and ControlPoints, recalculate the beizer curve points
+    def calculateInterpolatedPoints(self):
+
+        # Reset the list
+        self.interpolatedPoints.clear()
+
+        # Nothing to interpolate if there aren't at least two PathPoints
+        if len(self.pathPoints) < 2:
+            return
+
+        spillover = 0 # the distance before the first interpolated point, spilled over from the previous curve
+        for i in range(len(self.pathPoints) - 1):
+
+            # If the two pathpoints are practically in the same location (<0.1 inches), ignore the pathpoint
+            if (self.pathPoints[i+1].position - self.pathPoints[i].position).magnitude(Ref.FIELD) < 0.1:
+                continue
+
+            spillover = self.interpolateSplineCurve(self.pathPoints[i], self.pathPoints[i+1], spillover)
+
+            # no spillovers between two pure pursuit paths (separated by a point turn)
+            if self.pathPoints[i+1].shape == Shape.SHARP:
+                spillover = 0
+
 
 
     # Draw a segment from each path to the next. This will be drawn under the points themselves
@@ -84,8 +141,17 @@ class FullPath:
             pathPoint.controlB.draw(screen)
             index += 1
 
+    # Draw all the interpolated points that have been calculated from PathPoint and ControlPoints
+    def drawInterpolatedPoints(self, screen: pygame.Surface):
+
+        radius = 2
+        
+        for point in self.interpolatedPoints: # point is a PointRef
+            Utility.drawCircle(screen, *point.screenRef, Utility.RED, radius)
+
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments
     def draw(self, screen: pygame.Surface):
+        self.drawInterpolatedPoints(screen)
         self.drawPathSegments(screen)
         self.drawPathPoints(screen)
     
