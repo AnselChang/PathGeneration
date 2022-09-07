@@ -22,6 +22,8 @@ class Point(Draggable):
         self.DRAW_RADIUS = drawRadius
         self.DRAW_RADIUS_BIG = drawRadiusBig
 
+        self.isDragging = False
+
         super().__init__()
 
     # Implementing Hoverable
@@ -32,12 +34,12 @@ class Point(Draggable):
     # Implementing Draggable interface
     # This function should only be called when the mouse is hovering over this object and the mouse was just pressed
     def startDragging(self, userInput: UserInput):
-        pass
+        self.isDragging = True
 
     # Implementing Draggable interface
     # Called when the mouse has released the object
     def stopDragging(self):
-        pass
+        self.isDragging = False
 
     # Draw circle
     def draw(self, screen: pygame.Surface, position: tuple, color: tuple):
@@ -45,7 +47,7 @@ class Point(Draggable):
         # Draw PathPoint
         if self.isHovering:
             radius = self.DRAW_RADIUS_BIG
-            color = Utility.scaleTuple(color, 0.85)
+            color = Utility.scaleTuple(color, 0.7 if self.isDragging else 0.85)
         else:
             radius = self.DRAW_RADIUS
         Utility.drawCircle(screen, *position, color, radius)

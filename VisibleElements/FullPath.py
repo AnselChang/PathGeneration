@@ -2,6 +2,7 @@
 from pathlib import Path
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef, Ref
+from SingletonState.SoftwareState import SoftwareState
 from VisibleElements.PathPoint import PathPoint, Shape
 from VisibleElements.ControlPoint import ControlPoint
 from VisibleElements.PathSegment import PathSegment
@@ -25,9 +26,17 @@ class FullPath:
     # Return the location of the shadow PathPoint where the mouse is.
     # This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
     # but if the mouse is near a segment the shadow will "snap" to it
-    def getShadowPosition(self, mousePosition: PointRef):
+    def getShadowPosition(self, mousePosition: PointRef, state: SoftwareState) -> PointRef:
 
-        return mousePosition # temporary
+        # If hovering over a segment, the shadow position is the point on the segment closest to the mouse
+        if isinstance(state.objectHovering, PathSegment):
+            positionA = state.objectHovering.pointA.position.fieldRef
+            positionB = state.objectHovering.pointB.position.fieldRef
+            positionOnSegment = Utility.pointOnLineClosestToPoint(*mousePosition.fieldRef, *positionA, *positionB)
+            return PointRef(self.transform, Ref.FIELD, positionOnSegment)
+        # otherwise, the shadow position is simply the position of hte mouse
+        else:
+            return mousePosition
 
     # Append a PathPoint at at the specified position.
     # A segment will also need to be inserted somewhere.
@@ -163,7 +172,7 @@ class FullPath:
 
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments
     def draw(self, screen: pygame.Surface):
-        self.drawInterpolatedPoints(screen)
         self.drawPathSegments(screen)
+        self.drawInterpolatedPoints(screen)
         self.drawPathPoints(screen)
     

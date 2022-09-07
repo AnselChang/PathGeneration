@@ -43,7 +43,7 @@ def main():
         handleDeleting(userInput, state, path)
 
         # get the shadow point based on the mouse position
-        shadowPointRef = path.getShadowPosition(userInput.mousePosition)
+        shadowPointRef = path.getShadowPosition(userInput.mousePosition, state)
 
         # Handle all field left click functionality
         if userInput.isMouseOnField:
@@ -72,7 +72,7 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     path.draw(screen)
 
     # Draw PathPoint shadow at mouse
-    if userInput.isMouseOnField and state.objectHovering is fieldSurface:
+    if state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment):
         Utility.drawCircle(screen, *shadowPointRef.screenRef, Utility.GREEN, 10, 140)
             
     # Draw panel background
@@ -82,4 +82,8 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
 
     pygame.display.update()
 
-main()
+
+import cProfile
+import re
+cProfile.run('main()')
+#main()

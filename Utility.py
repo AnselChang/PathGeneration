@@ -78,14 +78,14 @@ def pointTouchingLine(mouseX: int, mouseY: int, x1: int, y1: int, x2: int, y2: i
     return False
 
 # Vector projection algorithm
-def pointOnLineClosestToPoint(x, y, x1, y1, x2, y2):
-    ax = x - x1
-    ay = y - y1
-    bx = x2 - x1
-    by = y2 - y1
+def pointOnLineClosestToPoint(pointX: int, pointY: int, firstX: int, firstY: int, secondX: int, secondY: int) -> tuple:
+    ax = pointX - firstX
+    ay = pointY - firstY
+    bx = secondX - firstX
+    by = secondY - firstY
 
     scalar = (ax * bx + ay * by) / (bx * bx + by * by)
-    return [x1 + scalar * bx, y1 + scalar * by]
+    return [firstX + scalar * bx, firstY + scalar * by]
 
 FONT20 = pygame.font.SysFont('Corbel', 20)
 FONT30 = pygame.font.SysFont('Corbel', 30)
