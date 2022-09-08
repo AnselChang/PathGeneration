@@ -6,6 +6,7 @@ from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
+from VisibleElements.Buttons import Buttons
 import Utility
 
 def main():
@@ -16,6 +17,7 @@ def main():
     fieldTransform: FieldTransform = FieldTransform()
     fieldSurface: FieldSurface = FieldSurface(fieldTransform)
     userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
+    buttons: Buttons = Buttons()
 
     state: SoftwareState = SoftwareState()
     path: FullPath = FullPath(fieldTransform)
@@ -34,7 +36,7 @@ def main():
         handleMousewheel(fieldSurface, fieldTransform, userInput)
         
         # Find the hovered object out of all the possible hoverable objects
-        handleHoverables(state, userInput, path, fieldSurface)
+        handleHoverables(state, userInput, path, buttons, fieldSurface)
         
         # Now that the hovered object is computed, handle what object is being dragged and then actually dragging the object
         handleDragging(userInput, state, fieldSurface)

@@ -1,4 +1,4 @@
-from Hoverable import Hoverable
+from Interfaces.Hoverable import Hoverable
 from SingletonState.SoftwareState import SoftwareState
 from SingletonState.UserInput import UserInput
 from SingletonState.FieldTransform import FieldTransform
@@ -8,7 +8,10 @@ from VisibleElements.FullPath import FullPath
 from VisibleElements.PathSegment import PathSegment
 from VisibleElements.PathPoint import PathPoint
 from VisibleElements.Point import Point
-from Draggable import Draggable
+from VisibleElements.Buttons import Buttons
+from Interfaces.Draggable import Draggable
+from Interfaces.Clickable import Clickable
+
 import pygame
 
 # Handle left clicks for dealing with the field
@@ -69,7 +72,7 @@ def handleDeleting(userInput: UserInput, state: SoftwareState, path: FullPath):
 
 
 # A generator to iterate through all the hoverable objects to determine which object is being hovered by the mouse in order
-def getHoverables(userInput: UserInput, path: FullPath, fieldSurface: FieldSurface):
+def getHoverables(userInput: UserInput, path: FullPath, buttons: Buttons, fieldSurface: FieldSurface):
 
     # The points, segments, and field can only be hoverable if the mouse is on the field permieter and not on the panel
     if userInput.isMouseOnField:
@@ -88,7 +91,10 @@ def getHoverables(userInput: UserInput, path: FullPath, fieldSurface: FieldSurfa
         yield fieldSurface
 
     else: # hoverable panel objects
-        pass # no panel yet!
+
+        # Iterate through each button on the panel
+        for button in Buttons:
+            yield button
 
     # weird python hack to make it return an empty iterator if nothing hoverable
     return
@@ -108,14 +114,18 @@ def handleHoverables(state: SoftwareState, userInput: UserInput, path: FullPath,
             obj.setHoveringObject()
             break
 
-# Called when the mouse was just pressed and we want to see if a new object is about to be dragged
-# This will try to drag either some object on the screen, or pan the entire field if no object is selected
-def handleStartingDraggingObject(userInput: UserInput, state: SoftwareState, fieldSurface: FieldSurface) -> None:
+# Called when the mouse was just pressed and we want to see if a new object is cliked or about to be dragged
+# If the object is draggable, drag it
+# Elif object is clickable, click it
+def handleStartingPressingObject(userInput: UserInput, state: SoftwareState, fieldSurface: FieldSurface) -> None:
 
     # if the mouse is down on some object, try to drag that object
     if isinstance(state.objectHovering, Draggable):
         state.objectDragged = state.objectHovering
         state.objectDragged.startDragging(userInput.mousePosition)
+    elif isinstance(state.objectHovering, Clickable):
+        objectClicked: Clickable = state.objectHovering # "cast" type hint to Clickable
+        objectClicked.click()
 
 
 # Determine what object is being dragged based on the mouse's rising and falling edges, and actually drag the object in question
@@ -129,7 +139,7 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
             print("Error", userInput.leftPressed)
             raise Exception("objectDragged should always be None if the mouse was up before this frame.")
         else:
-            handleStartingDraggingObject(userInput, state, fieldSurface)   
+            handleStartingPressingObject(userInput, state, fieldSurface)   
     
     elif userInput.mouseReleased: # released, so nothing should be dragged
         if state.objectDragged is not None: # there was an object being dragged, so release that

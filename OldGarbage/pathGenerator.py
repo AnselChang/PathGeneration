@@ -1,5 +1,5 @@
 import sys, pygame, cProfile
-import UserInput, OldGarbage.PathStructuresBezier as PathStructuresBezier, Utility, OldGarbage.Slider as Slider
+import SingletonState.UserInput as UserInput, OldGarbage.PathStructuresBezier as PathStructuresBezier, Math.Utility as Utility, OldGarbage.Slider as Slider
 
 # Handle A and S keys to zoom in and out, as well as mousewheel. Returns true if zoom has been changed
 def handleZoom(m, mousewheel, currentfieldSurface, rawFieldSurface):

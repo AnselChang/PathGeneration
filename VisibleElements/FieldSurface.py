@@ -1,14 +1,15 @@
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
 from SingletonState.UserInput import UserInput
-import Draggable, Utility, pygame
+from Interfaces.Draggable import Draggable
+import Utility, pygame
 
 """A class that stores the scaled surface of the vex field, and contains a draw() method to draw it onto the screen.
 It implements Draggable, meaning that the mouse can drag the field to pan the screen. This is coupled with FieldTransform,
 in that panning the screen will change panning values in FieldTransform and therefore pan every other object on the field.
 """
 
-class FieldSurface(Draggable.Draggable):
+class FieldSurface(Draggable):
 
     def __init__(self, fieldTransform: FieldTransform):
         self.transform = fieldTransform

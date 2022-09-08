@@ -1,4 +1,4 @@
-from Draggable import Draggable
+from Interfaces.Draggable import Draggable
 from SingletonState.UserInput import UserInput
 from SingletonState.ReferenceFrame import Ref, PointRef
 import Utility, pygame
@@ -44,7 +44,6 @@ class Point(Draggable):
     # Draw circle
     def draw(self, screen: pygame.Surface, position: tuple, color: tuple):
 
-        # Draw PathPoint
         if self.isHovering:
             radius = self.DRAW_RADIUS_BIG
             color = Utility.scaleTuple(color, 0.7 if self.isDragging else 0.85)

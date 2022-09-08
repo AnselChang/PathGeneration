@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import Hoverable
+from Hoverable import Hoverable
 from SingletonState.UserInput import UserInput
 
 """Python "Interface" for objects that are draggable by the mouse. This adds a layer of abstraction with the mouse

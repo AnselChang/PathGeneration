@@ -1,7 +1,7 @@
 from enum import Enum
 
-from Hoverable import Hoverable
-from Draggable import Draggable
+from Interfaces.Hoverable import Hoverable
+from Interfaces.Draggable import Draggable
 
 
 """ A class representing global state of the software."""

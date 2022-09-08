@@ -38,7 +38,15 @@ class ControlPoint(Point):
     # Return whether it has been moved
     def beDraggedByMouse(self, userInput: UserInput) -> bool:
         if userInput.isMouseOnField:
-            self.vector = (userInput.mousePosition - self.parent.position)
+            self.vector: VectorRef = (userInput.mousePosition - self.parent.position)
+
+            # Prevent vector from being too small (div by 0 errors) by mandating minimum magnitude
+            MIN_MAGNITUDE = 1 # mininum magnitude of vector in inches
+            mag = self.vector.magnitude(Ref.FIELD)
+            if mag == 0:
+                self.vector.fieldRef = (MIN_MAGNITUDE,0) # default vector is pointing to right
+            elif mag < MIN_MAGNITUDE:
+                self.vector *= (MIN_MAGNITUDE / mag) # scale self.vector magnitude to MIN_MAGNITUDE
 
             # If we're in continuous mode, we need to keep both control points opposite one another
             if self.parent.shape == Shape.SMOOTH:

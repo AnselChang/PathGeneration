@@ -47,10 +47,10 @@ class FullPath:
 
         if index == 0: # insert at beginning, so just default control point position
             controlVector = (3,3)
-        elif index == 1:
+        elif index == 1: # Set vector to be the inverse of the vector to the previous vector
             vectorAwayFromPrev = (position - self.pathPoints[index-1].position).normalize()
             controlVector = (vectorAwayFromPrev * 10).fieldRef
-        else:
+        else: # Set vector to be the sum of the inverses to the previous two vectors
             vectorAwayFromPrev = (position - self.pathPoints[index-1].position).normalize()
             vectorAwayFromPrev2 = (position - self.pathPoints[index-2].position).normalize()
             controlVector = ((vectorAwayFromPrev - vectorAwayFromPrev2).normalize() * 10).fieldRef

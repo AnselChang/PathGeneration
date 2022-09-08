@@ -1,4 +1,4 @@
-import math, Utility, random, OldGarbage.Slider as Slider
+import math, Math.Utility as Utility, random, OldGarbage.Slider as Slider
 
 STEP_TIME = 0.02 # 20 millisecond cycle time
 STOP_DISTANCE_THRESHOLD = 1 # In inches, pathfinding algo terminates when distance to destination dips below threshold
