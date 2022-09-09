@@ -73,7 +73,7 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     path.draw(screen, state)
 
     # Draw PathPoint shadow at mouse
-    if state.mode == Mode.EDIT and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
+    if state.mode == Mode.EDIT and state.objectDragged is None and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
         Utility.drawCircle(screen, *shadowPointRef.screenRef, Utility.GREEN, 10, 140)
             
     # Draw panel background

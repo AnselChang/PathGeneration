@@ -139,12 +139,8 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
 
     if userInput.leftPressed and userInput.mousewheelDelta == 0: # left mouse button just pressed
 
-        # When the mouse has just clicked on the object, nothing should have been dragging before
-        if state.objectDragged is not None:
-            print("Error", userInput.leftPressed)
-            raise Exception("objectDragged should always be None if the mouse was up before this frame.")
-        else:
-            handleStartingPressingObject(userInput, state, fieldSurface)   
+        # When the mouse has just clicked on the object, nothing should have been dragging before        
+        handleStartingPressingObject(userInput, state, fieldSurface)   
     
     elif userInput.mouseReleased: # released, so nothing should be dragged
         if state.objectDragged is not None: # there was an object being dragged, so release that

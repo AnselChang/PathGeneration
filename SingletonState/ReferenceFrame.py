@@ -84,6 +84,13 @@ class PointRef:
         else: # other is of type VectorRef
             return PointRef(self.transform, Ref.FIELD, Utility.subtract(self.fieldRef, other.fieldRef))
 
+    def __eq__(self, other):
+
+        if not type(other) == PointRef:
+            return False
+
+        return self._xf == other._xf and self._yf == other._yf
+
     # Create a deep copy of the object and return the copy
     def copy(self) -> 'PointRef':
         return PointRef(self.transform, Ref.FIELD, self.fieldRef)

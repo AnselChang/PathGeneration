@@ -38,21 +38,26 @@ class FullPath:
             return mousePosition
 
     # Append a PathPoint at at the specified position.
+    # Index = -1 means that we'll add it at the end
     # A segment will also need to be inserted somewhere.
     def createPathPoint(self, position: PointRef, index: int = -1):
 
+        # Passing an index of -1 indicates we're trying to add to the end
         if index == -1:
             index = len(self.pathPoints)
 
-        if index == 0: # insert at beginning, so just default control point position
-            controlVector = (3,3)
-        elif index == 1: # Set vector to be the inverse of the vector to the previous vector
+        if index == 1:
+            # Set vector to be the inverse of the vector to the previous vector
             vectorAwayFromPrev = (position - self.pathPoints[index-1].position).normalize()
             controlVector = (vectorAwayFromPrev * 10).fieldRef
-        else: # Set vector to be the sum of the inverses to the previous two vectors
+
+        elif index > 1:
+            # Set vector to be the sum of the inverses to the previous two vectors
             vectorAwayFromPrev = (position - self.pathPoints[index-1].position).normalize()
             vectorAwayFromPrev2 = (position - self.pathPoints[index-2].position).normalize()
             controlVector = ((vectorAwayFromPrev - vectorAwayFromPrev2).normalize() * 10).fieldRef
+        else: # index == 0
+            controlVector = (3,3)
 
         newPoint = PathPoint(position.copy(), controlVector)
 
