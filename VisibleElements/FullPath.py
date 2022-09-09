@@ -2,9 +2,8 @@
 from pathlib import Path
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef, Ref
-from SingletonState.SoftwareState import SoftwareState
+from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint, Shape
-from VisibleElements.ControlPoint import ControlPoint
 from VisibleElements.PathSegment import PathSegment
 import BezierCurves, Utility, pygame
 
@@ -146,20 +145,23 @@ class FullPath:
             segment.draw(screen)
 
     # Iterate through each PathPoint and draw it
-    def drawPathPoints(self, screen: pygame.Surface):
+    def drawPathPoints(self, screen: pygame.Surface, drawControl: bool):
         index = 0
         for pathPoint in self.pathPoints:
             
-            # draw line that goes from control to path point
-            pathPoint.controlA.drawOwnershipLine(screen)
-            pathPoint.controlB.drawOwnershipLine(screen)
+            if drawControl:
+                # draw line that goes from control to path point
+                pathPoint.controlA.drawOwnershipLine(screen)
+                pathPoint.controlB.drawOwnershipLine(screen)
 
             # Draw the path point itself
             pathPoint.draw(screen, index)
 
             # Then draw the control point on top
-            pathPoint.controlA.draw(screen)
-            pathPoint.controlB.draw(screen)
+            if drawControl:
+                pathPoint.controlA.draw(screen)
+                pathPoint.controlB.draw(screen)
+            
             index += 1
 
     # Draw all the interpolated points that have been calculated from PathPoint and ControlPoints
@@ -171,8 +173,15 @@ class FullPath:
             Utility.drawCircle(screen, *point.screenRef, Utility.RED, radius)
 
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments
-    def draw(self, screen: pygame.Surface):
-        self.drawPathSegments(screen)
+    def draw(self, screen: pygame.Surface, state: SoftwareState):
+        
+        # Draw ControlPoints only in Edit mode
+        drawControl = (state.mode == Mode.EDIT)
+
+        # Pointless for segments to be shown in PLAY mode, so draw only in Edit mode
+        if drawControl:
+            self.drawPathSegments(screen)
+        
         self.drawInterpolatedPoints(screen)
-        self.drawPathPoints(screen)
+        self.drawPathPoints(screen, drawControl)
     

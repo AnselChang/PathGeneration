@@ -1,5 +1,5 @@
 from AbstractClasses.Hoverable import Hoverable
-from SingletonState.SoftwareState import SoftwareState
+from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
@@ -17,14 +17,17 @@ import pygame
 # Handle left clicks for dealing with the field
 def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface: FieldSurface, path: FullPath):
 
-    # If nothing is hovered, create a new PathPoint at that location
-    if state.objectHovering is fieldSurface:
-        path.createPathPoint(shadowPointRef)
-        state.recomputeInterpolation = True
-    elif isinstance(state.objectHovering, PathSegment):
-        index = path.segments.index(state.objectHovering) + 1
-        path.createPathPoint(shadowPointRef, index)
-        state.recomputeInterpolation = True
+    # can only add new PathPoints when in edit mode
+    if state.mode == Mode.EDIT:
+
+        # If nothing is hovered, create a new PathPoint at that location
+        if state.objectHovering is fieldSurface:
+            path.createPathPoint(shadowPointRef)
+            state.recomputeInterpolation = True
+        elif isinstance(state.objectHovering, PathSegment):
+            index = path.segments.index(state.objectHovering) + 1
+            path.createPathPoint(shadowPointRef, index)
+            state.recomputeInterpolation = True
 
 # Handle right clicks for dealing with the field
 def handleRightClick(state: SoftwareState):
@@ -72,20 +75,21 @@ def handleDeleting(userInput: UserInput, state: SoftwareState, path: FullPath):
 
 
 # A generator to iterate through all the hoverable objects to determine which object is being hovered by the mouse in order
-def getHoverables(userInput: UserInput, path: FullPath, buttons: Buttons, fieldSurface: FieldSurface):
+def getHoverables(state: SoftwareState, userInput: UserInput, path: FullPath, buttons: Buttons, fieldSurface: FieldSurface):
 
     # The points, segments, and field can only be hoverable if the mouse is on the field permieter and not on the panel
     if userInput.isMouseOnField:
 
-        # For each pathPoint, iterate through the control points then the pathPoint itself
-        for pathPoint in path.pathPoints:
-            yield pathPoint.controlA
-            yield pathPoint.controlB
-            yield pathPoint
+        if state.mode == Mode.EDIT: # the path is only interactable when on edit mode
+            # For each pathPoint, iterate through the control points then the pathPoint itself
+            for pathPoint in path.pathPoints:
+                yield pathPoint.controlA
+                yield pathPoint.controlB
+                yield pathPoint
 
-        # After checking all the points, check the segments
-        for segment in path.segments:
-            yield segment
+            # After checking all the points, check the segments
+            for segment in path.segments:
+                yield segment
 
         # If nothing has been hovered, then finally check fieldSurface
         yield fieldSurface
@@ -108,7 +112,7 @@ def handleHoverables(state: SoftwareState, userInput: UserInput, path: FullPath,
         state.objectHovering.resetHoverableObject()
         state.objectHovering = None
 
-    for hoverableObject in getHoverables(userInput, path, buttons, fieldSurface):
+    for hoverableObject in getHoverables(state, userInput, path, buttons, fieldSurface):
         obj: Hoverable = hoverableObject # just for type hinting
         if obj.checkIfHovering(userInput):
             state.objectHovering = obj

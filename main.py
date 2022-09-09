@@ -1,7 +1,7 @@
 import pygame, sys
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
-from SingletonState.SoftwareState import SoftwareState
+from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from MouseInteraction import *
@@ -60,8 +60,6 @@ def main():
 
         # Draw everything on the screen
         drawEverything(screen, state, fieldSurface, path, buttons, shadowPointRef, userInput)
-
-        print(state.objectHovering)
         
         
 
@@ -72,10 +70,10 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     fieldSurface.draw(screen)
 
     # Draw the entire path with segments and PathPoints
-    path.draw(screen)
+    path.draw(screen, state)
 
     # Draw PathPoint shadow at mouse
-    if state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment):
+    if state.mode == Mode.EDIT and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
         Utility.drawCircle(screen, *shadowPointRef.screenRef, Utility.GREEN, 10, 140)
             
     # Draw panel background
