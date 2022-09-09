@@ -1,4 +1,4 @@
-from AbstractClasses.Clickable import Clickable
+from MouseInterfaces.Clickable import Clickable
 from abc import abstractmethod
 from SingletonState.UserInput import UserInput
 import Utility, pygame

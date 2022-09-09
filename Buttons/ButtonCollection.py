@@ -13,7 +13,9 @@ class Buttons:
         self.buttons: Button = [
             
             EditButton(state),
-            PlayButton(state),
+            SimulateButton(state),
+            RobotButton(state),
+            OdomButton(state)
 
         ]
 

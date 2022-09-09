@@ -1,4 +1,4 @@
-from AbstractClasses.Hoverable import Hoverable
+from MouseInterfaces.Hoverable import Hoverable
 from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from SingletonState.FieldTransform import FieldTransform
@@ -9,8 +9,8 @@ from VisibleElements.PathSegment import PathSegment
 from VisibleElements.PathPoint import PathPoint
 from VisibleElements.Point import Point
 from Buttons.ButtonCollection import Buttons
-from AbstractClasses.Draggable import Draggable
-from AbstractClasses.Clickable import Clickable
+from MouseInterfaces.Draggable import Draggable
+from MouseInterfaces.Clickable import Clickable
 
 import pygame
 

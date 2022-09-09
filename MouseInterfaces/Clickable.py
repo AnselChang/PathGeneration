@@ -1,4 +1,4 @@
-from AbstractClasses.Hoverable import Hoverable
+from MouseInterfaces.Hoverable import Hoverable
 from abc import ABC, abstractmethod
 
 
