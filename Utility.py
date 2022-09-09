@@ -1,3 +1,4 @@
+from email.mime import image
 import pygame, math, pygame.gfxdraw
 
 pygame.font.init()
@@ -20,6 +21,23 @@ LINEGREY = (100, 100, 100)
 LINEDARKGREY = (75, 75, 75)
 TEXTCOLOR = (30, 30, 30)
 VECTORCOLOR = (34, 185, 151)
+
+# Return an image given a filename
+def getImage(filename: str, imageScale: float = 1) -> pygame.Surface:
+    unscaledImage = pygame.image.load(filename).convert_alpha()
+    if imageScale == 1:
+        return unscaledImage
+    else:
+        dimensions = ( int(unscaledImage.get_width() * imageScale), int(unscaledImage.get_height() * imageScale) )
+        return pygame.transform.smoothscale(unscaledImage, dimensions)
+
+# Amount from 0 (nothing) to 1 (transparent)
+def getLighterImage(image: pygame.Surface, lightenPercent: float) -> pygame.Surface:
+
+    newImage = image.copy()
+    newImage.set_alpha(lightenPercent * 255)
+
+    return newImage
 
 def scaleTuple(nums: tuple, scalar: float):
     return [i * scalar for i in nums]

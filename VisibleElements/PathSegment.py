@@ -2,7 +2,7 @@
 from VisibleElements.PathPoint import PathPoint
 from SingletonState.UserInput import UserInput
 from SingletonState.ReferenceFrame import PointRef, Ref
-from Hoverable import Hoverable
+from AbstractClasses.Hoverable import Hoverable
 import Utility, pygame
 
 """ A class containing references to two PathPoint objects. The class stores hovered and dragging state, and handles

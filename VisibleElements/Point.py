@@ -1,4 +1,4 @@
-from Interfaces.Draggable import Draggable
+from AbstractClasses.Draggable import Draggable
 from SingletonState.UserInput import UserInput
 from SingletonState.ReferenceFrame import Ref, PointRef
 import Utility, pygame

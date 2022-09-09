@@ -1,14 +1,14 @@
 from enum import Enum
 
-from Interfaces.Hoverable import Hoverable
-from Interfaces.Draggable import Draggable
+from AbstractClasses.Hoverable import Hoverable
+from AbstractClasses.Draggable import Draggable
 
 
 """ A class representing global state of the software."""
 
 class Mode(Enum):
     EDIT = 1 # Modfying the path
-    SIMULATION = 2 # Simulating the path with some path following algorithm with a virtual robot
+    PLAY = 2 # Simulating the path with some path following algorithm with a virtual robot
 
 class SoftwareState:
 

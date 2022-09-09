@@ -1,7 +1,7 @@
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
 from SingletonState.UserInput import UserInput
-from Interfaces.Draggable import Draggable
+from AbstractClasses.Draggable import Draggable
 import Utility, pygame
 
 """A class that stores the scaled surface of the vex field, and contains a draw() method to draw it onto the screen.

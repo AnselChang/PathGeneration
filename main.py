@@ -6,7 +6,7 @@ from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
-from VisibleElements.Buttons import Buttons
+from Buttons.ButtonCollection import Buttons
 import Utility
 
 def main():
@@ -17,10 +17,10 @@ def main():
     fieldTransform: FieldTransform = FieldTransform()
     fieldSurface: FieldSurface = FieldSurface(fieldTransform)
     userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
-    buttons: Buttons = Buttons()
 
     state: SoftwareState = SoftwareState()
     path: FullPath = FullPath(fieldTransform)
+    buttons: Buttons = Buttons(state)
 
     # Main software loop
     while True:
@@ -59,13 +59,14 @@ def main():
             path.calculateInterpolatedPoints()
 
         # Draw everything on the screen
-        drawEverything(screen, state, fieldSurface, path, userInput, shadowPointRef)
+        drawEverything(screen, state, fieldSurface, path, buttons, shadowPointRef, userInput)
 
+        print(state.objectHovering)
         
         
 
 # Draw the vex field, full path, and panel
-def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath, userInput: UserInput, shadowPointRef: PointRef) -> None:
+def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath, buttons: Buttons, shadowPointRef: PointRef, userInput: UserInput) -> None:
     
     # Draw the vex field
     fieldSurface.draw(screen)
@@ -81,6 +82,13 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     border = 5
     pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
     pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
+
+    # Draw panel buttons
+    buttons.draw(screen)
+
+    # Draw a tooltip if there is one
+    if state.objectHovering is not None and hasattr(state.objectHovering, "tooltip"):
+        state.objectHovering.tooltip.draw(screen, userInput.mousePosition.screenRef)
 
     pygame.display.update()
 

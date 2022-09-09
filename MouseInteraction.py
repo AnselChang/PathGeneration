@@ -1,4 +1,4 @@
-from Interfaces.Hoverable import Hoverable
+from AbstractClasses.Hoverable import Hoverable
 from SingletonState.SoftwareState import SoftwareState
 from SingletonState.UserInput import UserInput
 from SingletonState.FieldTransform import FieldTransform
@@ -8,9 +8,9 @@ from VisibleElements.FullPath import FullPath
 from VisibleElements.PathSegment import PathSegment
 from VisibleElements.PathPoint import PathPoint
 from VisibleElements.Point import Point
-from VisibleElements.Buttons import Buttons
-from Interfaces.Draggable import Draggable
-from Interfaces.Clickable import Clickable
+from Buttons.ButtonCollection import Buttons
+from AbstractClasses.Draggable import Draggable
+from AbstractClasses.Clickable import Clickable
 
 import pygame
 
@@ -93,7 +93,7 @@ def getHoverables(userInput: UserInput, path: FullPath, buttons: Buttons, fieldS
     else: # hoverable panel objects
 
         # Iterate through each button on the panel
-        for button in Buttons:
+        for button in buttons.buttons:
             yield button
 
     # weird python hack to make it return an empty iterator if nothing hoverable
@@ -102,12 +102,13 @@ def getHoverables(userInput: UserInput, path: FullPath, buttons: Buttons, fieldS
 
 
 # Find the object that is hoverable, update that object's hoverable state, and return the object
-def handleHoverables(state: SoftwareState, userInput: UserInput, path: FullPath, fieldSurface: FieldSurface):
+def handleHoverables(state: SoftwareState, userInput: UserInput, path: FullPath, buttons: Buttons, fieldSurface: FieldSurface):
 
     if state.objectHovering is not None:
         state.objectHovering.resetHoverableObject()
+        state.objectHovering = None
 
-    for hoverableObject in getHoverables(userInput, path, fieldSurface):
+    for hoverableObject in getHoverables(userInput, path, buttons, fieldSurface):
         obj: Hoverable = hoverableObject # just for type hinting
         if obj.checkIfHovering(userInput):
             state.objectHovering = obj

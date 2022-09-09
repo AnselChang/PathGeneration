@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Hoverable import Hoverable
+from AbstractClasses.Hoverable import Hoverable
 from SingletonState.UserInput import UserInput
 
 """Python "Interface" for objects that are draggable by the mouse. This adds a layer of abstraction with the mouse
@@ -9,7 +9,7 @@ This is a abstract subclass of Hoverable, meaning that all Draggable objects are
 
 Useful for FieldTransform, PathPoint, and Slider."""
 
-class Draggable(Hoverable.Hoverable):
+class Draggable(Hoverable):
 
     def __init__(self):
         super().__init__()
