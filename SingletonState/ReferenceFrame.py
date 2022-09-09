@@ -31,6 +31,7 @@ class PointRef:
         else:
             self.fieldRef = point
 
+    # Given we only store the point in the field reference frame, convert to field reference frame before storing it
     def _setScreenRef(self, point: tuple) -> None:
 
         # undo the panning and zooming
@@ -42,6 +43,7 @@ class PointRef:
         self._xf = (normalizedScreenX - Utility.PIXELS_TO_FIELD_CORNER) / Utility.FIELD_SIZE_IN_PIXELS * Utility.FIELD_SIZE_IN_INCHES
         self._yf = (normalizedScreenY - Utility.PIXELS_TO_FIELD_CORNER) / Utility.FIELD_SIZE_IN_PIXELS * Utility.FIELD_SIZE_IN_INCHES
 
+    # Given we only store the point in the field reference frame, we need to convert it to return as screen reference frame
     def _getScreenRef(self) -> tuple:
         # convert to normalized (pre-zoom and pre-panning) coordinates
         normalizedScreenX = self._xf / Utility.FIELD_SIZE_IN_INCHES * Utility.FIELD_SIZE_IN_PIXELS + Utility.PIXELS_TO_FIELD_CORNER
@@ -59,7 +61,6 @@ class PointRef:
     
     def _setFieldRef(self, point: tuple) -> None:
         self._xf, self._yf = point
-
         
     def _getFieldRef(self) -> tuple:
         return self._xf, self._yf
@@ -116,23 +117,27 @@ class VectorRef:
 
     fieldRef = property(_getFieldRef, _setFieldRef)
 
+    # Given we only store the point in the field reference frame, convert to field reference frame before storing it
     def _setScreenRef(self, vector: tuple):
         scalar = Utility.FIELD_SIZE_IN_INCHES / Utility.FIELD_SIZE_IN_PIXELS / self.transform.zoom
         self._vxf = vector[0] * scalar
         self._vyf = vector[0] * scalar
 
+    # Given we only store the point in the field reference frame, we need to convert it to return as screen reference frame
     def _getScreenRef(self):
         scalar = self.transform.zoom * Utility.FIELD_SIZE_IN_PIXELS / Utility.FIELD_SIZE_IN_INCHES
         return self._vxf * scalar, self._vyf * scalar
 
     screenRef = property(_getScreenRef, _getFieldRef)
 
+    # Return the magnitude of the vector based on the given reference frame
     def magnitude(self, referenceFrame: Ref):
         if referenceFrame == Ref.FIELD:
             return Utility.distanceTuple(self.fieldRef)
         else:
             return Utility.distanceTuple(self.screenRef)
 
+    # Does not modify the current object but creates a new object with a magnitude of 1
     def normalize(self):
         mag = self.magnitude(Ref.FIELD)
         return VectorRef(self.transform, Ref.FIELD, Utility.divideTuple(self.fieldRef, mag))

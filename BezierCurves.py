@@ -1,7 +1,9 @@
+# Credits to Yusef Simsek for this code
+
 VECTOR_STRENGTH = 1.2 - 1 # The -1 is to make editing more intuitive. At a first value of 1, they're at 100%, 0.5 at 50% etc.
 
+# Returns the point on a bezier curve defined by the four points on location 0<=t<1.
 def getBezierPoint(t: float, p0: list, p1: list, p2: list, p3: list) -> list:
-    """Returns the point on a bezier curve defined by the four points on location 0<=t<1."""
 
     p1[0] += p0[0] + p1[0] * VECTOR_STRENGTH
     p1[1] += p0[1] + p1[1] * VECTOR_STRENGTH
@@ -22,8 +24,9 @@ def getBezierPoint(t: float, p0: list, p1: list, p2: list, p3: list) -> list:
     return [tx, ty]
 
 
+# returns the derivative on a bezier curve defined by the four points on location 0<=t<1
 def getBezierGradient(t: float, p0: tuple, p1: tuple, p2: tuple, p3: tuple) -> list:
-    """Returns the derivative on a bezier curve defined by the four points on location 0<=t<1."""
+
     inv_t = 1-t
 
     p1[0] += p0[0] + p1[0] * VECTOR_STRENGTH

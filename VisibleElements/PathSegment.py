@@ -20,6 +20,7 @@ class PathSegment(Hoverable):
         self.SEGMENT_THICKNESS = 3
         self.SEGMENT_HITBOX_THICKNESS = 10
 
+    # Check whether mouse is near the segment using a little math
     def checkIfHovering(self, userInput: UserInput) -> bool:
         a = self.pointA.position.screenRef
         b = self.pointB.position.screenRef

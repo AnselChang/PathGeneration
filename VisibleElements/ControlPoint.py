@@ -56,6 +56,7 @@ class ControlPoint(Point):
 
         return False
 
+    # Draw a line from the ControlPoint to the PathPoint as a visual indication of what PathPoint the ControlPoint belongs to
     def drawOwnershipLine(self, screen: pygame.Surface):
 
         # store position as an instance variable to be access by self.draw() after PathPoint is drawn

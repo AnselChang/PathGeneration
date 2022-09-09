@@ -4,7 +4,7 @@ from SingletonState.SoftwareState import SoftwareState
 import pygame
 
 """
-A class to initialize and store a collection of buttons
+A class to initialize and store a collection of buttons to be displayed on the panel
 """
 
 class Buttons:
