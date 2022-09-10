@@ -10,7 +10,7 @@ of the image depending on where the mouse is. It can be clicked, which results i
 This abstract class can be subclassed to give functionality to click().
 """
 
-class Button(Clickable):
+class AbstactButton(Clickable):
 
     def __init__(self, position: tuple, imageWidth: int, imageHeight: int):
 
@@ -48,7 +48,7 @@ imageA -> toggled off
 imageB -> toggled off but hovered
 imageC -> toggled on
 """
-class ToggleButton(Button):
+class ToggleButton(AbstactButton):
 
     def __init__(self, position: tuple, imageName: str, imageScale: float = 1):
         
