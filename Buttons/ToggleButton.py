@@ -1,6 +1,6 @@
 from Buttons.AbstractButton import AbstactButton
 from abc import abstractmethod
-import Utility, pygame
+import Utility, Graphics, pygame
 
 """
 An abstract button that can be toggled on and off, which yields visual differences.
@@ -12,9 +12,9 @@ class ToggleButton(AbstactButton):
 
     def __init__(self, position: tuple, imageName: str, imageScale: float = 1):
         
-        self.imageC = Utility.getImage(imageName, imageScale)
-        self.imageB = Utility.getLighterImage(self.imageC, 0.66)
-        self.imageA = Utility.getLighterImage(self.imageC, 0.33)
+        self.imageC = Graphics.getImage(imageName, imageScale)
+        self.imageB = Graphics.getLighterImage(self.imageC, 0.66)
+        self.imageA = Graphics.getLighterImage(self.imageC, 0.33)
 
         super().__init__(position, self.imageC.get_width(), self.imageC.get_height())
 

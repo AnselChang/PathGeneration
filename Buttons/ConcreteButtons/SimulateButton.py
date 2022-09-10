@@ -1,5 +1,5 @@
 from SingletonState.SoftwareState import SoftwareState, Mode
-from Buttons.AbstractButton import AbstactButton, ToggleButton
+from Buttons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
 import Utility
 

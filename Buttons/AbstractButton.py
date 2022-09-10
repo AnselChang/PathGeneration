@@ -1,7 +1,7 @@
 from MouseInterfaces.Clickable import Clickable
 from abc import abstractmethod
 from SingletonState.UserInput import UserInput
-import Utility, pygame
+import Graphics, pygame
 
 """
 An visual button class that appears on the panel. It switches between "hovered" and "non-hovered" versions
@@ -42,30 +42,3 @@ class AbstactButton(Clickable):
     def draw(self, screen: pygame.Surface):
         screen.blit(self.getImage(), self.position)
 
-"""
-An abstract button that can be toggled on and off, which yields visual differences.
-imageA -> toggled off
-imageB -> toggled off but hovered
-imageC -> toggled on
-"""
-class ToggleButton(AbstactButton):
-
-    def __init__(self, position: tuple, imageName: str, imageScale: float = 1):
-        
-        self.imageC = Utility.getImage(imageName, imageScale)
-        self.imageB = Utility.getLighterImage(self.imageC, 0.66)
-        self.imageA = Utility.getLighterImage(self.imageC, 0.33)
-
-        super().__init__(position, self.imageC.get_width(), self.imageC.get_height())
-
-    # Return whether object was toggled on
-    @abstractmethod
-    def isToggled(self) -> bool:
-        pass
-
-    # Implementing abstract method
-    def getImage(self) -> pygame.Surface:
-        if self.isToggled():
-            return self.imageC
-        else:
-            return self.imageB if self.isHovering else self.imageA

@@ -7,7 +7,7 @@ from VisibleElements.FieldSurface import FieldSurface
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Buttons.ButtonCollection import Buttons
-import Utility
+import Utility, colors
 
 def main():
 
@@ -74,12 +74,12 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
 
     # Draw PathPoint shadow at mouse
     if state.mode == Mode.EDIT and state.objectDragged is None and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
-        Utility.drawCircle(screen, *shadowPointRef.screenRef, Utility.GREEN, 10, 140)
+        Utility.drawCircle(screen, *shadowPointRef.screenRef, colors.GREEN, 10, 140)
             
     # Draw panel background
     border = 5
-    pygame.draw.rect(screen, Utility.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
-    pygame.draw.rect(screen, Utility.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
+    pygame.draw.rect(screen, colors.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
+    pygame.draw.rect(screen, colors.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
 
     # Draw panel buttons
     buttons.draw(screen)

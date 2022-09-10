@@ -6,7 +6,7 @@ from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint, Shape
 from VisibleElements.PathSegment import PathSegment
 from Simulation.Waypoints import Waypoints
-import BezierCurves, Utility, pygame
+import BezierCurves, Utility, colors, pygame
 
 
 """Store the full path of the robot. This consists of a list of PathPoint objects, as well as the interpolatedPoint objects
@@ -163,7 +163,7 @@ class FullPath:
         radius = 2
         
         for point in self.waypoints.iterator(): # point is a PointRef
-            Utility.drawCircle(screen, *point.screenRef, Utility.RED, radius)
+            Utility.drawCircle(screen, *point.screenRef, colors.RED, radius)
 
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments
     def draw(self, screen: pygame.Surface, state: SoftwareState):

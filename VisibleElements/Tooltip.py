@@ -1,4 +1,4 @@
-import Utility, pygame
+import Utility, colors, Graphics, pygame
 
 """
 Classes that have a self.tooltip instance variable storing a Tooltip object will have a tooltip displayed
@@ -18,7 +18,7 @@ class Tooltip:
     def getTooltipSurface(self, messages):
 
         # generate temporary text surfaces for each line to figure out width and height of text
-        texts = [Utility.FONT20.render(message, True, TEXT_COLOR) for message in messages]
+        texts = [Graphics.FONT20.render(message, True, TEXT_COLOR) for message in messages]
 
         outsideMargin = 7 # margin between text and tooltip surface
         insideMargin = 1 # margin between lines of text
@@ -32,7 +32,7 @@ class Tooltip:
         # Create the background surfaces based on the calculated tooltip dimensions
         tooltipSurface = pygame.Surface([tooltipWidth, tooltipHeight]).convert_alpha()
         pygame.draw.rect(tooltipSurface, BACKGROUND_COLOR, [0, 0, tooltipWidth, tooltipHeight], border_radius = 10)
-        pygame.draw.rect(tooltipSurface, Utility.BLACK, [0, 0, tooltipWidth, tooltipHeight], width = 3, border_radius = 10)
+        pygame.draw.rect(tooltipSurface, colors.BLACK, [0, 0, tooltipWidth, tooltipHeight], width = 3, border_radius = 10)
         
         # Draw the text line by line onto the surface
         y = outsideMargin

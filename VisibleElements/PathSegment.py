@@ -3,7 +3,7 @@ from VisibleElements.PathPoint import PathPoint
 from SingletonState.UserInput import UserInput
 from SingletonState.ReferenceFrame import PointRef, Ref
 from MouseInterfaces.Hoverable import Hoverable
-import Utility, pygame
+import Utility, colors, Graphics, pygame
 
 """ A class containing references to two PathPoint objects. The class stores hovered and dragging state, and handles
 mouse detection and drawing the segment.
@@ -28,7 +28,7 @@ class PathSegment(Hoverable):
 
     def draw(self, screen: pygame.Surface):
         # Line becomes thicker and darker if hovered
-        color = Utility.LINEDARKGREY if self.isHovering else Utility.LINEGREY
+        color = colors.LINEDARKGREY if self.isHovering else colors.LINEGREY
 
         # Draw line from position A to B
-        Utility.drawLine(screen, color, *self.pointA.position.screenRef, *self.pointB.position.screenRef, self.SEGMENT_THICKNESS)
+        Graphics.drawLine(screen, color, *self.pointA.position.screenRef, *self.pointB.position.screenRef, self.SEGMENT_THICKNESS)

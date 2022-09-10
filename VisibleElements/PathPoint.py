@@ -1,9 +1,8 @@
-from typing import Tuple
 from SingletonState.ReferenceFrame import PointRef, Ref
 from VisibleElements.Point import Point, Shape
 from SingletonState.UserInput import UserInput
 from VisibleElements.ControlPoint import ControlPoint
-import Utility, pygame
+import Utility, Graphics, colors, pygame
 
 """PathPoint objects are user-controllable points that consist of a main control point that is on the path, and 
 two "control" points not on  the actual path, in order to specify angle.
@@ -65,9 +64,9 @@ class PathPoint(Point):
     def draw(self, screen: pygame.Surface, index: int):
 
         position = self.position.screenRef
-        color: tuple = Utility.ORANGE if self.shape == Shape.SHARP else Utility.GREEN
+        color: tuple = colors.ORANGE if self.shape == Shape.SHARP else colors.GREEN
         super().draw(screen, position, color) # draw circle
-        Utility.drawText(screen, Utility.FONT20, str(index), Utility.BLACK, *position)
+        Utility.drawText(screen, Graphics.FONT20, str(index), colors.BLACK, *position)
 
 
     def __str__(self):
