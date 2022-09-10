@@ -5,6 +5,7 @@ from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint, Shape
 from VisibleElements.PathSegment import PathSegment
+from Simulation.Waypoints import Waypoints
 import BezierCurves, Utility, pygame
 
 
@@ -18,7 +19,7 @@ class FullPath:
         self.transform = transform
         self.pathPoints: list[PathPoint] = [] # The user-defined points
         self.segments: list[PathSegment] = []
-        self.interpolatedPoints: list[PointRef] = [] # the beizer-interpolated points generated from the user-defined points
+        self.waypoints: Waypoints = Waypoints()
 
         self.INTERPOLATED_POINT_DISTANCE = 0.75 # distance in inches between each interpolated bezier point
 
@@ -107,7 +108,7 @@ class FullPath:
 
         while ns < 1:
             x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
-            self.interpolatedPoints.append(PointRef(self.transform, Ref.FIELD, (x,y)))
+            self.waypoints.addWaypoint(PointRef(self.transform, Ref.FIELD, (x,y)))
 
             dxds, dyds = BezierCurves.getBezierGradient(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
             dsdt = self.INTERPOLATED_POINT_DISTANCE / Utility.hypo(dxds, dyds)
@@ -121,7 +122,7 @@ class FullPath:
     def calculateInterpolatedPoints(self):
 
         # Reset the list
-        self.interpolatedPoints.clear()
+        self.waypoints.reset()
 
         # Nothing to interpolate if there aren't at least two PathPoints
         if len(self.pathPoints) < 2:
@@ -137,9 +138,11 @@ class FullPath:
             # Actually interpolate between these two points
             spillover = self.interpolateSplineCurve(self.pathPoints[i], self.pathPoints[i+1], spillover)
 
-            # no spillovers between two pure pursuit paths (separated by a point turn)
+            # If the PathPoint is sharp, do not spillover to the next path
+            # Also, add a point turn
             if self.pathPoints[i+1].shape == Shape.SHARP:
                 spillover = 0
+                self.waypoints.addPointTurn()
 
 
 
@@ -174,7 +177,7 @@ class FullPath:
 
         radius = 2
         
-        for point in self.interpolatedPoints: # point is a PointRef
+        for point in self.waypoints.iterator(): # point is a PointRef
             Utility.drawCircle(screen, *point.screenRef, Utility.RED, radius)
 
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments

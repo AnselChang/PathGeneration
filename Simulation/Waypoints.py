@@ -9,7 +9,10 @@ Between each set of waypoints is a point turn
 class Waypoints:
 
     def __init__(self):
+        self.reset()
 
+    # Clear the entire list of waypoints
+    def reset(self):
         self.waypoints = [[]]
 
     # Whenever a new waypoint is calculated, append it to the last set of waypoints
@@ -21,3 +24,14 @@ class Waypoints:
     # The actual amount to turn is calculated later
     def addPointTurn(self):
         self.waypoints.append([])
+
+    # Return an iterator through every single waypoint
+    def iterator(self):
+
+        for segment in self.waypoints:
+            for waypoint in segment:
+                yield waypoint
+
+        # Weird python quirk to return empty iterator if self.waypoints is empty
+        return
+        yield
