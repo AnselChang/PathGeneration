@@ -23,21 +23,6 @@ class FullPath:
 
         self.INTERPOLATED_POINT_DISTANCE = 0.75 # distance in inches between each interpolated bezier point
 
-    # Return the location of the shadow PathPoint where the mouse is.
-    # This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
-    # but if the mouse is near a segment the shadow will "snap" to it
-    def getShadowPosition(self, mousePosition: PointRef, state: SoftwareState) -> PointRef:
-
-        # If hovering over a segment, the shadow position is the point on the segment closest to the mouse
-        if isinstance(state.objectHovering, PathSegment):
-            positionA = state.objectHovering.pointA.position.fieldRef
-            positionB = state.objectHovering.pointB.position.fieldRef
-            positionOnSegment = Utility.pointOnLineClosestToPoint(*mousePosition.fieldRef, *positionA, *positionB)
-            return PointRef(self.transform, Ref.FIELD, positionOnSegment)
-        # otherwise, the shadow position is simply the position of hte mouse
-        else:
-            return mousePosition
-
     # Append a PathPoint at at the specified position.
     # Index = -1 means that we'll add it at the end
     # A segment will also need to be inserted somewhere.

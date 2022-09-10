@@ -2,7 +2,7 @@ from MouseInterfaces.Hoverable import Hoverable
 from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from SingletonState.FieldTransform import FieldTransform
-from SingletonState.ReferenceFrame import PointRef
+from SingletonState.ReferenceFrame import PointRef, Ref
 from VisibleElements.FieldSurface import FieldSurface
 from VisibleElements.FullPath import FullPath
 from VisibleElements.PathSegment import PathSegment
@@ -11,8 +11,24 @@ from VisibleElements.Point import Point
 from Buttons.ButtonCollection import Buttons
 from MouseInterfaces.Draggable import Draggable
 from MouseInterfaces.Clickable import Clickable
+import Utility
 
 import pygame
+
+# Return the location of the shadow PathPoint where the mouse is.
+# This is exactly equal to the location of the mouse if the mouse is not hovering on a segment,
+# but if the mouse is near a segment the shadow will "snap" to it
+def getShadowPosition(mousePosition: PointRef, state: SoftwareState) -> PointRef:
+
+    # If hovering over a segment, the shadow position is the point on the segment closest to the mouse
+    if isinstance(state.objectHovering, PathSegment):
+        positionA = state.objectHovering.pointA.position.fieldRef
+        positionB = state.objectHovering.pointB.position.fieldRef
+        positionOnSegment = Utility.pointOnLineClosestToPoint(*mousePosition.fieldRef, *positionA, *positionB)
+        return PointRef(mousePosition.transform, Ref.FIELD, positionOnSegment)
+    # otherwise, the shadow position is simply the position of hte mouse
+    else:
+        return mousePosition
 
 # Handle left clicks for dealing with the field
 def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface: FieldSurface, path: FullPath):

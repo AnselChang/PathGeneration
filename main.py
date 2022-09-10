@@ -45,7 +45,7 @@ def main():
         handleDeleting(userInput, state, path)
 
         # get the shadow point based on the mouse position
-        shadowPointRef = path.getShadowPosition(userInput.mousePosition, state)
+        shadowPointRef = getShadowPosition(userInput.mousePosition, state)
 
         # Handle all field left click functionality
         if userInput.isMouseOnField:
