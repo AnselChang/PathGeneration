@@ -1,7 +1,8 @@
 from SingletonState.SoftwareState import SoftwareState, Mode
 from Buttons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
-import Utility
+from SingletonState.ReferenceFrame import PointRef
+import Utility, pygame
 
 # Button on panel to select odom mode
 class OdomButton(ToggleButton):
@@ -13,12 +14,20 @@ class OdomButton(ToggleButton):
         position = (Utility.SCREEN_SIZE + 230, 30)
         super().__init__(position, "Images/Buttons/odom.png", 0.1)
 
+    # Odombutton only ever has one tooltip message to draw
+    def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
+        self.tooltip.draw(screen, mousePosition)
+
     # Implementing ToggleButton function
     # button is active when the software mode is set to ODOM
     def isToggled(self) ->  bool:
         return self.softwareState.mode == Mode.ODOM
 
-    # Implementing Clickable function
-    # When clicked, set to odom mode
-    def click(self):
+    # odom button is never disabled
+    def isDisabled(self) -> bool:
+        return False
+
+    # Implementing ToggleButton function
+    # When toggled on, set mode to odom
+    def toggleButtonOn(self):
         self.softwareState.mode = Mode.ODOM

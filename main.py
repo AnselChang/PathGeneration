@@ -7,6 +7,7 @@ from VisibleElements.FieldSurface import FieldSurface
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Buttons.ButtonCollection import Buttons
+from MouseInterfaces.TooltipOwner import TooltipOwner
 import Utility, colors
 
 def main():
@@ -20,7 +21,7 @@ def main():
 
     state: SoftwareState = SoftwareState()
     path: FullPath = FullPath(fieldTransform)
-    buttons: Buttons = Buttons(state)
+    buttons: Buttons = Buttons(state, path.waypoints)
 
     # Main software loop
     while True:
@@ -85,8 +86,8 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     buttons.draw(screen)
 
     # Draw a tooltip if there is one
-    if state.objectHovering is not None and hasattr(state.objectHovering, "tooltip"):
-        state.objectHovering.tooltip.draw(screen, userInput.mousePosition.screenRef)
+    if state.objectHovering is not None and isinstance(state.objectHovering, TooltipOwner):
+        state.objectHovering.drawTooltip(screen, userInput.mousePosition.screenRef)
 
     pygame.display.update()
 

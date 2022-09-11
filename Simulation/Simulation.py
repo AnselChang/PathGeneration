@@ -5,6 +5,7 @@ from Simulation.RobotModel import RobotModel
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
+from Sliders.Slider import Slider
 
 import pygame
 
@@ -20,7 +21,8 @@ class Simulation:
     def __init__(self):
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
-        self.pointTurnController = PointTurnController()
+        self.pointTurnController: PointTurnController = PointTurnController()
+        self.slider: Slider = Slider() # simuation slider
 
     # controller is of type AbstrfactController, i.e. like Pure Pursuit
     # when running the simulation, the controller object is created based on the corresponding class passed in

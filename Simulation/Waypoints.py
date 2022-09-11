@@ -14,6 +14,7 @@ class Waypoints:
     # Clear the entire list of waypoints
     def reset(self):
         self.waypoints: list[list[PointRef]] = [[]]
+        self.size = 0
 
     # get the index of the waypoint, "unboxing" the 2d list
     def get(self, index: int) -> PointRef:
@@ -33,6 +34,7 @@ class Waypoints:
     # Whenever a new waypoint is calculated, append it to the last set of waypoints
     def addWaypoint(self, waypoint: PointRef):
         self.waypoints[-1].append(waypoint)
+        self.size += 1
 
     # This happens when we reach a "Sharp" PathPoint. In this case, we want a point turn to happen
     # We store this by adding a new element to waypoints

@@ -1,5 +1,6 @@
 from Buttons.AbstractButton import AbstactButton
 from abc import abstractmethod
+from MouseInterfaces.TooltipOwner import TooltipOwner
 import Utility, Graphics, pygame
 
 """
@@ -8,7 +9,7 @@ imageA -> toggled off
 imageB -> toggled off but hovered
 imageC -> toggled on
 """
-class ToggleButton(AbstactButton):
+class ToggleButton(AbstactButton, TooltipOwner):
 
     def __init__(self, position: tuple, imageName: str, imageScale: float = 1):
         
@@ -23,9 +24,25 @@ class ToggleButton(AbstactButton):
     def isToggled(self) -> bool:
         pass
 
+    # Whether the object is disabled from being toggled on, and thus also does not change color when hovering
+    @abstractmethod
+    def isDisabled(self) -> bool:
+        pass
+
+    # Implementing Clickable function
+    # When clicked AND not disabled, then call toggleButtonOn()
+    def click(self):
+        if not self.isDisabled():
+            self.toggleButtonOn()
+
+    # The action to do when the button is toggled on
+    @abstractmethod
+    def toggleButtonOn(self) -> None:
+        pass
+
     # Implementing abstract method
     def getImage(self) -> pygame.Surface:
         if self.isToggled():
             return self.imageC
         else:
-            return self.imageB if self.isHovering else self.imageA
+            return self.imageB if (self.isHovering and not self.isDisabled()) else self.imageA
