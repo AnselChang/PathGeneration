@@ -38,3 +38,17 @@ A hierarchy of all the classes in this software so far. Try to absorb as much as
 
 ## The overarching game loop
 
+The game loop takes place in main() inside main.py. It can be roughly decomposed to the following steps for each frame:
+1. Poll keyboard and mouse input, and store the data in the singleton UserInput
+2. Loop through each game object with a global mouse-object detection system, and store state in the singleton SoftwareState
+3. Update the various objects and react to the actions of the mouse
+4. Draw everything
+
+Throughout this game loop, there are various singletons that store some sort of state, and get passed around to many functions.
+- **FieldTransform** -> storing zooming and panning of the game field
+- **FieldSurface** -> The vex field object, which is draggable and thus modifies FieldTransform
+- **UserInput** -> Storing keyboard and mouse state, as well as some other I/O like quitting and dragging files
+- **FullPath** -> Storing all the data regarding the full path (path points, control points, segments, and waypoints)
+- **ButtonCollection** -> Storing all the buttons in the software
+
+For more information, go through each individual file for documentation in further detail.
