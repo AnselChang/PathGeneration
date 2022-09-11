@@ -1,5 +1,6 @@
 from Simulation.Waypoints import Waypoints
 from Simulation.AbstractController import AbstractController
+from Simulation.PointTurnController import PointTurnController
 from Simulation.RobotModel import RobotModel
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModelOutput import RobotModelOutput
@@ -19,6 +20,7 @@ class Simulation:
     def __init__(self):
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
+        self.pointTurnController = PointTurnController()
 
     # controller is of type AbstrfactController, i.e. like Pure Pursuit
     # when running the simulation, the controller object is created based on the corresponding class passed in
@@ -26,7 +28,6 @@ class Simulation:
 
         self.recordedSimulation.clear() # we're running a new simulation now, so delete the data from the old one
 
-        controller.initSimulation(waypoints)
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
         initialPosition: PointRef = waypoints.get(0)
@@ -35,17 +36,25 @@ class Simulation:
 
         robot: RobotModel = RobotModel(output)
 
-        # Run the simulation
-        while True:
-            
-            # Input robot position to controller and obtain wheel velocities
-            robotInput: RobotModelInput = controller.simulateTick(output)
+        # Iterate through each subset of waypoints, and point turn in between
+        for waypointSubset in waypoints.waypoints:
 
-            # Take in wheel velocities from controller and simulate the robot model for a tick
-            output: RobotModelOutput = robot.simulateTick(robotInput)
+            controller.initSimulation(waypointSubset)
+            isReachPointTurn = False
+            isDone = False
 
-            # Store the robot position at each tick
-            self.recordedSimulation.append(output)
+            while not isDone:
+                if not isReachPointTurn:
+                    # Input robot position to controller and obtain wheel velocities
+                    robotInput, isReachPointTurn = controller.simulateTick(output)
+                else: 
+                    robotInput, isDone = controller.simulateTick(output)
+
+                # Take in wheel velocities from controller and simulate the robot model for a tick
+                output: RobotModelOutput = robot.simulateTick(robotInput)
+
+                # Store the robot position at each tick
+                self.recordedSimulation.append(output)
 
 
     # Draw the line the robot takes in the simulation when following the path on the field

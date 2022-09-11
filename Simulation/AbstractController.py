@@ -5,6 +5,8 @@ from Simulation.RobotModelInput import RobotModelInput
 from Simulation.Waypoints import Waypoints
 from Sliders.Slider import Slider
 
+from typing import Tuple
+
 """
 An abstract class for an algorithm that follows a given path. Example subclasses are Pure Pursuit, Stanley, etc.
 This takes in a Waypoints object at initiailization, and at every tick computes new inputs to the robot model (velocities)
@@ -25,11 +27,11 @@ class AbstractController(ABC):
         
 
     # To be called at the start of a simulation. Sets waypoints and initial state
-    def initSimulation(self, waypoints: Waypoints):
-        self.waypoints = waypoints
+    def initSimulation(self, waypoints: list[PointRef]):
+        self.waypoints: list[PointRef] = waypoints
 
     # To be implemented by each algorithm. Simulates path following at each timestep.
-    # Returns the list of RobotStates at each timestep
+    # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
     @abstractmethod
-    def simulateTick(self, output: RobotModelOutput) -> RobotModelInput:
+    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
         pass
