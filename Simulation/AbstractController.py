@@ -15,7 +15,7 @@ during simulation
 Everything is stored relative to the field. This is converted to screenRef only when drawing everything
 """
 
-class PathFollowerInterface(ABC):
+class AbstractController(ABC):
 
     def __init__(self, waypoints: Waypoints, initialPosition: PointRef):
 
@@ -24,7 +24,7 @@ class PathFollowerInterface(ABC):
     # To be implemented by each algorithm. Simulates path following at each timestep.
     # Returns the list of RobotStates at each timestep
     @abstractmethod
-    def simulateAlgorithm(self, waypoints: Waypoints, initialPosition: PointRef) -> list[RobotState]:
+    def simulateAlgorithm(self, waypoints: Waypoints) -> list[RobotState]:
         pass
 
     # Get the RobotState at the specified timestep

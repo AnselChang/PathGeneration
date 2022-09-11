@@ -11,7 +11,7 @@ Everything is stored relative to the field
 
 class RobotState:
 
-    def __init__(self, position: PointRef, headingRadians: float, inchesPerSecond: float):
+    def __init__(self, position: PointRef, headingRadians: float, inchesPerSecond: float = 0):
         self.position = position
         self.heading = headingRadians
         self.velocity = inchesPerSecond
