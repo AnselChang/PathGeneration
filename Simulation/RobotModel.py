@@ -1,16 +1,18 @@
+from Simulation.RobotModelOutput import RobotModelOutput
+from Simulation.RobotModelInput import RobotModelInput
 import math
 
 """
-Kinematic model of robot that adheres to physics. The left and right wheel are controllable, and this robot's position
-and velocity are simulated over time. We assume no drift tangent to driving direction but a configurable amount of drift
-horizontally across the robot.
+Kinematic model of robot that adheres to physics. We simulate the robot's position and velocity over time, given
+left and right wheel velocities at each tick. We assume no drift tangent to driving direction but a configurable
+amount of drift horizontally across the robot.
 """
 
-class SimulatedRobot:
+class RobotModel:
 
-    def __init__(self, startPosition: tuple):
+    def __init__(self, start: RobotModelOutput):
 
-        self.xPosition, self.yPosition = startPositions
+        self.xPosition, self.yPosition = start.position.fieldRef
         self.deltaX, self.deltaY = 0,0
         self.heading = 0
 
@@ -20,13 +22,13 @@ class SimulatedRobot:
 
     # Simulate robot physics given wheel speeds, and assuming no accelerational limits for wheels
     # velocities given in inch/sec
-    def simulateTick(self, leftVelocity: float, rightVelocity: float):
+    def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
 
         oldDeltaX, oldDeltaY = self.deltaX, self.deltaY
 
         # the distance the wheels travelled this tick
-        leftDistance = leftVelocity * self.timestep
-        rightDistance = rightVelocity * self.timestep
+        leftDistance = input.leftVelocity * self.timestep
+        rightDistance = input.rightVelocity * self.timestep
 
         deltaTheta = (rightDistance - leftDistance) / self.trackWidth
         deltaDistance = (rightDistance + leftDistance) / 2

@@ -13,7 +13,22 @@ class Waypoints:
 
     # Clear the entire list of waypoints
     def reset(self):
-        self.waypoints = [[]]
+        self.waypoints: list[list[PointRef]] = [[]]
+
+    # get the index of the waypoint, "unboxing" the 2d list
+    def get(self, index: int) -> PointRef:
+        listIndex = 0
+
+         # while the index exceeds the size of the current list, go on to the next list
+        while len(self.waypoints[listIndex]) <= index and index >= 0:
+            index -= len(self.waypoints[listIndex])
+            listIndex += 1
+
+        if index < 0:
+            return None
+        else:
+            return self.waypoints[listIndex][index]
+
 
     # Whenever a new waypoint is calculated, append it to the last set of waypoints
     def addWaypoint(self, waypoint: PointRef):

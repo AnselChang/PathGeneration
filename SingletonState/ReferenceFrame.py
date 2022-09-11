@@ -1,5 +1,5 @@
 from SingletonState.FieldTransform import FieldTransform
-import Utility
+import Utility, math
 from enum import Enum
 
 """
@@ -138,14 +138,18 @@ class VectorRef:
     screenRef = property(_getScreenRef, _getFieldRef)
 
     # Return the magnitude of the vector based on the given reference frame
-    def magnitude(self, referenceFrame: Ref):
+    def magnitude(self, referenceFrame: Ref) -> float:
         if referenceFrame == Ref.FIELD:
             return Utility.distanceTuple(self.fieldRef)
         else:
             return Utility.distanceTuple(self.screenRef)
 
+    # Get the angle of the vector in radians
+    def theta(self) -> float:
+        return math.atan2(self._vyf, self._vxf)
+
     # Does not modify the current object but creates a new object with a magnitude of 1
-    def normalize(self):
+    def normalize(self) -> 'VectorRef':
         mag = self.magnitude(Ref.FIELD)
         return VectorRef(self.transform, Ref.FIELD, Utility.divideTuple(self.fieldRef, mag))
 
