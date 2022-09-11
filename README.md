@@ -29,3 +29,12 @@ Robot mode's interface is somewhat similar to simulation mode, except, instead o
 ## Odometry Mode
 ![Odometry mode](https://github.com/AnselChang/PathGeneration/blob/main/Images/Demo/odom.png?raw=true)
 Odometry mode is for obtaining real-time odometry data from the robot through serial. This mode displays the robot's estimated position in real time, as well as logging individual encoders and any other sensors that might be related to localization.
+
+
+Code Structure
+=============
+![Class hierarchy](https://github.com/AnselChang/PathGeneration/blob/main/Images/Demo/classes.png?raw=true)
+A hierarchy of all the classes in this software so far. Try to absorb as much as you can, but it will make more sense with some context below.
+
+## The overarching game loop
+
