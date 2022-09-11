@@ -3,7 +3,7 @@ from SingletonState.ReferenceFrame import PointRef
 from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.Waypoints import Waypoints
-import pygame
+from Sliders.Slider import Slider
 
 """
 An abstract class for an algorithm that follows a given path. Example subclasses are Pure Pursuit, Stanley, etc.
@@ -13,8 +13,19 @@ given the robot outputs (robot position and orientation)
 
 class AbstractController(ABC):
 
-    def __init__(self, waypoints: Waypoints):
+    def __init__(self):
+        self.sliders = self.defineParameterSliders()
 
+
+    # Any controller that implements AbstractController must return a list of sliders for the tunable parameters
+    # of that controller
+    @abstractmethod
+    def defineParameterSliders(self) -> list[Slider]:
+        pass
+        
+
+    # To be called at the start of a simulation. Sets waypoints and initial state
+    def initSimulation(self, waypoints: Waypoints):
         self.waypoints = waypoints
 
     # To be implemented by each algorithm. Simulates path following at each timestep.

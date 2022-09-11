@@ -5,6 +5,8 @@ from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 
+import pygame
+
 """
 A class that stores a complete simulation of the robot following path. This takes in a Waypoints object, a 
 RobotMode, and some class that implements AbstractController.
@@ -18,12 +20,13 @@ class Simulation:
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
 
-    # controller paramter a *class* (not object) that implements AbstractController, like Pure Pursuit
+    # controller is of type AbstrfactController, i.e. like Pure Pursuit
     # when running the simulation, the controller object is created based on the corresponding class passed in
-    def runSimulation(self, waypoints: Waypoints, controllerClass: type[AbstractController], robot: RobotModel):
+    def runSimulation(self, waypoints: Waypoints, controller: AbstractController, robot: RobotModel):
 
-        self.recordedSimulation.clear()
-        controller = controllerClass(waypoints)
+        self.recordedSimulation.clear() # we're running a new simulation now, so delete the data from the old one
+
+        controller.initSimulation(waypoints)
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
         initialPosition: PointRef = waypoints.get(0)
@@ -40,3 +43,12 @@ class Simulation:
 
             # Take in wheel velocities from controller and simulate the robot model for a tick
             output: RobotModelOutput = robot.simulateTick(robotInput)
+
+            # Store the robot position at each tick
+            self.recordedSimulation.append(output)
+
+
+    # Draw the line the robot takes in the simulation when following the path on the field
+    def drawSimulatedPathLine(self, screen: pygame.Surface):
+        # TODO
+        pass
