@@ -58,8 +58,37 @@ class Simulation:
                 # Store the robot position at each tick
                 self.recordedSimulation.append(output)
 
+        # Now that running simulation is complete, adjust slider bounds
+        self.slider.setBounds(0, len(self.recordedSimulation) - 1)
+
 
     # Draw the line the robot takes in the simulation when following the path on the field
     def drawSimulatedPathLine(self, screen: pygame.Surface):
-        # TODO
+
+        # If less than two timesteps, no line to draw
+        if len(self.recordedSimulation) < 2:
+            return
+
+        # TODO draw a line connecting the robot's position at every single timestep. Have each segment change
+        # color a little bit (so line looks like rainbow color) to get idea of how fast robot is moving
+        # use Graphics.py draw methods
         pass
+
+    def drawRobot(self, screen: pygame.Surface, robotPose: RobotModelOutput):
+        # TODO draw a robot at the specified position
+        # Use some sort of decent looking vector robot image
+        # Note that RobotModelOutput stores a pointref, so just call screenRef to draw it relative to screen
+        pass
+
+    # Draw everything, but only if there is a simulation to draw
+    def draw(self, screen: pygame.Surface):
+
+        # If nothing to draw, exit
+        if len(self.recordedSimulation) < 1:
+            return
+
+        self.drawSimulatedPathLine(screen)
+        
+        # draw the robot at the current timestep specified by slider
+        self.drawRobot(self.recordedSimulation[self.slider.getValue()])
+        
