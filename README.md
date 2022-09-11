@@ -40,7 +40,7 @@ A hierarchy of all the classes in this software so far. Try to absorb as much as
 
 The game loop takes place in main() inside main.py. It can be roughly decomposed to the following steps for each frame:
 1. Poll keyboard and mouse input, and store the data in the singleton UserInput
-2. Loop through each game object with a global mouse-object detection system, and store state in the singleton SoftwareState
+2. Loop through each game object with a global mouse-object interaction system, and store state in the singleton SoftwareState
 3. Update the various objects and react to the actions of the mouse
 4. Draw everything
 
@@ -52,3 +52,13 @@ Throughout this game loop, there are various singletons that store some sort of 
 - **ButtonCollection** -> Storing all the buttons in the software
 
 For more information, go through each individual file for documentation in further detail.
+
+# The global mouse-object interaction system
+
+This software features a centralized way of handling hovering, clicking, and dragging different types of objects with differing behaviors globally.
+
+![Draggable and Clickable interfaces implement Hoverable](https://github.com/AnselChang/PathGeneration/blob/main/Images/Demo/mouseInterfaceClasses.png?raw=true)
+
+Every object that can be hovered, dragged, or clicked implemenets one of these three interfaces. The key function `getHoverables() ` in MouseInteraction.py, using the python generator pattern, returns an iterator for every single hoverable object in the order of checking collision with the mouse. This is iterated through in the function 'handleHoverables()' of the same file, whichk when detecting a mouse colliding with a object, calls that abstract Hoverable and/or Draggable/Clickable functions that would be implemented in the object. This way, each object can be coded to react in its own way to mouse inputs.
+
+I would heavily recommend looking through both functions to get a concrete grasp of how this works. Thus, whenever it is desired to create an object that can be dragged or clicked, all it takes is implementing one of the interfaces and then adding it to the getHoverables() generator.
