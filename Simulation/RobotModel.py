@@ -24,6 +24,9 @@ class RobotModel:
     # velocities given in inch/sec
     def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
 
+        #TODO Kohmei, this code is probably wrong. It's up to you to write this
+        """
+
         oldDeltaX, oldDeltaY = self.deltaX, self.deltaY
 
         # the distance the wheels travelled this tick
@@ -43,4 +46,4 @@ class RobotModel:
 
         # Calculate drift from previous frame
         
-
+        """

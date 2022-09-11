@@ -8,7 +8,7 @@ The field reference frame is 144x144 inches while the screen has dimensions (SCR
 
 To use this class, create a PointRef, and pass the fieldTransform object which has field info, 
 as well as the point location and reference frame:
-    p = PointRef(fieldTransform, Enum.SCREEN, (40, 50))
+    p = PointRef(fieldTransform, Ref.SCREEN, (40, 50))
 
 Now, through the automatic getter and setter methods, you can use the screen and frame reference frames interchangeably:
     p.screenRef = (2,3)
