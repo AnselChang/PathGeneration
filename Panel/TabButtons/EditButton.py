@@ -2,7 +2,7 @@ from SingletonState.SoftwareState import SoftwareState, Mode
 from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
-import Utility, pygame
+import Utility, pygame, Graphics
 
 # Button on panel to select edit mode
 class EditButton(ToggleButton):
@@ -12,7 +12,10 @@ class EditButton(ToggleButton):
         self.tooltip = Tooltip("Edit path")
 
         position = (Utility.SCREEN_SIZE + 75, 30)
-        super().__init__(position, "Images/Buttons/edit.png", 0.08)
+        imageOn = Graphics.getImage("Images/Buttons/edit.png", 0.08)
+        imageHovered = Graphics.getLighterImage(imageOn, 0.66)
+        imageOff = Graphics.getLighterImage(imageOn, 0.33)
+        super().__init__(position, imageOff, imageHovered, imageOn)
 
     # EditButton only ever has one tooltip message to draw
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:

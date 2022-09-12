@@ -1,3 +1,4 @@
+from email.mime import image
 from Panel.AbstractButtons.AbstractButton import AbstactButton
 from abc import abstractmethod
 from MouseInterfaces.TooltipOwner import TooltipOwner
@@ -11,18 +12,13 @@ imageC -> toggled on
 """
 class ToggleButton(AbstactButton, TooltipOwner):
 
-    def __init__(self, position: tuple, imageName: str, imageScale: float = 1, optionalDisabledImageName: str = None):
+    def __init__(self, position: tuple, imageOff: pygame.Surface, imageHovered: pygame.Surface, imageOn: pygame.Surface):
         
-        self.imageC = Graphics.getImage(imageName, imageScale)
-        self.imageB = Graphics.getLighterImage(self.imageC, 0.66)
+        self.imageOn = imageOn
+        self.imageHovered = imageHovered
+        self.imageOff = imageOff
 
-        if optionalDisabledImageName is None:
-            self.imageA = Graphics.getLighterImage(self.imageC, 0.33)
-        else: 
-            disabledImage = Graphics.getImage(optionalDisabledImageName, imageScale)
-            self.imageA = Graphics.getLighterImage(disabledImage, 0.33)
-
-        super().__init__(position, self.imageC.get_width(), self.imageC.get_height())
+        super().__init__(position, self.imageOn.get_width(), self.imageOn.get_height())
 
     # Return whether object was toggled on
     @abstractmethod
@@ -48,6 +44,6 @@ class ToggleButton(AbstactButton, TooltipOwner):
     # Implementing abstract method
     def getImage(self) -> pygame.Surface:
         if self.isToggled():
-            return self.imageC
+            return self.imageOn
         else:
-            return self.imageB if (self.isHovering and not self.isDisabled()) else self.imageA
+            return self.imageHovered if (self.isHovering and not self.isDisabled()) else self.imageOff

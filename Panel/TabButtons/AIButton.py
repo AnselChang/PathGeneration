@@ -2,7 +2,7 @@ from SingletonState.SoftwareState import SoftwareState, Mode
 from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
-import Utility, pygame
+import Utility, pygame, Graphics
 
 # Button on panel to select edit mode
 class AIButton(ToggleButton):
@@ -12,7 +12,12 @@ class AIButton(ToggleButton):
         self.tooltip = Tooltip("Use AI algorithms to iteratively generate a full spline path from scratch")
 
         position = (Utility.SCREEN_SIZE + 20, 30)
-        super().__init__(position, "Images/Buttons/ai.png", 0.08, "Images/Buttons/ai_greyscale.png")
+
+        imageOn = Graphics.getImage("Images/Buttons/ai.png", 0.08)
+        imageHovered = Graphics.getLighterImage(imageOn, 0.66)
+        disabledImage = Graphics.getImage("Images/Buttons/ai_greyscale.png", 0.08)
+        imageOff = Graphics.getLighterImage(disabledImage, 0.33)
+        super().__init__(position, imageOff, imageHovered, imageOn)
 
     # EditButton only ever has one tooltip message to draw
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:

@@ -3,7 +3,7 @@ from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
 from Simulation.Waypoints import Waypoints
 from SingletonState.ReferenceFrame import PointRef
-import Utility, pygame
+import Utility, pygame, Graphics
 
 
 # Button on panel to select robot mode
@@ -16,7 +16,10 @@ class RobotButton(ToggleButton):
         self.tooltipDisabled = Tooltip("Disabled: Draw a path first in Edit mode", "before interfacing with the robot!")
 
         position = (Utility.SCREEN_SIZE + 185, 30)
-        super().__init__(position, "Images/Buttons/robot.png", 0.08)
+        imageOn = Graphics.getImage("Images/Buttons/robot.png", 0.08)
+        imageHovered = Graphics.getLighterImage(imageOn, 0.66)
+        imageOff = Graphics.getLighterImage(imageOn, 0.33)
+        super().__init__(position, imageOff, imageHovered, imageOn)
 
     # If there are at least two waypoints, then we can switch to this mode. Otherwise, we display an error tooltip
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
