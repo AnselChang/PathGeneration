@@ -11,11 +11,16 @@ imageC -> toggled on
 """
 class ToggleButton(AbstactButton, TooltipOwner):
 
-    def __init__(self, position: tuple, imageName: str, imageScale: float = 1):
+    def __init__(self, position: tuple, imageName: str, imageScale: float = 1, optionalDisabledImageName: str = None):
         
         self.imageC = Graphics.getImage(imageName, imageScale)
         self.imageB = Graphics.getLighterImage(self.imageC, 0.66)
-        self.imageA = Graphics.getLighterImage(self.imageC, 0.33)
+
+        if optionalDisabledImageName is None:
+            self.imageA = Graphics.getLighterImage(self.imageC, 0.33)
+        else: 
+            disabledImage = Graphics.getImage(optionalDisabledImageName, imageScale)
+            self.imageA = Graphics.getLighterImage(disabledImage, 0.33)
 
         super().__init__(position, self.imageC.get_width(), self.imageC.get_height())
 

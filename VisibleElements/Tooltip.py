@@ -45,7 +45,7 @@ class Tooltip:
     # Draw the tooltip approximately where the mouse position is
     def draw(self, screen: pygame.Surface, mousePosition: tuple):
 
-        Y_SEPARATION_FROM_MOUSE: int = 5
+        Y_SEPARATION_FROM_MOUSE: int = -45
         
         # Calculate tooltip position, preventing tooltip from going above or left of screen
         x = max(0, int(mousePosition[0] - self.tooltip.get_width()/2))

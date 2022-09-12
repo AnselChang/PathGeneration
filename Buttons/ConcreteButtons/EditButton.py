@@ -11,8 +11,8 @@ class EditButton(ToggleButton):
         self.softwareState = state
         self.tooltip = Tooltip("Edit path")
 
-        position = (Utility.SCREEN_SIZE + 20, 30)
-        super().__init__(position, "Images/Buttons/edit.png", 0.1)
+        position = (Utility.SCREEN_SIZE + 75, 30)
+        super().__init__(position, "Images/Buttons/edit.png", 0.08)
 
     # EditButton only ever has one tooltip message to draw
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:

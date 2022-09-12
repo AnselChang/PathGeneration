@@ -4,30 +4,30 @@ from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
 import Utility, pygame
 
-# Button on panel to select odom mode
-class OdomButton(ToggleButton):
+# Button on panel to select edit mode
+class AIButton(ToggleButton):
 
     def __init__(self, state: SoftwareState):
         self.softwareState = state
-        self.tooltip = Tooltip("Test robot odometry by displaying the VEX", "robot's real-time position through serial")
+        self.tooltip = Tooltip("Use AI algorithms to iteratively generate a full spline path from scratch")
 
-        position = (Utility.SCREEN_SIZE + 240, 30)
-        super().__init__(position, "Images/Buttons/odom.png", 0.08)
+        position = (Utility.SCREEN_SIZE + 20, 30)
+        super().__init__(position, "Images/Buttons/ai.png", 0.08, "Images/Buttons/ai_greyscale.png")
 
-    # Odombutton only ever has one tooltip message to draw
+    # EditButton only ever has one tooltip message to draw
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
         self.tooltip.draw(screen, mousePosition)
 
     # Implementing ToggleButton function
-    # button is active when the software mode is set to ODOM
+    # button is active when the software mode is set to AI
     def isToggled(self) ->  bool:
-        return self.softwareState.mode == Mode.ODOM
+        return self.softwareState.mode == Mode.AI
 
-    # odom button is never disabled
+    # edit button is never disabled
     def isDisabled(self) -> bool:
         return False
 
     # Implementing ToggleButton function
-    # When toggled on, set mode to odom
+    # When toggled on, set mode to ai
     def toggleButtonOn(self):
-        self.softwareState.mode = Mode.ODOM
+        self.softwareState.mode = Mode.AI

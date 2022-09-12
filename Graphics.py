@@ -1,4 +1,4 @@
-import pygame, math, Utility, colors
+import pygame, math, Utility, colors, numpy
 
 FONT20 = pygame.font.SysFont('Corbel', 20)
 FONT30 = pygame.font.SysFont('Corbel', 30)
@@ -28,6 +28,7 @@ def getLighterImage(image: pygame.Surface, lightenPercent: float) -> pygame.Surf
     newImage.set_alpha(lightenPercent * 255)
 
     return newImage
+
 
 
 # align = 0 -> align left/top

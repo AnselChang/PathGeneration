@@ -92,7 +92,7 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     pygame.display.update()
 
 
-import cProfile
-import re
-cProfile.run('main()')
-#main()
+#import cProfile
+#import re
+#cProfile.run('main()')
+main()

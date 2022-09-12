@@ -14,8 +14,8 @@ class SimulateButton(ToggleButton):
         self.tooltipEnabled = Tooltip("Tune parameters for path following on the virtual", "robot, and simulate path following algorithms")
         self.tooltipDisabled = Tooltip("Disabled: Draw a path first in Edit mode", "before trying to simulate path following!")
 
-        position = (Utility.SCREEN_SIZE + 90, 30)
-        super().__init__(position, "Images/Buttons/simulate.png", 0.1)
+        position = (Utility.SCREEN_SIZE + 130, 30)
+        super().__init__(position, "Images/Buttons/simulate.png", 0.08)
 
     # If there are at least two waypoints, then we can switch to this mode. Otherwise, we display an error tooltip
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:

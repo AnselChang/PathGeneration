@@ -1,4 +1,4 @@
-from Buttons.ConcreteButtons import EditButton, OdomButton, RobotButton, SimulateButton
+from Buttons.ConcreteButtons import AIButton, EditButton, OdomButton, RobotButton, SimulateButton
 from Buttons.AbstractButton import AbstactButton
 from SingletonState.SoftwareState import SoftwareState
 from Simulation.Waypoints import Waypoints
@@ -13,6 +13,7 @@ class Buttons:
     def __init__(self, state: SoftwareState, waypoints: Waypoints):
         self.buttons: AbstactButton = [
             
+            AIButton.AIButton(state),
             EditButton.EditButton(state),
             SimulateButton.SimulateButton(state, waypoints),
             RobotButton.RobotButton(state, waypoints),

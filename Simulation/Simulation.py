@@ -78,6 +78,7 @@ class Simulation:
         # TODO draw a robot at the specified position
         # Use some sort of decent looking vector robot image
         # Note that RobotModelOutput stores a pointref, so just call screenRef to draw it relative to screen
+        # Robot should be oriented based on robotPose.heading
         pass
 
     # Draw everything, but only if there is a simulation to draw

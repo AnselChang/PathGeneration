@@ -15,8 +15,8 @@ class RobotButton(ToggleButton):
         self.tooltipEnabled = Tooltip("Export the path to the VEX robot and import a", "recorded run to the program through serial")
         self.tooltipDisabled = Tooltip("Disabled: Draw a path first in Edit mode", "before interfacing with the robot!")
 
-        position = (Utility.SCREEN_SIZE + 160, 30)
-        super().__init__(position, "Images/Buttons/robot.png", 0.1)
+        position = (Utility.SCREEN_SIZE + 185, 30)
+        super().__init__(position, "Images/Buttons/robot.png", 0.08)
 
     # If there are at least two waypoints, then we can switch to this mode. Otherwise, we display an error tooltip
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
