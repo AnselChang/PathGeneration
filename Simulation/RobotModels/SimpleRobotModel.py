@@ -1,30 +1,26 @@
 from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
+from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from RobotSpecs import RobotSpecs
 import math
 
 """
-Kinematic model of robot that adheres to physics. We simulate the robot's position and velocity over time, given
+Inaccurate kinematic model of robot that adheres to physics. We simulate the robot's position and velocity over time, given
 left and right wheel velocities at each tick. We assume no drift tangent to driving direction but a configurable
 amount of drift horizontally across the robot.
 """
 
-class RobotModel:
+class SimpleRobotModel(AbstractRobotModel):
 
     def __init__(self, robotSpecs: RobotSpecs, start: RobotModelOutput):
 
-        self.xPosition, self.yPosition = start.position.fieldRef
+        # initialize robot sepcs and start pose in superclass
+        super().__init__(robotSpecs, start)
+
         self.deltaX, self.deltaY = 0,0
-        self.heading = 0
 
-        self.robotSpecs = robotSpecs
-
-    # Simulate robot physics given wheel speeds, and assuming no accelerational limits for wheels
-    # velocities given in inch/sec
+    # In the simple robot model, we assume no slipping.
     def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
-
-        #TODO Kohmei, this code is probably wrong. It's up to you to write this
-        """
 
         oldDeltaX, oldDeltaY = self.deltaX, self.deltaY
 
@@ -43,6 +39,4 @@ class RobotModel:
         self.yPosition += self.deltaY
         self.heading += deltaTheta
 
-        # Calculate drift from previous frame
-        
-        """
+        return RobotModelOutput(self.xPosition, self.yPosition, self.heading)

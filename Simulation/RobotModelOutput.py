@@ -1,4 +1,5 @@
-from SingletonState.ReferenceFrame import PointRef
+from SingletonState.ReferenceFrame import PointRef, Ref
+from SingletonState.FieldTransform import FieldTransform
 
 """
 The output of the robot model at each tick, and the input to the next Controller tick.
@@ -12,6 +13,10 @@ Everything is stored relative to the field
 
 class RobotModelOutput:
 
-    def __init__(self, position: PointRef, headingRadians: float):
-        self.position = position
+    # Initialize transform reference at the creation of simulation object
+    transform: FieldTransform = None
+
+    # xPosition and yPosition in inches
+    def __init__(self, xPosition: float, yPosition: float, headingRadians: float):
+        self.position = PointRef(self.transform, Ref.FIELD, (xPosition, yPosition))
         self.heading = headingRadians

@@ -1,11 +1,14 @@
 from Simulation.Waypoints import Waypoints
 from Simulation.ControllerClasses.AbstractController import AbstractController
 from Simulation.ControllerClasses.PointTurnController import PointTurnController
-from Simulation.RobotModel import RobotModel
+from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
+from Simulation.RobotModels.SimpleRobotModel import SimpleRobotModel
+from Simulation.RobotModels.ComplexRobotModel import ComplexRobotModel
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerManager import ControllerManager
+from SingletonState.FieldTransform import FieldTransform
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
 
@@ -20,7 +23,11 @@ It then runs a full simulation (not in real time), and ultimately generates a li
 
 class Simulation:
 
-    def __init__(self, controllers: ControllerManager, robotSpecs: RobotSpecs):
+    def __init__(self, transform: FieldTransform, controllers: ControllerManager, robotSpecs: RobotSpecs):
+
+        # Initialize RobotModelOutput class's transform reference
+        RobotModelOutput.transform = transform
+
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
         self.pointTurnController: PointTurnController = PointTurnController()
@@ -48,7 +55,9 @@ class Simulation:
         initialHeading: float = (waypoints.get(1) - waypoints.get(0)).theta()
         output: RobotModelOutput = RobotModelOutput(initialPosition, initialHeading)
 
-        robot: RobotModel = RobotModel(self.robotSpecs, output)
+        # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
+        # different simulation implementations
+        robot: AbstractRobotModel = SimpleRobotModel(self.robotSpecs, output)
 
         # Iterate through each subset of waypoints, and point turn in between
         i = 0
