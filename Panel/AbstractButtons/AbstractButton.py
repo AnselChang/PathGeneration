@@ -1,6 +1,7 @@
 from MouseInterfaces.Clickable import Clickable
 from abc import abstractmethod
 from SingletonState.UserInput import UserInput
+from MouseInterfaces.TooltipOwner import TooltipOwner
 import Graphics, pygame
 
 """
@@ -10,7 +11,7 @@ of the image depending on where the mouse is. It can be clicked, which results i
 This abstract class can be subclassed to give functionality to click().
 """
 
-class AbstactButton(Clickable):
+class AbstactButton(Clickable, TooltipOwner):
 
     def __init__(self, position: tuple, imageWidth: int, imageHeight: int):
 

@@ -5,12 +5,14 @@ from MouseInterfaces.TooltipOwner import TooltipOwner
 import Utility, Graphics, pygame
 
 """
-An abstract button that can be toggled on and off, which yields visual differences.
-imageA -> toggled off
-imageB -> toggled off but hovered
-imageC -> toggled on
+An abstract button that can be clicked to call clickEnabledFunction()
+This button can be enabled or disabled
+
+self.imageEnabled -> clickable
+self.imageDIsabled -> not clickable
+self.hovered -> when clickable and mouse is hovering
 """
-class ClickButton(AbstactButton, TooltipOwner):
+class ClickButton(AbstactButton):
 
     def __init__(self, position: tuple, imageDisabled: pygame.Surface, imageEnabled: pygame.Surface, imageHovered: pygame.Surface):
         

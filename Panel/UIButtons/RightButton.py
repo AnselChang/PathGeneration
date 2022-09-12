@@ -5,6 +5,10 @@ from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
 import pygame
 
+"""
+Right button for going to the previous controller in the Simulation tab
+"""
+
 class RightButton(ClickButton):
 
     def __init__(self, controllers: ControllerManager):

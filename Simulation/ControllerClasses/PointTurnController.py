@@ -1,6 +1,7 @@
 from Simulation.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
+from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
 
 from typing import Tuple
@@ -20,10 +21,11 @@ class PointTurnController(AbstractController):
         return []
 
     # To be called at the start of a simulation. Sets waypoints and initial state
-    def initSimulation(self, targetHeading: float):
+    def initSimulation(self, robotSpecs: RobotSpecs, targetHeading: float):
+        self.robotSpecs = robotSpecs
         self.targetHeading: float = targetHeading
 
     # Simulate a point turn to self.targetHeading
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
-    def simulateTick(self, output: RobotModelOutput, timestep: float) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
         pass

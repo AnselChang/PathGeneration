@@ -9,7 +9,7 @@ class OdomButton(ToggleButton):
 
     def __init__(self, state: SoftwareState):
         self.softwareState = state
-        self.tooltip = Tooltip("Test robot odometry by displaying the VEX", "robot's real-time position through serial")
+        self.tooltip = Tooltip("Adjust robot parameters, and test simulated", "robot kinematics and VEX robot odometry")
 
         position = (Utility.SCREEN_SIZE + 240, 30)
         imageOn = Graphics.getImage("Images/Buttons/odom.png", 0.08)

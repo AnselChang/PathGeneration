@@ -5,11 +5,13 @@ from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from Simulation.ControllerManager import ControllerManager
+from Simulation.Simulation import Simulation
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Panel.Panel import Panel
 from MouseInterfaces.TooltipOwner import TooltipOwner
 from AI.DiscNodes import DiscNodes
+from RobotSpecs import RobotSpecs
 import Utility, colors
 from typing import Iterator
 
@@ -28,6 +30,9 @@ state: SoftwareState = SoftwareState()
 path: FullPath = FullPath(fieldTransform)
 panel: Panel = Panel(state, path, controllers)
 discNodes: DiscNodes = DiscNodes(fieldTransform)
+robotSpecs: RobotSpecs = RobotSpecs()
+simulation: Simulation = Simulation(controllers, robotSpecs)
+
 
 def main():
 

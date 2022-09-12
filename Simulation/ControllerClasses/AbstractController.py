@@ -3,6 +3,7 @@ from SingletonState.ReferenceFrame import PointRef
 from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.Waypoints import Waypoints
+from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
 
 from typing import Tuple
@@ -29,7 +30,8 @@ class AbstractController(ABC):
         
 
     # To be called at the start of a simulation. Sets waypoints and initial state
-    def initSimulation(self, waypoints: list[PointRef], timestep: float):
+    def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[PointRef]):
+        self.robotSpecs = robotSpecs
         self.waypoints: list[PointRef] = waypoints
 
     # To be implemented by each algorithm. Simulates path following at each timestep.

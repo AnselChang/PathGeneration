@@ -1,16 +1,15 @@
 from email.mime import image
 from Panel.AbstractButtons.AbstractButton import AbstactButton
 from abc import abstractmethod
-from MouseInterfaces.TooltipOwner import TooltipOwner
 import Utility, Graphics, pygame
 
 """
 An abstract button that can be toggled on and off, which yields visual differences.
-imageA -> toggled off
-imageB -> toggled off but hovered
-imageC -> toggled on
+self.imageOn - when toggled on
+self.imageOff - when toggled off
+self.imageHovered - when toggled off, not disabled, and hovering
 """
-class ToggleButton(AbstactButton, TooltipOwner):
+class ToggleButton(AbstactButton):
 
     def __init__(self, position: tuple, imageOff: pygame.Surface, imageHovered: pygame.Surface, imageOn: pygame.Surface):
         

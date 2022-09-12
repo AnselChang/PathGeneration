@@ -1,5 +1,6 @@
 from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
+from RobotSpecs import RobotSpecs
 import math
 
 """
@@ -10,18 +11,17 @@ amount of drift horizontally across the robot.
 
 class RobotModel:
 
-    def __init__(self, start: RobotModelOutput):
+    def __init__(self, robotSpecs: RobotSpecs, start: RobotModelOutput):
 
         self.xPosition, self.yPosition = start.position.fieldRef
         self.deltaX, self.deltaY = 0,0
         self.heading = 0
 
-        self.trackWidth = 10 # inches
-        self.driftFriction = 1 # in inches per second^2
+        self.robotSpecs = robotSpecs
 
     # Simulate robot physics given wheel speeds, and assuming no accelerational limits for wheels
     # velocities given in inch/sec
-    def simulateTick(self, input: RobotModelInput, timestep: float) -> RobotModelOutput:
+    def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
 
         #TODO Kohmei, this code is probably wrong. It's up to you to write this
         """
