@@ -27,7 +27,7 @@ class AbstractController(ABC):
         
 
     # To be called at the start of a simulation. Sets waypoints and initial state
-    def initSimulation(self, waypoints: list[PointRef]):
+    def initSimulation(self, waypoints: list[PointRef], timestep: float):
         self.waypoints: list[PointRef] = waypoints
 
     # To be implemented by each algorithm. Simulates path following at each timestep.

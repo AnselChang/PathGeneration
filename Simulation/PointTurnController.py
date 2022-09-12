@@ -21,5 +21,5 @@ class PointTurnController(AbstractController):
 
     # Simulate a point turn to self.targetHeading
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
-    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, output: RobotModelOutput, timestep: float) -> Tuple[RobotModelInput, bool]:
         pass

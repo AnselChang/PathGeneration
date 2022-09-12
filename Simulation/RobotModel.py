@@ -18,11 +18,10 @@ class RobotModel:
 
         self.trackWidth = 10 # inches
         self.driftFriction = 1 # in inches per second^2
-        self.timestep = 0.05 # how long each tick lasts in seconds
 
     # Simulate robot physics given wheel speeds, and assuming no accelerational limits for wheels
     # velocities given in inch/sec
-    def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
+    def simulateTick(self, input: RobotModelInput, timestep: float) -> RobotModelOutput:
 
         #TODO Kohmei, this code is probably wrong. It's up to you to write this
         """
