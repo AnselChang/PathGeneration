@@ -24,7 +24,9 @@ class Simulation:
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
         self.pointTurnController: PointTurnController = PointTurnController()
-        self.slider: Slider = Slider() # simuation slider
+
+        # TODO uncomment this when slider is fully implemented
+        #self.slider: Slider = Slider() # simuation slider
 
         self.controllers = controllers
         self.robotSpecs = robotSpecs
