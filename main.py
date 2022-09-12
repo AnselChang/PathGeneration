@@ -26,8 +26,6 @@ path: FullPath = FullPath(fieldTransform)
 panel: Panel = Panel(state, path)
 discNodes: DiscNodes = DiscNodes(fieldTransform)
 
-
-
 def main():
 
     # Main software loop
