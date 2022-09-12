@@ -1,6 +1,7 @@
 from Simulation.ControllerClasses.AbstractController import AbstractController
 from Simulation.ControllerClasses.PurePursuitController import PurePursuitController
 from Simulation.ControllerClasses.StanleyController import StanleyController
+from Simulation.ControllerClasses.TestController import TestController
 
 """
 Store references to each controller, and manage which controller is currently selected
@@ -11,6 +12,7 @@ class ControllerManager:
     def __init__(self):
 
         self.controllers: list[AbstractController] = [
+            TestController(),
             PurePursuitController(),
             StanleyController()
         ]

@@ -6,6 +6,11 @@ from Sliders.Slider import Slider
 
 from typing import Tuple
 
+"""
+A simple path following controller. It computes the angular velocity command that moves the robot
+from its current position to reach some look-ahead point in front of the robot
+"""
+
 class PurePursuitController(AbstractController):
 
     def __init__(self):

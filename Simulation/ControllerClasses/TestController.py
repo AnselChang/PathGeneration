@@ -6,14 +6,13 @@ from Sliders.Slider import Slider
 from typing import Tuple
 
 """
-A more sophisticated controller that is theorized to follow lines better.
-https://dingyan89.medium.com/three-methods-of-vehicle-lateral-control-pure-pursuit-stanley-and-mpc-db8cc1d32081
+A dummy controller that sets the velocities of the wheels to something in order to test other features of the software
 """
 
-class StanleyController(AbstractController):
+class TestController(AbstractController):
 
     def __init__(self):
-        super().__init__("Stanley")
+        super().__init__("Testing")
     
 
     def defineParameterSliders(self) -> list[Slider]:
