@@ -8,6 +8,7 @@ from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Buttons.ButtonCollection import Buttons
 from MouseInterfaces.TooltipOwner import TooltipOwner
+from AI.DiscNodes import DiscNodes
 import Utility, colors
 
 def main():
@@ -22,6 +23,7 @@ def main():
     state: SoftwareState = SoftwareState()
     path: FullPath = FullPath(fieldTransform)
     buttons: Buttons = Buttons(state, path.waypoints)
+    discNodes: DiscNodes = DiscNodes(fieldTransform)
 
     # Main software loop
     while True:
@@ -60,12 +62,12 @@ def main():
             path.calculateInterpolatedPoints()
 
         # Draw everything on the screen
-        drawEverything(screen, state, fieldSurface, path, buttons, shadowPointRef, userInput)
+        drawEverything(screen, state, fieldSurface, path, buttons, shadowPointRef, userInput, discNodes)
         
         
 
 # Draw the vex field, full path, and panel
-def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath, buttons: Buttons, shadowPointRef: PointRef, userInput: UserInput) -> None:
+def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath, buttons: Buttons, shadowPointRef: PointRef, userInput: UserInput, discNodes: DiscNodes) -> None:
     
     # Draw the vex field
     fieldSurface.draw(screen)
@@ -88,6 +90,9 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     # Draw a tooltip if there is one
     if state.objectHovering is not None and isinstance(state.objectHovering, TooltipOwner):
         state.objectHovering.drawTooltip(screen, userInput.mousePosition.screenRef)
+
+    if state.mode == Mode.AI:
+        discNodes.draw(screen)
 
     pygame.display.update()
 
