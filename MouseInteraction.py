@@ -8,10 +8,11 @@ from VisibleElements.FullPath import FullPath
 from VisibleElements.PathSegment import PathSegment
 from VisibleElements.PathPoint import PathPoint
 from VisibleElements.Point import Point
-from Buttons.ButtonCollection import Buttons
+from Panel.Panel import Panel
 from MouseInterfaces.Draggable import Draggable
 from MouseInterfaces.Clickable import Clickable
 import Utility
+from typing import Iterator
 
 import pygame
 
@@ -89,46 +90,14 @@ def handleDeleting(userInput: UserInput, state: SoftwareState, path: FullPath):
         state.recomputeInterpolation = True
 
 
-
-# A generator to iterate through all the hoverable objects to determine which object is being hovered by the mouse in order
-def getHoverables(state: SoftwareState, userInput: UserInput, path: FullPath, buttons: Buttons, fieldSurface: FieldSurface):
-
-    # The points, segments, and field can only be hoverable if the mouse is on the field permieter and not on the panel
-    if userInput.isMouseOnField:
-
-        if state.mode == Mode.EDIT: # the path is only interactable when on edit mode
-            # For each pathPoint, iterate through the control points then the pathPoint itself
-            for pathPoint in path.pathPoints:
-                yield pathPoint.controlA
-                yield pathPoint.controlB
-                yield pathPoint
-
-            # After checking all the points, check the segments
-            for segment in path.segments:
-                yield segment
-
-        # If nothing has been hovered, then finally check fieldSurface
-        yield fieldSurface
-
-    else: # hoverable panel objects
-
-        # Iterate through each button on the panel
-        for button in buttons.buttons:
-            yield button
-
-    # weird python hack to make it return an empty iterator if nothing hoverable
-    return
-    yield
-
-
 # Find the object that is hoverable, update that object's hoverable state, and return the object
-def handleHoverables(state: SoftwareState, userInput: UserInput, path: FullPath, buttons: Buttons, fieldSurface: FieldSurface):
+def handleHoverables(state: SoftwareState, userInput: UserInput, hoverablesGenerator: Iterator[Hoverable]):
 
     if state.objectHovering is not None:
         state.objectHovering.resetHoverableObject()
         state.objectHovering = None
 
-    for hoverableObject in getHoverables(state, userInput, path, buttons, fieldSurface):
+    for hoverableObject in hoverablesGenerator:
         obj: Hoverable = hoverableObject # just for type hinting
         if obj.checkIfHovering(userInput):
             state.objectHovering = obj

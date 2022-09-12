@@ -6,24 +6,30 @@ from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
-from Buttons.ButtonCollection import Buttons
+from Panel.Panel import Panel
 from MouseInterfaces.TooltipOwner import TooltipOwner
 from AI.DiscNodes import DiscNodes
 import Utility, colors
+from typing import Iterator
+
+
+
+# All the global singleton objects
+screen: pygame.Surface = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
+pygame.display.set_caption("Path Generation 2.0 by Ansel")
+
+fieldTransform: FieldTransform = FieldTransform()
+fieldSurface: FieldSurface = FieldSurface(fieldTransform)
+userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
+
+state: SoftwareState = SoftwareState()
+path: FullPath = FullPath(fieldTransform)
+panel: Panel = Panel(state, path)
+discNodes: DiscNodes = DiscNodes(fieldTransform)
+
+
 
 def main():
-
-    screen: pygame.Surface = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
-    pygame.display.set_caption("Path Generation 2.0 by Ansel")
-
-    fieldTransform: FieldTransform = FieldTransform()
-    fieldSurface: FieldSurface = FieldSurface(fieldTransform)
-    userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
-
-    state: SoftwareState = SoftwareState()
-    path: FullPath = FullPath(fieldTransform)
-    buttons: Buttons = Buttons(state, path.waypoints)
-    discNodes: DiscNodes = DiscNodes(fieldTransform)
 
     # Main software loop
     while True:
@@ -39,7 +45,7 @@ def main():
         handleMousewheel(fieldSurface, fieldTransform, userInput)
         
         # Find the hovered object out of all the possible hoverable objects
-        handleHoverables(state, userInput, path, buttons, fieldSurface)
+        handleHoverables(state, userInput, getHoverables())
         
         # Now that the hovered object is computed, handle what object is being dragged and then actually dragging the object
         handleDragging(userInput, state, fieldSurface)
@@ -62,12 +68,12 @@ def main():
             path.calculateInterpolatedPoints()
 
         # Draw everything on the screen
-        drawEverything(screen, state, fieldSurface, path, buttons, shadowPointRef, userInput, discNodes)
+        drawEverything(shadowPointRef)
         
         
 
 # Draw the vex field, full path, and panel
-def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath, buttons: Buttons, shadowPointRef: PointRef, userInput: UserInput, discNodes: DiscNodes) -> None:
+def drawEverything(shadowPointRef: PointRef) -> None:
     
     # Draw the vex field
     fieldSurface.draw(screen)
@@ -85,7 +91,7 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
     pygame.draw.rect(screen, colors.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
 
     # Draw panel buttons
-    buttons.draw(screen)
+    panel.draw(screen)
 
     # Draw a tooltip if there is one
     if state.objectHovering is not None and isinstance(state.objectHovering, TooltipOwner):
@@ -95,6 +101,38 @@ def drawEverything(screen: pygame.Surface, state: SoftwareState, fieldSurface: F
         discNodes.draw(screen)
 
     pygame.display.update()
+
+
+# returns a generator object to iterate through all the hoverable objects,
+# to determine which object is being hovered by the mouse in order
+def getHoverables() -> Iterator[Hoverable]:
+
+    # The points, segments, and field can only be hoverable if the mouse is on the field permieter and not on the panel
+    if userInput.isMouseOnField:
+
+        if state.mode == Mode.EDIT: # the path is only interactable when on edit mode
+            # For each pathPoint, iterate through the control points then the pathPoint itself
+            for pathPoint in path.pathPoints:
+                yield pathPoint.controlA
+                yield pathPoint.controlB
+                yield pathPoint
+
+            # After checking all the points, check the segments
+            for segment in path.segments:
+                yield segment
+
+        # If nothing has been hovered, then finally check fieldSurface
+        yield fieldSurface
+
+    else: # hoverable panel objects
+
+        # Iterate through each button on the panel
+        for panelObject in panel.getHoverables():
+            yield panelObject
+
+    # weird python hack to make it return an empty iterator if nothing hoverable
+    return
+    yield
 
 
 #import cProfile
