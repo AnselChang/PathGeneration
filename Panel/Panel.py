@@ -1,9 +1,10 @@
-from Buttons.ConcreteButtons import AIButton, EditButton, OdomButton, RobotButton, SimulateButton
-from Buttons.AbstractButton import AbstactButton
+from Panel.TabButtons import AIButton, EditButton, OdomButton, RobotButton, SimulateButton
+from Panel.AbstractButtons.AbstractButton import AbstactButton
 from Panel import AbstractTab, AITab, EditTab, OdomTab, RobotTab, SimulationTab
 from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.FullPath import FullPath
 from MouseInterfaces.Hoverable import Hoverable
+from Simulation.ControllerManager import ControllerManager
 import pygame
 from typing import Iterator
 
@@ -14,7 +15,7 @@ Stores all the Tab objects and draws all the UI from the selected Tab onto the s
 
 class Panel:
 
-    def __init__(self, state: SoftwareState, path: FullPath):
+    def __init__(self, state: SoftwareState, path: FullPath, controllers: ControllerManager):
 
         self.state: SoftwareState = state
         
@@ -29,10 +30,11 @@ class Panel:
 
         self.aiTab: AITab.AITab = AITab.AITab()
         self.editTab: EditTab.EditTab = EditTab.EditTab()
-        self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab()
-        self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab()
+        self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(controllers)
+        self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(controllers)
         self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab()
 
+    # Given the mode, get the tab oject associated with that mode
     def getTab(self, mode: Mode) -> AbstractTab.AbstractTab:
         if mode == Mode.AI:
             return self.aiTab

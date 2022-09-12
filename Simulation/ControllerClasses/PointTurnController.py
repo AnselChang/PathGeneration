@@ -1,4 +1,4 @@
-from Simulation.AbstractController import AbstractController
+from Simulation.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
 from Sliders.Slider import Slider
@@ -6,7 +6,8 @@ from Sliders.Slider import Slider
 from typing import Tuple
 
 """
-A special controller, which is not user-configurable, specifically for point turns. Stored privately in Simulation.py
+A special controller, which is not user-configurable and not part of the ControllerManager list, 
+specifically for point turns. Stored privately in Simulation.py
 """
 
 class PointTurnController(AbstractController):

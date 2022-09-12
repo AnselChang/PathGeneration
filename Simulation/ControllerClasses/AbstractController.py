@@ -16,7 +16,8 @@ given the robot outputs (robot position and orientation)
 class AbstractController(ABC):
 
     def __init__(self):
-        self.sliders = self.defineParameterSliders()
+        self.simulationSliders = self.defineParameterSliders() # sliders for tuning the simulation robot
+        self.robotSliders = self.defineParameterSliders() # sliders for tuning the actual robot
 
 
     # Any controller that implements AbstractController must return a list of sliders for the tunable parameters

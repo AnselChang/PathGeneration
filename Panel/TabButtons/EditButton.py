@@ -1,33 +1,33 @@
 from SingletonState.SoftwareState import SoftwareState, Mode
-from Buttons.ToggleButton import ToggleButton
+from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
 import Utility, pygame
 
 # Button on panel to select edit mode
-class AIButton(ToggleButton):
+class EditButton(ToggleButton):
 
     def __init__(self, state: SoftwareState):
         self.softwareState = state
-        self.tooltip = Tooltip("Use AI algorithms to iteratively generate a full spline path from scratch")
+        self.tooltip = Tooltip("Edit path")
 
-        position = (Utility.SCREEN_SIZE + 20, 30)
-        super().__init__(position, "Images/Buttons/ai.png", 0.08, "Images/Buttons/ai_greyscale.png")
+        position = (Utility.SCREEN_SIZE + 75, 30)
+        super().__init__(position, "Images/Buttons/edit.png", 0.08)
 
     # EditButton only ever has one tooltip message to draw
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
         self.tooltip.draw(screen, mousePosition)
 
     # Implementing ToggleButton function
-    # button is active when the software mode is set to AI
+    # button is active when the software mode is set to EDIT
     def isToggled(self) ->  bool:
-        return self.softwareState.mode == Mode.AI
+        return self.softwareState.mode == Mode.EDIT
 
     # edit button is never disabled
     def isDisabled(self) -> bool:
         return False
 
     # Implementing ToggleButton function
-    # When toggled on, set mode to ai
+    # When toggled on, set mode to edit
     def toggleButtonOn(self):
-        self.softwareState.mode = Mode.AI
+        self.softwareState.mode = Mode.EDIT

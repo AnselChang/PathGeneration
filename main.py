@@ -4,6 +4,7 @@ from SingletonState.ReferenceFrame import PointRef
 from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
+from Simulation.ControllerManager import ControllerManager
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Panel.Panel import Panel
@@ -21,10 +22,11 @@ pygame.display.set_caption("Path Generation 2.0 by Ansel")
 fieldTransform: FieldTransform = FieldTransform()
 fieldSurface: FieldSurface = FieldSurface(fieldTransform)
 userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
+controllers: ControllerManager = ControllerManager()
 
 state: SoftwareState = SoftwareState()
 path: FullPath = FullPath(fieldTransform)
-panel: Panel = Panel(state, path)
+panel: Panel = Panel(state, path, controllers)
 discNodes: DiscNodes = DiscNodes(fieldTransform)
 
 def main():

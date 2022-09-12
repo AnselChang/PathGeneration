@@ -1,5 +1,5 @@
 from SingletonState.SoftwareState import SoftwareState, Mode
-from Buttons.ToggleButton import ToggleButton
+from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
 import Utility, pygame

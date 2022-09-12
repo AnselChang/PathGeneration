@@ -1,21 +1,22 @@
 from SingletonState.SoftwareState import SoftwareState, Mode
-from Buttons.ToggleButton import ToggleButton
+from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
 from Simulation.Waypoints import Waypoints
 from SingletonState.ReferenceFrame import PointRef
 import Utility, pygame
 
-# Button on panel to select simulate mode
-class SimulateButton(ToggleButton):
+
+# Button on panel to select robot mode
+class RobotButton(ToggleButton):
 
     def __init__(self, state: SoftwareState, waypoints: Waypoints):
         self.softwareState = state
         self.waypoints = waypoints
-        self.tooltipEnabled = Tooltip("Tune parameters for path following on the virtual", "robot, and simulate path following algorithms")
-        self.tooltipDisabled = Tooltip("Disabled: Draw a path first in Edit mode", "before trying to simulate path following!")
+        self.tooltipEnabled = Tooltip("Export the path to the VEX robot and import a", "recorded run to the program through serial")
+        self.tooltipDisabled = Tooltip("Disabled: Draw a path first in Edit mode", "before interfacing with the robot!")
 
-        position = (Utility.SCREEN_SIZE + 130, 30)
-        super().__init__(position, "Images/Buttons/simulate.png", 0.08)
+        position = (Utility.SCREEN_SIZE + 185, 30)
+        super().__init__(position, "Images/Buttons/robot.png", 0.08)
 
     # If there are at least two waypoints, then we can switch to this mode. Otherwise, we display an error tooltip
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
@@ -25,9 +26,9 @@ class SimulateButton(ToggleButton):
             self.tooltipEnabled.draw(screen, mousePosition)
 
     # Implementing ToggleButton function
-    # button is active when the software mode is set to EDIT
+    # button is active when the software mode is set to ROBOT
     def isToggled(self) ->  bool:
-        return self.softwareState.mode == Mode.SIMULATE
+        return self.softwareState.mode == Mode.ROBOT
 
     # robot button is disabled if there is no path
     def isDisabled(self) -> bool:
@@ -36,4 +37,4 @@ class SimulateButton(ToggleButton):
     # Implementing ToggleButton function
     # When toggled on, set mode to edit
     def toggleButtonOn(self):
-        self.softwareState.mode = Mode.SIMULATE
+        self.softwareState.mode = Mode.ROBOT

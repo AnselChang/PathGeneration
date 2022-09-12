@@ -1,4 +1,4 @@
-from Buttons.AbstractButton import AbstactButton
+from Panel.AbstractButtons.AbstractButton import AbstactButton
 from abc import abstractmethod
 from MouseInterfaces.TooltipOwner import TooltipOwner
 import Utility, Graphics, pygame
