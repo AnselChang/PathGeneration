@@ -6,6 +6,9 @@ from Sliders.Slider import Slider
 from typing import Tuple
 
 class StanleyController(AbstractController):
+
+    def __init__(self):
+        super().__init__("Stanley")
     
 
     def defineParameterSliders(self) -> list[Slider]:

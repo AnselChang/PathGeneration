@@ -11,6 +11,9 @@ specifically for point turns. Stored privately in Simulation.py
 """
 
 class PointTurnController(AbstractController):
+
+    def __init__(self):
+        super().__init__("Point Turns")
     
     # Not user-configurable, so return an empty list
     def defineParameterSliders(self) -> list[Slider]:

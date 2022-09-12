@@ -5,29 +5,29 @@ from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
 import pygame
 
-class LeftButton(ClickButton):
+class RightButton(ClickButton):
 
     def __init__(self, controllers: ControllerManager):
 
         self.controllers: ControllerManager = controllers
 
-        self.tooltip = Tooltip("Select previous controller")
+        self.tooltip = Tooltip("Select next controller")
 
-        imageHovered = Graphics.getImage("Images/Buttons/Arrows/left2.png", 0.08)
-        imageEnabled = Graphics.getImage("Images/Buttons/Arrows/left.png", 0.08)
+        imageHovered = Graphics.getImage("Images/Buttons/Arrows/right2.png", 0.08)
+        imageEnabled = Graphics.getImage("Images/Buttons/Arrows/right.png", 0.08)
         imageDisabled = Graphics.getLighterImage(imageEnabled, 0.33)
-        super().__init__((Utility.SCREEN_SIZE+20, 100), imageDisabled, imageEnabled, imageHovered)
+        super().__init__((Utility.SCREEN_SIZE+245, 100), imageDisabled, imageEnabled, imageHovered)
 
-    # Draw left button tooltip
+    # Draw right button tooltip
     def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
         self.tooltip.draw(screen, mousePosition)
 
 
     # Whether there is a previous controller
     def isDisabled(self) -> bool:
-        return not self.controllers.isPrevious()
+        return not self.controllers.isNext()
 
 
     # When clicked, go to previous controller
     def clickEnabledButton(self) -> None:
-        self.controllers.previous()
+        self.controllers.next()

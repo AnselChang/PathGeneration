@@ -7,6 +7,9 @@ from Sliders.Slider import Slider
 from typing import Tuple
 
 class PurePursuitController(AbstractController):
+
+    def __init__(self):
+        super().__init__("Pure Pursuit")
     
 
     def defineParameterSliders(self) -> list[Slider]:
