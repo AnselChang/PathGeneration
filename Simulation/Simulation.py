@@ -1,9 +1,9 @@
 from Simulation.Waypoints import Waypoints
 from Simulation.ControllerClasses.AbstractController import AbstractController
-from Simulation.ControllerClasses.PointTurnController import PointTurnController
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from Simulation.RobotModels.SimpleRobotModel import SimpleRobotModel
 from Simulation.RobotModels.ComplexRobotModel import ComplexRobotModel
+from Simulation.ControllerStateMachine import ControllerStateMachine
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
@@ -35,7 +35,6 @@ class Simulation:
 
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
-        self.pointTurnController: PointTurnController = PointTurnController()
 
         # TODO uncomment this when slider is fully implemented
         #self.slider: Slider = Slider() # simuation slider
@@ -48,19 +47,21 @@ class Simulation:
         self.simulationIndex = 0 # temporary, slider is replacement
 
 
+
     # controller is of type AbstrfactController, i.e. like Pure Pursuit
     # when running the simulation, the controller object is created based on the corresponding class passed in
     def runSimulation(self):
 
         self.simulationIndex = 0
 
-        waypoints: Waypoints = self.path.waypoints
-
-        # Get the controller algorithm we're running for this simulation
-        controller: AbstractController = self.controllers.getController()
-        
         # we're running a new simulation now, so delete the data from the old one
         self.recordedSimulation.clear() 
+
+        waypoints: Waypoints = self.path.waypoints
+
+        # Set up the controller state machine that alternates between path following and point turn controllers
+        controllerSM = ControllerStateMachine(self.robotSpecs, waypoints, self.controllers.getController())
+        
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
         initialPosition: PointRef = waypoints.get(0)
@@ -71,42 +72,22 @@ class Simulation:
         # different simulation implementations
         robot: AbstractRobotModel = SimpleRobotModel(self.robotSpecs, output)
 
-        # Iterate through each subset of waypoints, and point turn in between
-        i = 0
-        for waypointSubset in waypoints.waypoints:
+        # Iterate until robot has reached the destination
+        timesteps = 0
+        while timesteps < 10000 and not isDone: # hard limit of 10000 in case of getting stuck in simulation
 
-            controller.initSimulation(self.robotSpecs, waypointSubset)
-            isReachPointTurn = False
-            isDone = False
+            # Input robot position to controller and obtain wheel velocities
+            robotInput, isDone = controllerSM.runController(output)
 
-            while not isDone:
+            # Take in wheel velocities from controller and simulate the robot model for a tick
+            output: RobotModelOutput = robot.simulateTick(robotInput)
 
-                if not isReachPointTurn: # follow the path
+            # Store the robot position at each tick
+            self.recordedSimulation.append(output)
 
-                    # Input robot position to controller and obtain wheel velocities
-                    robotInput, isReachPointTurn = controller.simulateTick(output)
+            # Increment number of timesteps elapsed
+            timesteps += 1
 
-                    # If this condition is true, we've reached the end of the current path segment
-                    # and are either about to point turn into the next segment or finish the simulation
-                    if isReachPointTurn:
-                        # If reached the last PathPoint, do not point turn and end simulation
-                        if i >= len(waypoints.waypoints) - 1:
-                            break 
-                        else:
-                            # Otherwise, prepare the point turn by initializing turn angle
-                            heading: float = (waypoints.waypoints[i+1][1] - waypoints.waypoints[i+1][0]).theta()
-                            self.pointTurnController.initSimulation(self.robotSpecs, heading)
-
-                else: # point turn
-                    robotInput, isDone = self.pointTurnController.simulateTick(output)
-
-                # Take in wheel velocities from controller and simulate the robot model for a tick
-                output: RobotModelOutput = robot.simulateTick(robotInput)
-
-                # Store the robot position at each tick
-                self.recordedSimulation.append(output)
-
-                i += 1
 
         # Now that running simulation is complete, adjust slider bounds
         #self.slider.setBounds(0, len(self.recordedSimulation) - 1)
