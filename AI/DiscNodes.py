@@ -1,6 +1,6 @@
 from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.FieldTransform import FieldTransform
-import Graphics, pygame, colors
+import Graphics, pygame, colors, math
 
 
 """
@@ -48,9 +48,7 @@ class Disc:
         self.child.drawPath(screen)
 
     def draw(self, screen: pygame.Surface):
-        color = colors.RED if self.isStartNode else colors.LIGHTBLUE
         pos = self.position.screenRef
-        Graphics.drawCircle(screen, *pos, color, 5 * Disc.transform.zoom)
         Graphics.drawText(screen, Graphics.FONT30, str(self.id), (0,0,0), *pos)
 
 class DiscNodes:
@@ -58,7 +56,23 @@ class DiscNodes:
     def __init__(self, transform: FieldTransform):
 
         self.initDiscs(transform)
-        self.child = self.rollout(self.discs[0])
+
+
+        self.bestDistance = math.inf
+        self.bestChild = None
+
+        for i in range(0, 31):
+
+            # Each element corresponds to the index of the child of the node, or -1 if non existing yet
+            child = [-1] * len(self.discs)
+            child[0] = i
+
+            child, distance = self.rollout(child, i, 0)
+            print(i, distance)
+            if distance < self.bestDistance:
+                self.bestDistance = distance
+                self.bestChild = child
+                print("Best: ", i)
 
     # Initialize the disc list by creating disc objects at each location and specifying their coordinates
     def initDiscs(self, transform: FieldTransform) -> list[Disc]:
@@ -110,14 +124,11 @@ class DiscNodes:
 
     # Rollout policy is simply to select the closest unvisited disc 
     # Return the evaluation of this position
-    def rollout(self, disc: Disc):
-        
-        # Each element corresponds to the index of the child of the node, or -1 if non existing yet
-        child = [-1] * len(self.discs)
+    def rollout(self, child: list[int], startID, startDistance) -> float:
 
-        currentID = 0 # current disc element
+        currentID = startID # current disc element
 
-        totalDistance = 0
+        totalDistance = startDistance
 
         while True:
             
@@ -127,7 +138,6 @@ class DiscNodes:
                 if child[neighbor.id] == -1:
                     nextID = neighbor.id
                     break # We found nearest neighbor, don't keep searching
-
             # Exhausted search, unvisited neighbor not founded. Terminate loop
             if nextID == -1:
                 break
@@ -139,23 +149,26 @@ class DiscNodes:
             totalDistance += self.discs[currentID].distanceTo(self.discs[nextID])
 
             currentID = nextID
-            print(round(totalDistance, 1), child)
+            #print(round(totalDistance, 1), child)
 
-        return child
+        return child, totalDistance
 
 
 
     # Draw each disc
     def draw(self, screen: pygame.Surface):
-        for disc in self.discs:
-            disc.draw(screen)
 
-        color = Graphics.ColorCycle()
+        color = Graphics.ColorCycle(0.03)
 
+        # Draw disc path from self.child
         index = 0
-        pos1 = self.discs[0].position.screenRef
+        pos1 = self.discs[index].position.screenRef
         while index != -1:
-            index = self.child[index]
+            index = self.bestChild[index]
             pos2 = self.discs[index].position.screenRef
             Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
             pos1 = pos2
+
+        # Draw discs
+        for disc in self.discs:
+            disc.draw(screen)
