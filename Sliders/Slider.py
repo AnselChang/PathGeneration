@@ -20,7 +20,8 @@ class Slider(Draggable):
 
     def beDraggedByMouse(self, userInput: UserInput) -> bool:
         mouseX, mouseY = userInput.mousePosition.screenRef
-        self.val = Utility.clamp((mouseX - self.x) / self.width * (self.max - self.min) + self.min, self.min, self.max)
+        self.val = round(Utility.clamp((mouseX - self.x) / self.width * (self.max - self.min) + self.min, self.min,
+                                            self.max) / self.step) * self.step
         if not self.updateAfterDrag:
             self.callback(self.val)
 

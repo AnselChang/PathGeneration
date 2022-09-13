@@ -25,8 +25,8 @@ class SimulationTab(AbstractTab):
         self.rightButton: RightButton = RightButton(simulation.controllers)
         self.playButton: SimulationOnOffButton = SimulationOnOffButton(state, simulation)
 
-        slider = Slider(850, 500, 100, 20, 30, 1, colors.LIGHTBLUE, False, lambda val: print("Slider value: " + str(val)))
-        slider.setValue(30)
+        slider = Slider(850, 500, 100, 0, 100, 5, colors.LIGHTBLUE, False, lambda val: print("Slider value: " + str(val)))
+        slider.setValue(25)
         self.sliders.append(slider)
 
     # A generator for all the hoverable UI objects
