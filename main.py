@@ -48,6 +48,9 @@ def main():
         
         # Handle zooming with mousewheel
         handleMousewheel(fieldSurface, fieldTransform, userInput)
+
+        # Handle panel keyboard input
+        panel.handleKeyboardInput(userInput.keyJustPressed)
         
         # Find the hovered object out of all the possible hoverable objects
         handleHoverables(state, userInput, getHoverables())
@@ -105,6 +108,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     if state.mode == Mode.AI:
         discNodes.draw(screen)
 
+    print(state.objectHovering is not None, state.objectDragged is not None)
     pygame.display.update()
 
 

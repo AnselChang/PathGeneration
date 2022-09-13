@@ -47,6 +47,11 @@ class Panel:
         else:
             return self.odomTab
 
+    def handleKeyboardInput(self, keyJustPressed):
+        if keyJustPressed is not None:
+            self.getTab(self.state.mode).handleKeyboardInput(keyJustPressed)
+
+
     # Returns a generator of all the hoverable objects for the panel
     def getHoverables(self) -> Iterator[Hoverable]:
 

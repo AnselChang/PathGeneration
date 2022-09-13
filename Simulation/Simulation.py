@@ -14,6 +14,7 @@ from SingletonState.SoftwareState import SoftwareState
 from VisibleElements.FullPath import FullPath
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
+import Utility, colors
 
 import pygame
 
@@ -36,17 +37,18 @@ class Simulation:
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
 
-        # TODO uncomment this when slider is fully implemented
-        #self.slider: Slider = Slider() # simuation slider
+        # simuation slider
+        self.slider: Slider = Slider(Utility.SCREEN_SIZE + 120, 190, 115, 0, 1, 1, colors.LIGHTBLUE)
 
         self.state = state
         self.controllers = controllers
         self.path = path
         self.robotSpecs = robotSpecs
 
-        self.simulationIndex = 0 # temporary, slider is replacement
 
-
+    # Return whether there is a simulation stored in this object
+    def exists(self) -> bool:
+        return len(self.recordedSimulation) > 0
 
     # controller is of type AbstrfactController, i.e. like Pure Pursuit
     # when running the simulation, the controller object is created based on the corresponding class passed in
@@ -91,7 +93,7 @@ class Simulation:
 
 
         # Now that running simulation is complete, adjust slider bounds
-        #self.slider.setBounds(0, len(self.recordedSimulation) - 1)
+        self.slider.setBounds(0, len(self.recordedSimulation) - 1)
 
 
     # Draw the line the robot takes in the simulation when following the path on the field
@@ -111,25 +113,28 @@ class Simulation:
     def drawRobot(self, screen: pygame.Surface, robotPose: RobotModelOutput):
         self.robotDrawing.draw(screen, robotPose.position, robotPose.heading)
 
+    # move slider by delta
+    def moveSlider(self, amount: int):
+        index = self.slider.getValue()
+        self.slider.setValue(index + amount)
+
     # Draw everything, but only if there is a simulation to draw
     def draw(self, screen: pygame.Surface):
 
         # If nothing to draw, exit
-        if len(self.recordedSimulation) < 1:
+        if not self.exists():
             return
 
         self.drawSimulatedPathLine(screen)
         
         # draw the robot at the current timestep specified by slider
-        #self.drawRobot(self.recordedSimulation[self.slider.getValue()])
-        # temporary code before slider comes
-        if len(self.recordedSimulation) > 0 and self.state.playingSimulation:
+        self.drawRobot(screen, self.recordedSimulation[self.slider.getValue()])
             
-            self.drawRobot(screen, self.recordedSimulation[self.simulationIndex])
-            self.simulationIndex += 1
-
-            if self.simulationIndex >= len(self.recordedSimulation):
+        # go to next simulation frame if playing
+        if self.state.playingSimulation:
+            self.moveSlider(1)
+            if self.slider.getValue() >= len(self.recordedSimulation) - 1:
                 self.state.playingSimulation = False
-                self.simulationIndex = 0
+                self.slider.setValue(0)
             
         

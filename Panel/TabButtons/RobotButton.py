@@ -22,7 +22,7 @@ class RobotButton(ToggleButton):
         super().__init__(position, imageOff, imageHovered, imageOn)
 
     # If there are at least two waypoints, then we can switch to this mode. Otherwise, we display an error tooltip
-    def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
+    def drawTooltip(self, screen: pygame.Surface, mousePosition: tuple) -> None:
         if self.isDisabled():
             self.tooltipDisabled.draw(screen, mousePosition)
         else:

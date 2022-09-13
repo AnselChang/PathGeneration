@@ -16,7 +16,6 @@ Stores all the UI for the Simulation tab
 
 class SimulationTab(AbstractTab):
 
-    sliders = []
 
     def __init__(self, state: SoftwareState, simulation: Simulation):
         self.simulation = simulation
@@ -25,13 +24,24 @@ class SimulationTab(AbstractTab):
         self.rightButton: RightButton = RightButton(simulation.controllers)
         self.playButton: SimulationOnOffButton = SimulationOnOffButton(state, simulation)
 
+    # If space key pressed, toggle play button.
+    # If left or right key pressed, scrub one frame for simulation
+    def handleKeyboardInput(self, keyJustPressed):
+        if keyJustPressed == pygame.K_SPACE:
+            self.playButton.toggleButton()
+        elif keyJustPressed == pygame.K_LEFT or keyJustPressed == pygame.K_RIGHT:
+            self.simulation.moveSlider(1 if keyJustPressed == pygame.K_RIGHT else -1)
+            self.playButton.state.playingSimulation = False
+
     # A generator for all the hoverable UI objects
     def getHoverables(self) -> Iterator[Hoverable]:
         yield self.leftButton
         yield self.rightButton
         yield self.playButton
-        for slider in self.sliders:
-            yield slider
+
+        if self.simulation.exists():
+            yield self.simulation.slider
+
 
     # Draw all the UI onto the screen
     def draw(self, screen: pygame.Surface):
@@ -46,5 +56,6 @@ class SimulationTab(AbstractTab):
         self.rightButton.draw(screen)
         self.playButton.draw(screen)
 
-        for slider in self.sliders:
-            slider.draw(screen)
+        if self.simulation.exists():
+            self.simulation.slider.draw(screen)
+
