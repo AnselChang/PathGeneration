@@ -1,6 +1,7 @@
 from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.FieldTransform import FieldTransform
 import Graphics, pygame, colors, math
+import time
 
 
 """
@@ -53,26 +54,55 @@ class Disc:
 
 class DiscNodes:
 
+    def search(self, depth: int, child: list[int], parent: int = 0, distance: float = 0, string = "0 -> "):
+
+        if depth == 0:
+            return *self.rollout(child.copy(), parent, distance), string
+
+        shortest = math.inf
+        bestChild = None
+        bestString = ""
+        for i in range(0, 31):
+
+            if i == parent or child[i] != -1:
+                continue
+
+            child[parent] = i
+            #print(child)
+            nd = distance + self.discs[parent].distanceTo(self.discs[i])
+            ns = string + str(i) + " -> "
+            newDistance, newChild, newString = self.search(depth - 1, child, i, nd, ns)
+            child[parent] = -1
+
+            if newDistance < shortest:
+                shortest = newDistance
+                bestChild = newChild
+                bestString = newString
+
+        return shortest, bestChild, bestString
+
+
+
     def __init__(self, transform: FieldTransform):
 
         self.initDiscs(transform)
 
 
         self.bestDistance = math.inf
-        self.bestChild = None
 
-        for i in range(0, 31):
+        depth = 4
+        start = time.time()
+        shortest,self.bestChild, bestString = self.search(depth, [-1] * len(self.discs), 0)
+        print("DEPTH {} ({} seconds)".format(depth, round(time.time()-start, 2)))
+        print(bestString + ":", shortest, "inches")
 
-            # Each element corresponds to the index of the child of the node, or -1 if non existing yet
-            child = [-1] * len(self.discs)
-            child[0] = i
-
-            child, distance = self.rollout(child, i, 0)
-            print(i, distance)
-            if distance < self.bestDistance:
-                self.bestDistance = distance
-                self.bestChild = child
-                print("Best: ", i)
+        s = "["
+        index = 0
+        while index != -1:
+            s += "{}, ".format(index)
+            index = self.bestChild[index]
+        s += "]"
+        print(s)
 
     # Initialize the disc list by creating disc objects at each location and specifying their coordinates
     def initDiscs(self, transform: FieldTransform) -> list[Disc]:
@@ -151,7 +181,7 @@ class DiscNodes:
             currentID = nextID
             #print(round(totalDistance, 1), child)
 
-        return child, totalDistance
+        return totalDistance, child
 
 
 
@@ -163,8 +193,10 @@ class DiscNodes:
         # Draw disc path from self.child
         index = 0
         pos1 = self.discs[index].position.screenRef
-        while index != -1:
+        while True:
             index = self.bestChild[index]
+            if index == -1:
+                break
             pos2 = self.discs[index].position.screenRef
             Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
             pos1 = pos2
