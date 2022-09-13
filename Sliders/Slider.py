@@ -7,23 +7,30 @@ import Utility
 
 class Slider(Draggable):
 
-    def __init__(self, x, y, width, min, max, step):
+    def __init__(self, x, y, width, min, max, step, color, updateAfterDrag, callback):
         self.x = x
         self.y = y
         self.width = width
         self.min = min
         self.max = max
         self.step = step
+        self.color = color
+        self.updateAfterDrag = updateAfterDrag
+        self.callback = callback
 
     def beDraggedByMouse(self, userInput: UserInput) -> bool:
-        pass
+        mouseX, mouseY = userInput.mousePosition.screenRef
+        self.val = Utility.clamp((mouseX - self.x) / self.width * (self.max - self.min) + self.min, self.min, self.max)
+        if not self.updateAfterDrag:
+            self.callback(self.val)
 
+        return True
 
     def stopDragging(self):
-        pass
+        self.callback(self.val)
 
     def checkIfHovering(self, userInput: UserInput) -> bool:
-        mouseX, mouseY = pygame.mouse.get_rel()
+        mouseX, mouseY = userInput.mousePosition.screenRef
         return Utility.pointTouchingLine(mouseX, mouseY, self.x, self.y, self.x + self.width, self.y, 20)
 
     def startDragging(self, userInput: UserInput):
@@ -41,10 +48,10 @@ class Slider(Draggable):
 
     # Manually override the slider position. One example would when playing a simulation, and the slider moves by itself
     def setValue(self, val):
-        self.val = val
+        self.val = Utility.clamp(val, self.min, self.max)
 
     # Draw slider on surface
     def draw(self, screen: pygame.Surface):
         Graphics.drawRoundedLine(screen, colors.LINEGREY, self.x, self.y, self.x + self.width, self.y, 20)
-        Graphics.drawCircle(screen, self.x + (self.val / (self.max - self.min)) * self.width, self.y, colors.LIGHTBLUE, 8)
+        Graphics.drawCircle(screen, self.x + ((self.val - self.min) / (self.max - self.min)) * self.width, self.y, self.color, 8)
         pass
