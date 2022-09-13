@@ -7,6 +7,7 @@ from MouseInterfaces.Hoverable import Hoverable
 from typing import Iterator
 from Simulation.Simulation import Simulation
 import pygame, Graphics, colors, Utility
+from Sliders.Slider import Slider
 
 
 """
@@ -14,6 +15,8 @@ Stores all the UI for the Simulation tab
 """
 
 class SimulationTab(AbstractTab):
+
+    sliders = []
 
     def __init__(self, state: SoftwareState, simulation: Simulation):
         self.simulation = simulation
@@ -27,6 +30,8 @@ class SimulationTab(AbstractTab):
         yield self.leftButton
         yield self.rightButton
         yield self.playButton
+        for slider in self.sliders:
+            yield slider
 
     # Draw all the UI onto the screen
     def draw(self, screen: pygame.Surface):
@@ -40,3 +45,6 @@ class SimulationTab(AbstractTab):
         self.leftButton.draw(screen)
         self.rightButton.draw(screen)
         self.playButton.draw(screen)
+
+        for slider in self.sliders:
+            slider.draw(screen)
