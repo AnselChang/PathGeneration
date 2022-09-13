@@ -21,6 +21,10 @@ class PurePursuitController(AbstractController):
         #TODO define the tunable parameters of this controller
         pass
 
+    # init whatever is needed at the start of each path
+    def initController(self):
+        pass
+
     # Performs one timestep of the pure pursuit algorithm
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:

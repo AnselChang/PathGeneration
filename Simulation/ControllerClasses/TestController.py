@@ -18,9 +18,14 @@ class TestController(AbstractController):
     def defineParameterSliders(self) -> list[Slider]:
         #TODO define the tunable parameters of this controller
         pass
+    
+    # init whatever is needed at the start of each path
+    def initController(self):
+        self.ticks = 0
 
     # Performs one timestep of the stanley algorithm
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
         #TODO implement this!
-        pass
+        self.ticks += 1
+        return RobotModelInput(10, 5), self.ticks >= 1000 # repeat 100 times before done

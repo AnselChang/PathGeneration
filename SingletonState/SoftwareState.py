@@ -22,6 +22,8 @@ class SoftwareState:
 
         self.recomputeInterpolation = False # Whether to recompute bezier interpolation from modifying path
 
+        self.playingSimulation = False # Whether the simulation is currently stepping through each frame
+
     def __str__(self):
         return "Software State:\nHovering: {}\nDragged: {}".format(self.objectHovering, self.objectDragged)
 

@@ -20,6 +20,10 @@ class StanleyController(AbstractController):
         #TODO define the tunable parameters of this controller
         pass
 
+    # nothing else needed to init for now
+    def initController(self):
+        pass
+
     # Performs one timestep of the stanley algorithm
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:

@@ -25,10 +25,10 @@ class SimpleRobotModel(AbstractRobotModel):
         oldDeltaX, oldDeltaY = self.deltaX, self.deltaY
 
         # the distance the wheels travelled this tick
-        leftDistance = input.leftVelocity * self.timestep
-        rightDistance = input.rightVelocity * self.timestep
+        leftDistance = input.leftVelocity * self.robotSpecs.timestep
+        rightDistance = input.rightVelocity * self.robotSpecs.timestep
 
-        deltaTheta = (rightDistance - leftDistance) / self.trackWidth
+        deltaTheta = (rightDistance - leftDistance) / self.robotSpecs.trackWidth
         deltaDistance = (rightDistance + leftDistance) / 2
 
         self.deltaX = deltaDistance * math.cos(self.heading + deltaTheta/2)

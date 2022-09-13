@@ -28,10 +28,10 @@ controllers: ControllerManager = ControllerManager()
 
 state: SoftwareState = SoftwareState()
 path: FullPath = FullPath(fieldTransform)
-panel: Panel = Panel(state, path, controllers)
 discNodes: DiscNodes = DiscNodes(fieldTransform)
 robotSpecs: RobotSpecs = RobotSpecs()
-simulation: Simulation = Simulation(fieldTransform, controllers, robotSpecs)
+simulation: Simulation = Simulation(state, fieldTransform, controllers, path, robotSpecs)
+panel: Panel = Panel(state, path, simulation)
 
 
 def main():

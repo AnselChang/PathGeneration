@@ -34,6 +34,14 @@ class AbstractController(ABC):
         self.robotSpecs = robotSpecs
         self.waypoints: list[PointRef] = waypoints
 
+        self.initController()
+
+        
+    # Do anything needed to initialize the controller at the start of the path
+    @abstractmethod
+    def initController(self):
+        pass
+
     # To be implemented by each algorithm. Simulates path following at each timestep.
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
     @abstractmethod

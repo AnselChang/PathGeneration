@@ -1,0 +1,45 @@
+from Panel.AbstractButtons.FlipFlopButton import FlipFlopButton
+import Utility, Graphics
+from SingletonState.SoftwareState import SoftwareState
+from Simulation.Simulation import Simulation
+from VisibleElements.Tooltip import Tooltip
+from SingletonState.ReferenceFrame import PointRef
+import pygame
+
+"""
+Right button for going to the previous controller in the Simulation tab
+"""
+
+class SimulationOnOffButton(FlipFlopButton):
+
+    def __init__(self, state: SoftwareState, simulation: Simulation):
+
+        self.state = state
+        self.simulation = simulation
+
+        self.tooltipPlay = Tooltip("Play simulation")
+        self.tooltipPause = Tooltip("Pause simulation")
+
+        imageHoveredOn = Graphics.getImage("Images/Buttons/pause.png", 0.08)
+        imageOn = Graphics.getLighterImage(imageHoveredOn, 0.85)
+        imageHoveredOff = Graphics.getImage("Images/Buttons/play.png", 0.08)
+        imageOff = Graphics.getLighterImage(imageHoveredOn, 0.85)
+        super().__init__((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH/2, 400), imageOff, imageHoveredOff, imageOn, imageHoveredOn)
+
+    # Draw right button tooltip
+    def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
+        if self.state.playingSimulation:
+            self.tooltipPause.draw(screen, mousePosition)
+        else:
+            self.tooltipPlay.draw(screen, mousePosition)
+
+     # Return whether object is on
+    def isOn(self) -> bool:
+        return self.state.playingSimulation
+
+  # The action to do when the button is toggled on
+    def toggleButton(self) -> None:
+        self.state.playingSimulation = not self.state.playingSimulation
+        if self.state.playingSimulation:
+            self.simulation.runSimulation()
+

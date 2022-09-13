@@ -1,6 +1,6 @@
 from Panel.AbstractTab import AbstractTab
 from MouseInterfaces.Hoverable import Hoverable
-from Simulation.ControllerManager import ControllerManager
+from Simulation.Simulation import Simulation
 from typing import Iterator
 import pygame
 
@@ -11,8 +11,8 @@ Stores all the UI for the Simulation tab
 
 class RobotTab(AbstractTab):
 
-    def __init__(self, controllers: ControllerManager):
-        self.controllers = controllers
+    def __init__(self, simulation: Simulation):
+        self.simulation = simulation
 
     # A generator for all the hoverable UI objects
     def getHoverables(self) -> Iterator[Hoverable]:

@@ -9,6 +9,9 @@ from Simulation.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerManager import ControllerManager
 from SingletonState.FieldTransform import FieldTransform
+from Simulation.RobotDrawing import RobotDrawing
+from SingletonState.SoftwareState import SoftwareState
+from VisibleElements.FullPath import FullPath
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
 
@@ -23,10 +26,12 @@ It then runs a full simulation (not in real time), and ultimately generates a li
 
 class Simulation:
 
-    def __init__(self, transform: FieldTransform, controllers: ControllerManager, robotSpecs: RobotSpecs):
+    def __init__(self, state: SoftwareState, transform: FieldTransform, controllers: ControllerManager, path: FullPath, robotSpecs: RobotSpecs):
 
         # Initialize RobotModelOutput class's transform reference
         RobotModelOutput.transform = transform
+
+        self.robotDrawing = RobotDrawing(transform, robotSpecs.trackWidth)
 
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[RobotModelOutput] = []
@@ -35,14 +40,21 @@ class Simulation:
         # TODO uncomment this when slider is fully implemented
         #self.slider: Slider = Slider() # simuation slider
 
+        self.state = state
         self.controllers = controllers
+        self.path = path
         self.robotSpecs = robotSpecs
+
+        self.simulationIndex = 0 # temporary, slider is replacement
 
 
     # controller is of type AbstrfactController, i.e. like Pure Pursuit
     # when running the simulation, the controller object is created based on the corresponding class passed in
-    def runSimulation(self, waypoints: Waypoints):
+    def runSimulation(self):
 
+        self.simulationIndex = 0
+
+        waypoints: Waypoints = self.path.waypoints
 
         # Get the controller algorithm we're running for this simulation
         controller: AbstractController = self.controllers.getController()
@@ -53,7 +65,7 @@ class Simulation:
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
         initialPosition: PointRef = waypoints.get(0)
         initialHeading: float = (waypoints.get(1) - waypoints.get(0)).theta()
-        output: RobotModelOutput = RobotModelOutput(initialPosition, initialHeading)
+        output: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading)
 
         # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
         # different simulation implementations
@@ -78,7 +90,7 @@ class Simulation:
                     # and are either about to point turn into the next segment or finish the simulation
                     if isReachPointTurn:
                         # If reached the last PathPoint, do not point turn and end simulation
-                        if i == len(waypoints.waypoints) - 1:
+                        if i >= len(waypoints.waypoints) - 1:
                             break 
                         else:
                             # Otherwise, prepare the point turn by initializing turn angle
@@ -97,7 +109,7 @@ class Simulation:
                 i += 1
 
         # Now that running simulation is complete, adjust slider bounds
-        self.slider.setBounds(0, len(self.recordedSimulation) - 1)
+        #self.slider.setBounds(0, len(self.recordedSimulation) - 1)
 
 
     # Draw the line the robot takes in the simulation when following the path on the field
@@ -112,12 +124,10 @@ class Simulation:
         # use Graphics.py draw methods
         pass
 
+    # Draw the robot at the specified position and pose
+    # TODO: actually point the direction of the robot given heading
     def drawRobot(self, screen: pygame.Surface, robotPose: RobotModelOutput):
-        # TODO draw a robot at the specified position
-        # Use some sort of decent looking vector robot image
-        # Note that RobotModelOutput stores a pointref, so just call screenRef to draw it relative to screen
-        # Robot should be oriented based on robotPose.heading
-        pass
+        self.robotDrawing.draw(screen, robotPose.position)
 
     # Draw everything, but only if there is a simulation to draw
     def draw(self, screen: pygame.Surface):
@@ -129,5 +139,15 @@ class Simulation:
         self.drawSimulatedPathLine(screen)
         
         # draw the robot at the current timestep specified by slider
-        self.drawRobot(self.recordedSimulation[self.slider.getValue()])
+        #self.drawRobot(self.recordedSimulation[self.slider.getValue()])
+        # temporary code before slider comes
+        if len(self.recordedSimulation) > 0 and self.state.playingSimulation:
+            
+            self.drawRobot(screen, self.recordedSimulation[self.simulationIndex])
+            self.simulationIndex += 1
+
+            if self.simulationIndex >= len(self.recordedSimulation):
+                self.state.playingSimulation = False
+                self.simulationIndex = 0
+            
         
