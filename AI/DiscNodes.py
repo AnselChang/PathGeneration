@@ -15,33 +15,23 @@ class Disc:
     def __init__(self, fieldTileX: float, fieldTileY: float, isStartNode: bool = False):
         self.position: PointRef = PointRef(Disc.transform, Ref.FIELD, (fieldTileX*24 - 0.5, fieldTileY*24 - 0.5))
 
-        self.child: 'Disc' = None
-        self.parent: 'Disc' = None
+        # The index of this node in relation to DiscNodes.discs. Initialied in sortOtherDiscs()
+        self.id = -1
 
         self.isStartNode = isStartNode
 
 
+    # Get the index of self in relation to disc list
     # Sort self.otherDiscs from closest to furthest disc
-    def sortOtherDiscs(self, discs: 'Disc'):
-        self.otherDiscs: list['Disc'] = sorted(discs, key = lambda other: self.distanceTo(other))
-        del self.otherDiscs[0] # delete the first element, which is just identity because sorting by distance
+    def preprocess(self, discs: list['Disc']):
+        self.id = discs.index(self)
+        self.neighbors: list['Disc'] = sorted(discs, key = lambda other: self.distanceTo(other))
+        del self.neighbors[0] # delete the first element, which is just identity because sorting by distance
 
     # return the distance to the other disc in inches
     def distanceTo(self, other: 'Disc') -> float:
         return (other.position - self.position).magnitude(Ref.FIELD)
 
-    # Recursive greedy rollout algorithm
-    # marks itself as visited then calls next closest node
-    def rollout(self, parent: 'Disc', color: Graphics.ColorCycle):
-        self.parent = parent
-        self.color = color.next()
-
-        # Find the closest unvisited disc then end
-        for disc in self.otherDiscs:
-            if disc.parent is None:
-                self.child = disc
-                disc.rollout(self, color)
-                return
 
     # Recursive algortihm to draw path
     def drawPath(self, screen: pygame.Surface):
@@ -59,14 +49,16 @@ class Disc:
 
     def draw(self, screen: pygame.Surface):
         color = colors.RED if self.isStartNode else colors.LIGHTBLUE
-        Graphics.drawCircle(screen, *self.position.screenRef, color, 5 * Disc.transform.zoom)
+        pos = self.position.screenRef
+        Graphics.drawCircle(screen, *pos, color, 5 * Disc.transform.zoom)
+        Graphics.drawText(screen, Graphics.FONT30, str(self.id), (0,0,0), *pos)
 
 class DiscNodes:
 
     def __init__(self, transform: FieldTransform):
 
         self.initDiscs(transform)
-        self.rollout(self.discs[0])
+        self.child = self.rollout(self.discs[0])
 
     # Initialize the disc list by creating disc objects at each location and specifying their coordinates
     def initDiscs(self, transform: FieldTransform) -> list[Disc]:
@@ -108,7 +100,7 @@ class DiscNodes:
 
         # Pre-process by sorting each disc's distance to each other disc. O(n^2*log(n))
         for disc in self.discs:
-            disc.sortOtherDiscs(self.discs)
+            disc.preprocess(self.discs)
 
     # Set the visited attribute of all Discs to false
     def resetVisited(self):
@@ -117,9 +109,40 @@ class DiscNodes:
             disc.parent = None
 
     # Rollout policy is simply to select the closest unvisited disc 
+    # Return the evaluation of this position
     def rollout(self, disc: Disc):
-        self.resetVisited()
-        disc.rollout(disc, Graphics.ColorCycle())
+        
+        # Each element corresponds to the index of the child of the node, or -1 if non existing yet
+        child = [-1] * len(self.discs)
+
+        currentID = 0 # current disc element
+
+        totalDistance = 0
+
+        while True:
+            
+            # Look for nearest unvisited neighbor
+            nextID = -1
+            for neighbor in self.discs[currentID].neighbors:
+                if child[neighbor.id] == -1:
+                    nextID = neighbor.id
+                    break # We found nearest neighbor, don't keep searching
+
+            # Exhausted search, unvisited neighbor not founded. Terminate loop
+            if nextID == -1:
+                break
+
+            # we have found closest unvisited neighbor
+            child[currentID] = nextID
+
+            # update total distance
+            totalDistance += self.discs[currentID].distanceTo(self.discs[nextID])
+
+            currentID = nextID
+            print(round(totalDistance, 1), child)
+
+        return child
+
 
 
     # Draw each disc
@@ -127,4 +150,12 @@ class DiscNodes:
         for disc in self.discs:
             disc.draw(screen)
 
-        self.discs[0].drawPath(screen)
+        color = Graphics.ColorCycle()
+
+        index = 0
+        pos1 = self.discs[0].position.screenRef
+        while index != -1:
+            index = self.child[index]
+            pos2 = self.discs[index].position.screenRef
+            Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
+            pos1 = pos2
