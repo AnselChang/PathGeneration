@@ -108,7 +108,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     if state.mode == Mode.AI:
         discNodes.draw(screen)
 
-    print(state.objectHovering is not None, state.objectDragged is not None)
+    # print(state.objectHovering is not None, state.objectDragged is not None)
     pygame.display.update()
 
 

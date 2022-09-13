@@ -72,7 +72,7 @@ class Simulation:
 
         # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
         # different simulation implementations
-        robot: AbstractRobotModel = SimpleRobotModel(self.robotSpecs, output)
+        robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, output)
 
         # Iterate until robot has reached the destination
         timesteps = 0
