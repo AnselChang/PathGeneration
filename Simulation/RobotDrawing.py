@@ -1,7 +1,7 @@
 from ctypes import sizeof
 from SingletonState.ReferenceFrame import PointRef, VectorRef, Ref
 from SingletonState.FieldTransform import FieldTransform
-import pygame, Graphics, colors
+import pygame, Graphics, colors, math
 
 """
 Storing the relative coordinates of the shapes associated with the robot sprite (square + 2 wheels)
@@ -18,14 +18,14 @@ class RobotDrawing:
 
         WHEEL_HEIGHT = 3
         WHEEL_WIDTH = 1
-        self.wheelSize = VectorRef(transform, Ref.FIELD, (WHEEL_HEIGHT,WHEEL_HEIGHT))
+        self.wheelSize = VectorRef(transform, Ref.FIELD, (WHEEL_WIDTH,WHEEL_HEIGHT))
         
         self.leftWheel = VectorRef(transform, Ref.FIELD, (-size/2, -WHEEL_HEIGHT/2))
         self.rightWheel = VectorRef(transform, Ref.FIELD, (size/2 - WHEEL_WIDTH/2, -WHEEL_HEIGHT/2))
 
 
     # Draw the robot centered around the center PointRef onto the screen
-    def draw(self, screen: pygame.Surface, center: PointRef):
+    def draw(self, screen: pygame.Surface, center: PointRef, heading: float):
 
         # Draw robot
         topleft = (center + self.topleft).screenRef
@@ -40,5 +40,10 @@ class RobotDrawing:
         # Draw right wheel
         rightwheel = (center + self.rightWheel).screenRef
         pygame.draw.rect(screen, (100,100,100), (*rightwheel, *wheelsize))
+
+        # temporary heading code
+        vx = center.screenRef[0] + 20 * math.cos(heading)
+        vy = center.screenRef[1] + 20 * math.sin(heading)
+        Graphics.drawLine(screen, [0,0,0], *center.screenRef, vx, vy, 5)
 
 

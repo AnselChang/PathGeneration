@@ -127,7 +127,7 @@ class Simulation:
     # Draw the robot at the specified position and pose
     # TODO: actually point the direction of the robot given heading
     def drawRobot(self, screen: pygame.Surface, robotPose: RobotModelOutput):
-        self.robotDrawing.draw(screen, robotPose.position)
+        self.robotDrawing.draw(screen, robotPose.position, robotPose.heading)
 
     # Draw everything, but only if there is a simulation to draw
     def draw(self, screen: pygame.Surface):
