@@ -30,6 +30,10 @@ class PointTurnController(AbstractController):
         pass
 
     # Simulate a point turn to self.targetHeading
-    # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
+    # Simple non-blocking P control to desired heading
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
-        pass
+          
+        K_p = -2
+
+        error = (self.targetHeading - output.heading) * K_p
+        return RobotModelInput(error, -error), abs(error) < 0.055 # in radians, roughly 3 degrees of tolerance

@@ -71,4 +71,4 @@ class ControllerStateMachine:
                     heading = (nextSubset[1] - nextSubset[0]).theta()
                     self.pointTurnController.initSimulation(self.robotSpecs, heading)
 
-                    return (robotInput, False)
+            return (robotInput, False)

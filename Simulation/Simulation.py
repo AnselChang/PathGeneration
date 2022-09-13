@@ -74,6 +74,7 @@ class Simulation:
 
         # Iterate until robot has reached the destination
         timesteps = 0
+        isDone = False
         while timesteps < 10000 and not isDone: # hard limit of 10000 in case of getting stuck in simulation
 
             # Input robot position to controller and obtain wheel velocities

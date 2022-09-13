@@ -28,4 +28,4 @@ class TestController(AbstractController):
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
         #TODO implement this!
         self.ticks += 1
-        return RobotModelInput(10, 5), self.ticks >= 1000 # repeat 100 times before done
+        return RobotModelInput(10, 5), self.ticks >= 100 # repeat 100 times before done
