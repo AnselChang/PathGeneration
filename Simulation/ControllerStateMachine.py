@@ -68,7 +68,10 @@ class ControllerStateMachine:
                     self.pathController.initSimulation(self.robotSpecs, nextSubset)
 
                     # Set heading for upcoming point turn
-                    heading = (nextSubset[1] - nextSubset[0]).theta()
+                    if (len(nextSubset) >= 2):
+                        heading = (nextSubset[1] - nextSubset[0]).theta()
+                    else:
+                        heading = robotOutput.heading
                     self.pointTurnController.initSimulation(self.robotSpecs, heading)
 
             return (robotInput, False)

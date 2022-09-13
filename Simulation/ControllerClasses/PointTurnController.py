@@ -23,7 +23,7 @@ class PointTurnController(AbstractController):
     # To be called at the start of a simulation. Sets waypoints and initial state
     def initSimulation(self, robotSpecs: RobotSpecs, targetHeading: float):
         self.robotSpecs = robotSpecs
-        self.targetHeading: float = targetHeading
+        self.targetHeading: float = 0#targetHeading
 
     # nothing else needed to init
     def initController(self):
@@ -33,7 +33,7 @@ class PointTurnController(AbstractController):
     # Simple non-blocking P control to desired heading
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
           
-        K_p = -2
+        K_p = 5
 
-        error = (self.targetHeading - output.heading) * K_p
-        return RobotModelInput(error, -error), abs(error) < 0.055 # in radians, roughly 3 degrees of tolerance
+        error = (output.heading - self.targetHeading) * K_p
+        return RobotModelInput(error, -error), abs(error) < 0.03 # in radians, roughly 3 degrees of tolerance

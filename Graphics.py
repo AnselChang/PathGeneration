@@ -76,11 +76,12 @@ def drawPolarTriangle(screen, color, x, y, theta, r1, r2Scalar, a):
     y3 = y + r2Scalar * r1 * math.sin(theta)
     drawTriangle(screen, color, x1, y1, x2, y2, x3, y3)
 
-def drawPolygon(screen, color, points, width = 1):
-    width = round(width)
+# Draw filled polygon given list of points
+def drawPolygon(screen: pygame.Surface, color: tuple, points: list[tuple]):
+
+    pygame.gfxdraw.filled_polygon(screen, points, color)
     pygame.gfxdraw.aapolygon(screen, points, color)
-    if width > 1:
-        pygame.draw.polygon(screen, color, points, width = width)
+
 
 def drawLine(screen: pygame.Surface, color: tuple, x1: int, y1: int, x2: int, y2: int, thickness: int = 1):
 
