@@ -2,7 +2,7 @@ from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from RobotSpecs import RobotSpecs
-import math
+import math, Utility
 import numpy as np
 
 """
@@ -19,9 +19,24 @@ class ComplexRobotModel(AbstractRobotModel):
 
         self.deltaX, self.deltaY = 0,0
         self.xVelocity, self.yVelocity = 0,0
+        self.leftVelocity, self.rightVelocity = 0,0
 
     # We account for slipping from self.robotSpecs friction coefficients
     def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
+
+        # Clamp velocities within realistic range
+        input.leftVelocity = Utility.clamp(input.leftVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
+        input.rightVelocity = Utility.clamp(input.rightVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
+
+        # Limit the acceleration of the robot to robotSpecs.maximumAcceleration
+        input.leftVelocity = Utility.clamp(input.leftVelocity, self.leftVelocity - 
+        self.robotSpecs.maximumAcceleration, self.leftVelocity + self.robotSpecs.maximumAcceleration)
+        input.rightVelocity = Utility.clamp(input.rightVelocity, self.rightVelocity - 
+        self.robotSpecs.maximumAcceleration, self.rightVelocity + self.robotSpecs.maximumAcceleration)
+
+        # Store the left and right velocities for the next tick
+        self.leftVelocity = input.leftVelocity
+        self.rightVelocity = input.rightVelocity
 
         # Save the start locations to calculate the change in position later
         prevX, prevY = self.xPosition, self.yPosition
