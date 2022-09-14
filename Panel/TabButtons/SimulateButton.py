@@ -1,14 +1,14 @@
 from SingletonState.SoftwareState import SoftwareState, Mode
 from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
-from Simulation.Waypoints import Waypoints
+from Simulation.InterpolatedPoints import InterpolatedPoints
 from SingletonState.ReferenceFrame import PointRef
 import Utility, pygame, Graphics
 
 # Button on panel to select simulate mode
 class SimulateButton(ToggleButton):
 
-    def __init__(self, state: SoftwareState, waypoints: Waypoints):
+    def __init__(self, state: SoftwareState, waypoints: InterpolatedPoints):
         self.softwareState = state
         self.waypoints = waypoints
         self.tooltipEnabled = Tooltip("Tune parameters for path following on the virtual", "robot, and simulate path following algorithms")

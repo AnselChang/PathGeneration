@@ -1,4 +1,4 @@
-from Simulation.Waypoints import Waypoints
+from Simulation.InterpolatedPoints import InterpolatedPoints
 from Simulation.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from Simulation.RobotModels.SimpleRobotModel import SimpleRobotModel
@@ -10,6 +10,7 @@ from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerManager import ControllerManager
 from SingletonState.FieldTransform import FieldTransform
 from Simulation.RobotDrawing import RobotDrawing
+from Simulation.Waypoint import Waypoint
 from SingletonState.SoftwareState import SoftwareState
 from VisibleElements.FullPath import FullPath
 from RobotSpecs import RobotSpecs
@@ -59,7 +60,7 @@ class Simulation:
         # we're running a new simulation now, so delete the data from the old one
         self.recordedSimulation.clear() 
 
-        waypoints: Waypoints = self.path.waypoints
+        waypoints: list[list[Waypoint]] = self.path.waypoints.convertToWaypoints()
 
         # Set up the controller state machine that alternates between path following and point turn controllers
         controllerSM = ControllerStateMachine(self.robotSpecs, waypoints, self.controllers.getController())
