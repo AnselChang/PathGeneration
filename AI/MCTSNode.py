@@ -40,11 +40,22 @@ class MCTSNode:
     def getUCT(self):
 
         if self.numSimulations == 0:
-            return 0.5
+            return math.inf
 
-        exploitation =  MCTSNode.globalShortestDistance / self.globalShortestDistance
-        exploration = math.sqrt(math.log(self.numSimulations) / MCTSNode.totalSimulations)
-        return exploitation * MCTSNode.EXPLORATION_FACTOR * exploration
+        exploitation =  1000 - self.shortestFullDistance
+        exploration = math.sqrt(math.log(MCTSNode.totalSimulations) / self.numSimulations)
+        return exploitation + MCTSNode.EXPLORATION_FACTOR * exploration
+
+    def getExploitation(self):
+        if self.numSimulations == 0:
+            return -1
+
+        return MCTSNode.globalShortestDistance / self.globalShortestDistance
+
+    def getExplroation(self):
+        if self.numSimulations == 0:
+            return math.inf
+        return math.sqrt(math.log(self.numSimulations) / MCTSNode.totalSimulations)
 
 
     # Only called on top-leveled node. Selects a leaf node based on highest UTC value
@@ -101,19 +112,34 @@ class MCTSNode:
             # Otherwise, backpropagate up!
             self.parent.backpropagate(fullDistance)
 
-    # Get the best child in terms of shortest path of the current object
-    def getBestChild(self) -> 'MCTSNode':
+    # Get best leaf node so far
+    def getBestNode(self) -> 'MCTSNode':
+
+        if self.leaf():
+            return self
+
+        bestDistance = math.inf
+        best = None
         for child in self.children:
-            if child.shortestFullDistance == MCTSNode.globalShortestDistance:
-                return child
+            if child.shortestFullDistance <= bestDistance:
+                bestDistance = child.shortestFullDistance
+                best = child
+        
+        return best.getBestNode()
+
+    def leaf(self):
+        return len(self.children) == 0
 
     def __str__(self) -> str:
         return "MCTSNode ({})".format(self.discID)
 
     def tree(self):
         s = "\t" * self.depth
-        s += "{} {}".format(self.discID, self.numSimulations)
+        s += "{} {} {}".format(self.discID, self.numSimulations,  self.shortestFullDistance)
         print(s)
+
+        if self.depth == 3:
+            return
 
         for child in self.children:
             child.tree()

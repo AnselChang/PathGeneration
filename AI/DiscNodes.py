@@ -12,7 +12,7 @@ class DiscNodes:
 
         self.initDiscs(transform)
 
-        self.bestChild = None
+        self.bestLeafNode = None
 
         self.treeMCTS = MCTSNode()
         
@@ -31,16 +31,28 @@ class DiscNodes:
 
     def MCTS(self):
 
-        for i in range(3):
+        for i in range(10000):
             selectedNode: MCTSNode = self.treeMCTS.selectNode()
             #print("MCTS EXPANDING NODE", selectedNode.discID, selectedNode.depth, selectedNode.getUCT(), selectedNode.numSimulations)
+
             selectedNode.expandNode(self.discs)
-            simulationNode = selectedNode.children[0]
-            distance = self.rollout(simulationNode.childArray.copy(), simulationNode.discID, simulationNode.startDistance)
-            selectedNode.backpropagate(distance)
+
+            if len(selectedNode.children) == 0:
+                # if reached a terminal leaf, backpropagate immediately
+
+                selectedNode.backpropagate(selectedNode.startDistance)
+            else:
+                # Otherwise, perform a rollout
+                simulationNode = selectedNode.children[0]
+                distance = self.rollout(simulationNode.childArray.copy(), simulationNode.discID, simulationNode.startDistance)
+                selectedNode.backpropagate(distance)
+            
         self.treeMCTS.tree()
-        self.bestChild: MCTSNode = self.treeMCTS.getBestChild()
         
+        self.bestLeafNode: MCTSNode = self.treeMCTS.getBestNode()
+        print(self.bestLeafNode)
+        print(self.bestLeafNode.shortestFullDistance)
+        print(MCTSNode.globalShortestDistance, "with exploration factor", MCTSNode.EXPLORATION_FACTOR)        
 
 
     # Rollout policy is simply to select the closest unvisited disc 
@@ -80,20 +92,17 @@ class DiscNodes:
     def draw(self, screen: pygame.Surface):
 
         # Draw AI stuff if MCTS has computed
-        if self.bestChild is not None:
+        if self.bestLeafNode is not None:
 
             color = Graphics.ColorCycle(0.03)
 
             # Draw disc path from self.child
-            index = 0
-            pos1 = self.discs[index].position.screenRef
-            while True:
-                index = self.bestChild[index]
-                if index == -1:
-                    break
-                pos2 = self.discs[index].position.screenRef
+            node = self.bestLeafNode
+            while node.parent is not None:
+                pos1 = self.discs[node.discID].position.screenRef
+                pos2 = self.discs[node.parent.discID].position.screenRef
                 Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
-                pos1 = pos2
+                node = node.parent
 
         # Draw discs
         for disc in self.discs:
