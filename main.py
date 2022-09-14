@@ -86,8 +86,9 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     # Draw the vex field
     fieldSurface.draw(screen)
 
-    # Draw the entire path with segments and PathPoints
-    path.draw(screen, state)
+    if state.mode == Mode.EDIT or state.mode == Mode.SIMULATE or state.mode == Mode.ROBOT:
+        # Draw the entire path with segments and PathPoints
+        path.draw(screen, state)
 
     # Draw PathPoint shadow at mouse
     if state.mode == Mode.EDIT and state.objectDragged is None and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
@@ -98,17 +99,16 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     pygame.draw.rect(screen, colors.PANEL_GREY, [Utility.SCREEN_SIZE + border, 0, Utility.PANEL_WIDTH - border, Utility.SCREEN_SIZE])
     pygame.draw.rect(screen, colors.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
 
+    if state.mode == Mode.AI:
+        discNodes.draw(screen)
+    
     # Draw panel buttons
     panel.draw(screen)
 
     # Draw a tooltip if there is one
     if state.objectHovering is not None and isinstance(state.objectHovering, TooltipOwner):
         state.objectHovering.drawTooltip(screen, userInput.mousePosition.screenRef)
-
-    if state.mode == Mode.AI:
-        discNodes.draw(screen)
-
-    # print(state.objectHovering is not None, state.objectDragged is not None)
+        
     pygame.display.update()
 
 

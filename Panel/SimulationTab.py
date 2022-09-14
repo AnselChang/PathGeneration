@@ -2,7 +2,7 @@ from Panel.AbstractTab import AbstractTab
 from Panel.UIButtons.LeftButton import LeftButton
 from Panel.UIButtons.RightButton import RightButton
 from Panel.UIButtons.SimulationOnOffButton import SimulationOnOffButton
-from SingletonState.SoftwareState import SoftwareState
+from SingletonState.SoftwareState import SoftwareState, Mode
 from MouseInterfaces.Hoverable import Hoverable
 from typing import Iterator
 from Simulation.Simulation import Simulation
@@ -19,6 +19,7 @@ class SimulationTab(AbstractTab):
 
     def __init__(self, state: SoftwareState, simulation: Simulation):
         self.simulation = simulation
+        self.state = state
 
         self.leftButton: LeftButton = LeftButton(simulation.controllers)
         self.rightButton: RightButton = RightButton(simulation.controllers)
@@ -26,12 +27,15 @@ class SimulationTab(AbstractTab):
 
     # If space key pressed, toggle play button.
     # If left or right key pressed, scrub one frame for simulation
+    # Esc to exit back to edit mode
     def handleKeyboardInput(self, keyJustPressed):
         if keyJustPressed == pygame.K_SPACE:
             self.playButton.toggleButton()
         elif keyJustPressed == pygame.K_LEFT or keyJustPressed == pygame.K_RIGHT:
             self.simulation.moveSlider(1 if keyJustPressed == pygame.K_RIGHT else -1)
             self.playButton.state.playingSimulation = False
+        elif keyJustPressed == pygame.K_ESCAPE:
+            self.state.mode = Mode.EDIT
 
     # A generator for all the hoverable UI objects
     def getHoverables(self) -> Iterator[Hoverable]:

@@ -1,4 +1,25 @@
-import pygame, math, Utility, colors, numpy
+import pygame, math, Utility, colors, colorsys
+
+
+"""
+A class that cycles through each hue gradually through next(), which returns a color
+"""
+class ColorCycle:
+    def __init__(self, rate: float = 0.05, brightness: float = 0.5):
+        self.rate = rate
+        self.brightness: float = 0.5
+
+        self.hue: float = 0
+
+    def _hsv2rgb(self, h,s,v):
+        return tuple(round(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
+
+    # Return the next color
+    def next(self) -> tuple:
+        self.hue += self.rate
+        return self._hsv2rgb(self.hue, self.brightness, self.brightness)
+
+
 
 FONT20 = pygame.font.SysFont('Corbel', 20)
 FONT30 = pygame.font.SysFont('Corbel', 30)

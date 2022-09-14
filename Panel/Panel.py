@@ -29,7 +29,7 @@ class Panel:
         ]
 
         self.aiTab: AITab.AITab = AITab.AITab()
-        self.editTab: EditTab.EditTab = EditTab.EditTab()
+        self.editTab: EditTab.EditTab = EditTab.EditTab(state, path)
         self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(state, simulation)
         self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(simulation)
         self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab()
