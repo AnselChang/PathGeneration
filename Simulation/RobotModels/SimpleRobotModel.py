@@ -2,7 +2,7 @@ from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from RobotSpecs import RobotSpecs
-import math
+import math, Utility
 
 """
 Inaccurate kinematic model of robot that adheres to physics. We simulate the robot's position and velocity over time, given
@@ -21,6 +21,10 @@ class SimpleRobotModel(AbstractRobotModel):
 
     # In the simple robot model, we assume no slipping.
     def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
+
+        # Clamp velocities within realistic range
+        input.leftVelocity = Utility.clamp(input.leftVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
+        input.rightVelocity = Utility.clamp(input.rightVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
 
         oldDeltaX, oldDeltaY = self.deltaX, self.deltaY
 

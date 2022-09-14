@@ -10,6 +10,10 @@ An interface that defines the methods needed to integrate UI into a tab (aka mod
 
 class AbstractTab(ABC):
 
+    # By default, nothing happens when handling keyboard import. Subclasses may overload this
+    def handleKeyboardInput(self, keyJustPressed):
+        pass
+
     # A generator for all the hoverable UI objects
     @abstractmethod
     def getHoverables(self) -> Iterator[Hoverable]:

@@ -148,28 +148,32 @@ class VectorRef:
     def theta(self) -> float:
         return math.atan2(self._vyf, self._vxf)
 
+    # Returns an new vector that is rotated counterclockwise the specified theta in radians
+    # Does not modify the current object
+    def rotate(self, theta: float) -> 'VectorRef':
+        ct = math.cos(theta)
+        st = math.sin(theta)
+        x2 = ct * self._vxf - st * self._vyf
+        y2 = st * self._vxf + ct * self._vyf
+        return VectorRef(self.transform, Ref.FIELD, (x2, y2))
+
     # Does not modify the current object but creates a new object with a magnitude of 1
     def normalize(self) -> 'VectorRef':
         mag = self.magnitude(Ref.FIELD)
         return VectorRef(self.transform, Ref.FIELD, Utility.divideTuple(self.fieldRef, mag))
 
+    # Vector addition. Does not modify but returns new VectorRef
     def __add__(self, other: 'VectorRef') -> 'VectorRef':
         return VectorRef(self.transform, Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))
 
+    # Vector subtraction. Does not modify but returns new VectorRef
     def __sub__(self, other: 'VectorRef') -> 'VectorRef':
         return VectorRef(self.transform, Ref.FIELD, Utility.subtractTuples(self.fieldRef, other.fieldRef))
 
+    # Scales vector by some scalar. Does not modify but returns new VectorRef
     def __mul__(self, scalar: float) -> 'VectorRef':
         return VectorRef(self.transform, Ref.FIELD, Utility.scaleTuple(self.fieldRef, scalar))
 
-
-# Return a new PointRef object that translates the given PointRef by deltaPosition given by the referenceFrame (field/screen)
-# Does not modify existing PointRef
-def translateByVector(point: PointRef, deltaPosition: tuple, referenceFrame: Ref) -> PointRef:
-
-    oldPosition = point.get(referenceFrame)
-    newPosition: tuple = (oldPosition[0] + deltaPosition[0], oldPosition[1] + deltaPosition[1])
-    return PointRef(point.transform, referenceFrame, newPosition)
 
 # Testing code
 if __name__ == "__main__":

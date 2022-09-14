@@ -137,3 +137,10 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
         changed = state.objectDragged.beDraggedByMouse(userInput)
         if changed and (isinstance(state.objectDragged, Point)):
             state.recomputeInterpolation = True
+
+        # if an object is being dragged it always takes precedence over any object that might be "hovering"
+        if state.objectHovering is not state.objectDragged:
+            if state.objectHovering is not None:
+                state.objectHovering.resetHoverableObject()
+            state.objectHovering = state.objectDragged
+            state.objectHovering.setHoveringObject()

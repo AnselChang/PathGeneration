@@ -29,7 +29,7 @@ class Panel:
         ]
 
         self.aiTab: AITab.AITab = AITab.AITab()
-        self.editTab: EditTab.EditTab = EditTab.EditTab()
+        self.editTab: EditTab.EditTab = EditTab.EditTab(state, path)
         self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(state, simulation)
         self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(simulation)
         self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab()
@@ -46,6 +46,11 @@ class Panel:
             return self.robotTab
         else:
             return self.odomTab
+
+    def handleKeyboardInput(self, keyJustPressed):
+        if keyJustPressed is not None:
+            self.getTab(self.state.mode).handleKeyboardInput(keyJustPressed)
+
 
     # Returns a generator of all the hoverable objects for the panel
     def getHoverables(self) -> Iterator[Hoverable]:

@@ -5,6 +5,8 @@ from Sliders.Slider import Slider
 
 from typing import Tuple
 
+from Utility import map_range
+
 """
 A dummy controller that sets the velocities of the wheels to something in order to test other features of the software
 """
@@ -28,4 +30,11 @@ class TestController(AbstractController):
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
         #TODO implement this!
         self.ticks += 1
-        return RobotModelInput(10, 5), self.ticks >= 1000 # repeat 100 times before done
+        if self.ticks <= 50: # first 100 ticks, go straight
+            return [RobotModelInput(20, 20), False]
+        elif self.ticks <=80: # then turn left but slowly come to a stop
+            return [RobotModelInput(map_range(self.ticks,50,80,20,0), 0), False]
+        elif self.ticks <= 120: # let the robot slide with no power
+            return [RobotModelInput(0, 0), False]
+        else: # next 100 ticks, stop
+            return [RobotModelInput(10, 10), True]

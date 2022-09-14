@@ -20,7 +20,7 @@ class AIButton(ToggleButton):
         super().__init__(position, imageOff, imageHovered, imageOn)
 
     # EditButton only ever has one tooltip message to draw
-    def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
+    def drawTooltip(self, screen: pygame.Surface, mousePosition: tuple) -> None:
         self.tooltip.draw(screen, mousePosition)
 
     # Implementing ToggleButton function

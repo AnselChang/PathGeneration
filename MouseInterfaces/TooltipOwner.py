@@ -11,5 +11,5 @@ class TooltipOwner(ABC):
 
     # Classes implementing TooltipOwner must implement this and draw the tooltip
     @abstractmethod
-    def drawTooltip(self, screen: pygame.Surface, mousePosition: PointRef) -> None:
+    def drawTooltip(self, screen: pygame.Surface, mousePosition: tuple) -> None:
         pass
