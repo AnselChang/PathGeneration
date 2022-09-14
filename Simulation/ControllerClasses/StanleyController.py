@@ -1,3 +1,4 @@
+from xml.etree.ElementTree import PI
 from Simulation.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModelOutput import RobotModelOutput
@@ -30,7 +31,7 @@ class StanleyController(AbstractController):
         #TODO implement this!
         self.ticks += 1
         kp = 0.01
-        headingError = 45 - output.heading
-        leftVelocity = 5 - kp*headingError
-        rightVelocity = 5 + kp*headingError
-        return RobotModelInput(leftVelocity, rightVelocity), self.ticks >= 1000 # repeat 100 times before done
+        positionError = output.position._getFieldRef()
+        if(positionError[1]/positionError[0] - output.heading/180*PI > PI/8): #If angle error is large enough
+            return RobotModelInput(0,1), False # turn to face 0,0
+        return RobotModelInput(0, 0), positionError[0] < 0.1 and positionError[1] < 0.1 # repeat 100 times before done
