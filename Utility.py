@@ -75,38 +75,3 @@ def pointOnLineClosestToPoint(pointX: int, pointY: int, firstX: int, firstY: int
     scalar = (ax * bx + ay * by) / (bx * bx + by * by)
     return [firstX + scalar * bx, firstY + scalar * by]
 
-FONT20 = pygame.font.SysFont('Corbel', 20)
-FONT30 = pygame.font.SysFont('Corbel', 30)
-FONT40 = pygame.font.SysFont('Corbel', 40)
-
-def getFont(size):
-    if size < 25:
-        return FONT20
-    elif size < 35:
-        return FONT30
-    else:
-        return FONT40
-
-# align = 0 -> align left/top
-# align = 0.5 -> align mid
-# align = 1 -> align right/bottom
-def drawText(surface: pygame.Surface, font: pygame.font, string: str, color: tuple, x: int, y: int, alignX: float = 0.5, alignY: float = 0.5):
-    text = font.render(string, True, color)
-    surface.blit(text, [x - text.get_width()*alignX, y - text.get_height()*alignY])
-
-def drawThinLine(screen: pygame.Surface, color: tuple, x1: int, y1: int, x2: int, y2: int):
-    pygame.draw.aaline(screen, color, (x1,y1), (x2,y2))
-
-def drawCircle(screen: pygame.Surface, x: int, y: int, color: tuple, radius: int, alpha: int = 255):
-    x = int(x)
-    y = int(y)
-    radius = int(radius)
-    if alpha == 255:
-        pygame.gfxdraw.aacircle(screen, x, y, radius, color)
-        pygame.draw.circle(screen, color, (x,y), radius)
-    else:
-        surface = pygame.Surface([radius*2, radius*2], pygame.SRCALPHA)
-        pygame.gfxdraw.aacircle(surface, radius, radius, radius, (*color, alpha))
-        pygame.draw.circle(surface, (*color, alpha), (radius, radius), radius)
-        screen.blit(surface, (x - radius, y - radius))
-

@@ -66,7 +66,7 @@ class PathPoint(Point):
         position = self.position.screenRef
         color: tuple = colors.ORANGE if self.shape == Shape.SHARP else colors.GREEN
         super().draw(screen, position, color) # draw circle
-        Utility.drawText(screen, Graphics.FONT20, str(index), colors.BLACK, *position)
+        Graphics.drawText(screen, Graphics.FONT20, str(index), colors.BLACK, *position)
 
 
     def __str__(self):

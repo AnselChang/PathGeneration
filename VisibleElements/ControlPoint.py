@@ -3,7 +3,7 @@ from SingletonState.FieldTransform import FieldTransform
 from SingletonState.UserInput import UserInput
 from VisibleElements.Point import Point, Shape
 from SingletonState.ReferenceFrame import VectorRef, Ref
-import Utility, colors, pygame
+import Utility, colors, pygame, Graphics
 
 """
 A control point is associated with a PathPoint and determines the beizer curve shape about that point
@@ -63,7 +63,7 @@ class ControlPoint(Point):
         self.cachePosition = (self.parent.position + self.vector).screenRef
 
         # Draw line to parent to show ownership
-        Utility.drawThinLine(screen, colors.BLUE, *self.cachePosition, *self.parent.position.screenRef)
+        Graphics.drawThinLine(screen, colors.BLUE, *self.cachePosition, *self.parent.position.screenRef)
 
     def draw(self, screen: pygame.Surface):
         

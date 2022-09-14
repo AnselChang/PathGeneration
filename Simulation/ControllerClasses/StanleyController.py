@@ -20,7 +20,7 @@ class StanleyController(AbstractController):
         #TODO define the tunable parameters of this controller
         pass
 
-    # nothing else needed to init for now
+    # init whatever is needed at the start of each path
     def initController(self):
         pass
 

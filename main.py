@@ -14,7 +14,7 @@ from AI.DiscNodes import DiscNodes
 from RobotSpecs import RobotSpecs
 import Utility, colors
 from typing import Iterator
-
+import Graphics
 
 
 # All the global singleton objects
@@ -92,7 +92,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
 
     # Draw PathPoint shadow at mouse
     if state.mode == Mode.EDIT and state.objectDragged is None and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
-        Utility.drawCircle(screen, *shadowPointRef.screenRef, colors.GREEN, 10, 140)
+        Graphics.drawCircle(screen, *shadowPointRef.screenRef, colors.GREEN, 10, 140)
             
     # Draw panel background
     border = 5

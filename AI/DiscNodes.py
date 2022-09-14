@@ -12,7 +12,10 @@ class DiscNodes:
 
         self.initDiscs(transform)
 
+        self.bestChild = None
+
         self.treeMCTS = MCTSNode()
+        
         self.MCTS()
 
     # Initialize the disc list by creating disc objects at each location and specifying their coordinates
@@ -28,14 +31,16 @@ class DiscNodes:
 
     def MCTS(self):
 
-        for i in range(1000):
+        for i in range(3):
             selectedNode: MCTSNode = self.treeMCTS.selectNode()
+            #print("MCTS EXPANDING NODE", selectedNode.discID, selectedNode.depth, selectedNode.getUCT(), selectedNode.numSimulations)
             selectedNode.expandNode(self.discs)
-            simulationNode = selectedNode.childArray[0]
+            simulationNode = selectedNode.children[0]
             distance = self.rollout(simulationNode.childArray.copy(), simulationNode.discID, simulationNode.startDistance)
             selectedNode.backpropagate(distance)
-
-        best: MCTSNode = self.treeMCTS.getBestChild()
+        self.treeMCTS.tree()
+        self.bestChild: MCTSNode = self.treeMCTS.getBestChild()
+        
 
 
     # Rollout policy is simply to select the closest unvisited disc 
@@ -74,19 +79,23 @@ class DiscNodes:
     # Draw each disc
     def draw(self, screen: pygame.Surface):
 
-        color = Graphics.ColorCycle(0.03)
+        # Draw AI stuff if MCTS has computed
+        if self.bestChild is not None:
 
-        # Draw disc path from self.child
-        index = 0
-        pos1 = self.discs[index].position.screenRef
-        while True:
-            index = self.bestChild[index]
-            if index == -1:
-                break
-            pos2 = self.discs[index].position.screenRef
-            Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
-            pos1 = pos2
+            color = Graphics.ColorCycle(0.03)
+
+            # Draw disc path from self.child
+            index = 0
+            pos1 = self.discs[index].position.screenRef
+            while True:
+                index = self.bestChild[index]
+                if index == -1:
+                    break
+                pos2 = self.discs[index].position.screenRef
+                Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
+                pos1 = pos2
 
         # Draw discs
         for disc in self.discs:
             disc.draw(screen)
+
