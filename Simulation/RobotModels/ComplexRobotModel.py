@@ -18,22 +18,24 @@ class ComplexRobotModel(AbstractRobotModel):
         super().__init__(robotSpecs, start)
 
         self.deltaX, self.deltaY = 0,0
+        self.xVelocity, self.yVelocity = 0,0
 
     # We account for slipping from self.robotSpecs friction coefficients
     def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
 
-        print("Starting position: ", self.xPosition, self.yPosition, self.heading)
-
-        radius: float = 0
-        omega: float = 0
-
+        # Save the start locations to calculate the change in position later
+        prevX, prevY = self.xPosition, self.yPosition
+        
         if(input.leftVelocity == input.rightVelocity):
             # Special case where we have no rotation
             # radius = "INFINITE"
             # omega = 0
             velocity = input.leftVelocity # left and right velocities are the same
             distance = velocity * self.robotSpecs.timestep
-            return RobotModelOutput(self.xPosition+distance*math.cos(self.heading), self.yPosition+distance*math.sin(self.heading), self.heading)
+
+            self.xPosition = self.xPosition + distance * math.cos(self.heading)
+            self.yPosition = self.yPosition + distance * math.sin(self.heading)
+            self.heading = self.heading # no change in heading
             
         else:   
             # Normal case where we have rotation
@@ -44,12 +46,10 @@ class ComplexRobotModel(AbstractRobotModel):
             
             # Calculate the angular velocity of the robot about the center of the circle
             omega = (input.rightVelocity-input.leftVelocity)/self.robotSpecs.trackWidth
-            # print("omega: ", omega)
         
             # Calculate the center of the circle we are turning on (Instantaneous center of curvature)
             icc = np.array([self.xPosition - radius*math.sin(self.heading),
             self.yPosition + radius*math.cos(self.heading)])
-            # print(icc)
 
             # Calculate the new position of the robot after the timestep
 
@@ -77,7 +77,28 @@ class ComplexRobotModel(AbstractRobotModel):
             self.yPosition = outputMatrix[1][0]
             self.heading = outputMatrix[2][0]
 
-            return RobotModelOutput(self.xPosition, self.yPosition, self.heading)
+        # Unit vector in the direction of the robot's heading
+        robotHeadingVector = np.array([math.cos(self.heading), math.sin(self.heading)])
+
+        # Vector for the robot's velocity from the last timestep
+        robotVelocityVector = np.array([self.xVelocity, self.yVelocity])
+
+        # Calculate the lateral velocity of the robot
+        lateralVelocity = np.cross(robotHeadingVector, robotVelocityVector)
+        
+        #Find the x and y components of the lateral velocity
+        lateralX = lateralVelocity * math.cos(self.heading + math.pi/2)
+        lateralY = lateralVelocity * math.sin(self.heading + math.pi/2)
+        
+        # Add the slip multiplied by friction coefficient
+        self.xPosition += lateralX * (1-self.robotSpecs.lateralFriction)
+        self.yPosition += lateralY * (1-self.robotSpecs.lateralFriction)
+
+        # Calculate the velocity of the robot after the timestep
+        self.xVelocity = self.xPosition - prevX
+        self.yVelocity = self.yPosition - prevY
+
+        return RobotModelOutput(self.xPosition, self.yPosition, self.heading)
 
         
 
