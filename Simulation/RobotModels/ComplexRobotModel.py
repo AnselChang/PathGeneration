@@ -19,6 +19,7 @@ class ComplexRobotModel(AbstractRobotModel):
 
         self.deltaX, self.deltaY = 0,0
         self.xVelocity, self.yVelocity = 0,0
+        self.angularVelocity = 0
         self.leftVelocity, self.rightVelocity = 0,0
 
     # We account for slipping from self.robotSpecs friction coefficients
@@ -44,7 +45,7 @@ class ComplexRobotModel(AbstractRobotModel):
         if(input.leftVelocity == input.rightVelocity):
             # Special case where we have no rotation
             # radius = "INFINITE"
-            # omega = 0
+            omega = 0
             velocity = input.leftVelocity # left and right velocities are the same
             distance = velocity * self.robotSpecs.timestep
 
@@ -112,8 +113,9 @@ class ComplexRobotModel(AbstractRobotModel):
         # Calculate the velocity of the robot after the timestep
         self.xVelocity = self.xPosition - prevX
         self.yVelocity = self.yPosition - prevY
+        self.angularVelocity = omega
 
-        return RobotModelOutput(self.xPosition, self.yPosition, self.heading)
+        return RobotModelOutput(self.xPosition, self.yPosition, self.heading, self.leftVelocity, self.rightVelocity, self.xVelocity, self.yVelocity, self.angularVelocity)
 
         
 
