@@ -1,6 +1,6 @@
 from Simulation.ControllerClasses.AbstractController import AbstractController
 from Simulation.ControllerClasses.PointTurnController import PointTurnController
-from Simulation.Waypoints import Waypoints
+from Simulation.Waypoint import Waypoint
 from Simulation.RobotModelInput import RobotModelInput
 from Simulation.RobotModelOutput import RobotModelOutput
 from RobotSpecs import RobotSpecs
@@ -15,17 +15,17 @@ all the logic switching between the selected controller and the point turn contr
 
 class ControllerStateMachine:
 
-    def __init__(self, robotSpecs: RobotSpecs, waypoints: Waypoints, pathController: AbstractController):
+    def __init__(self, robotSpecs: RobotSpecs, waypoints: list[list[Waypoint]], pathController: AbstractController):
 
         self.robotSpecs = robotSpecs
-        self.waypoints: Waypoints =  waypoints
+        self.waypoints: list[list[Waypoint]] =  waypoints
         self.pathController: AbstractController = pathController
         self.pointTurnController: PointTurnController = PointTurnController()
 
         self.segmentIndex = 0 # which segment of waypoints the controller is on
 
         # Initialize path controller with first path segment
-        self.pathController.initSimulation(self.robotSpecs, self.waypoints.waypoints[0])
+        self.pathController.initSimulation(self.robotSpecs, self.waypoints[0])
 
         self.isPointTurn = False
 
@@ -56,7 +56,7 @@ class ControllerStateMachine:
             # If at last waypoint segment, then return true for exiting. Otherwise, go on to point turn
             if isDone:
 
-                if self.segmentIndex == len(self.waypoints.waypoints) - 1: # last waypoint segment
+                if self.segmentIndex == len(self.waypoints) - 1: # last waypoint segment
                     return (robotInput, True)
 
                 else: # not last, go to point turn
@@ -64,14 +64,10 @@ class ControllerStateMachine:
 
                     # Get ready for next path segment once point turn ends
                     self.segmentIndex += 1
-                    nextSubset = self.waypoints.waypoints[self.segmentIndex]
+                    nextSubset = self.waypoints.points[self.segmentIndex]
                     self.pathController.initSimulation(self.robotSpecs, nextSubset)
 
                     # Set heading for upcoming point turn
-                    if (len(nextSubset) >= 2):
-                        heading = (nextSubset[1] - nextSubset[0]).theta()
-                    else:
-                        heading = robotOutput.heading
-                    self.pointTurnController.initSimulation(self.robotSpecs, heading)
+                    self.pointTurnController.initSimulation(self.robotSpecs, self.waypoints[self.segmentIndex][0].heading)
 
             return (robotInput, False)

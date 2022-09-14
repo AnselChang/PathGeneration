@@ -5,8 +5,8 @@ from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint, Shape
 from VisibleElements.PathSegment import PathSegment
-from Simulation.Waypoints import Waypoints
-import BezierCurves, Utility, colors, pygame
+from Simulation.InterpolatedPoints import InterpolatedPoints
+import BezierCurves, Utility, colors, pygame, Graphics
 
 
 """Store the full path of the robot. This consists of a list of PathPoint objects, as well as the interpolatedPoint objects
@@ -19,7 +19,7 @@ class FullPath:
         self.transform = transform
         self.pathPoints: list[PathPoint] = [] # The user-defined points
         self.segments: list[PathSegment] = []
-        self.waypoints: Waypoints = Waypoints()
+        self.waypoints: InterpolatedPoints = InterpolatedPoints()
 
         self.INTERPOLATED_POINT_DISTANCE = 0.75 # distance in inches between each interpolated bezier point
 
@@ -93,7 +93,7 @@ class FullPath:
 
         while ns < 1:
             x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
-            self.waypoints.addWaypoint(PointRef(self.transform, Ref.FIELD, (x,y)))
+            self.waypoints.addPoint(PointRef(self.transform, Ref.FIELD, (x,y)))
 
             dxds, dyds = BezierCurves.getBezierGradient(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
             dsdt = self.INTERPOLATED_POINT_DISTANCE / Utility.hypo(dxds, dyds)
@@ -163,7 +163,7 @@ class FullPath:
         radius = 2
         
         for point in self.waypoints.iterator(): # point is a PointRef
-            Utility.drawCircle(screen, *point.screenRef, colors.RED, radius)
+            Graphics.drawCircle(screen, *point.screenRef, colors.RED, radius)
 
     # Draw the path on the screen, including the user-defined points, interpolated points, and segments
     def draw(self, screen: pygame.Surface, state: SoftwareState):

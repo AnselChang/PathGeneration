@@ -12,7 +12,10 @@ class DiscNodes:
 
         self.initDiscs(transform)
 
+        self.bestLeafNode = None
+
         self.treeMCTS = MCTSNode()
+        
         self.MCTS()
 
     # Initialize the disc list by creating disc objects at each location and specifying their coordinates
@@ -28,14 +31,28 @@ class DiscNodes:
 
     def MCTS(self):
 
-        for i in range(1000):
+        for i in range(10000):
             selectedNode: MCTSNode = self.treeMCTS.selectNode()
-            selectedNode.expandNode(self.discs)
-            simulationNode = selectedNode.childArray[0]
-            distance = self.rollout(simulationNode.childArray.copy(), simulationNode.discID, simulationNode.startDistance)
-            selectedNode.backpropagate(distance)
+            #print("MCTS EXPANDING NODE", selectedNode.discID, selectedNode.depth, selectedNode.getUCT(), selectedNode.numSimulations)
 
-        best: MCTSNode = self.treeMCTS.getBestChild()
+            selectedNode.expandNode(self.discs)
+
+            if len(selectedNode.children) == 0:
+                # if reached a terminal leaf, backpropagate immediately
+
+                selectedNode.backpropagate(selectedNode.startDistance)
+            else:
+                # Otherwise, perform a rollout
+                simulationNode = selectedNode.children[0]
+                distance = self.rollout(simulationNode.childArray.copy(), simulationNode.discID, simulationNode.startDistance)
+                selectedNode.backpropagate(distance)
+            
+        self.treeMCTS.tree()
+        
+        self.bestLeafNode: MCTSNode = self.treeMCTS.getBestNode()
+        print(self.bestLeafNode)
+        print(self.bestLeafNode.shortestFullDistance)
+        print(MCTSNode.globalShortestDistance, "with exploration factor", MCTSNode.EXPLORATION_FACTOR)        
 
 
     # Rollout policy is simply to select the closest unvisited disc 
@@ -74,19 +91,20 @@ class DiscNodes:
     # Draw each disc
     def draw(self, screen: pygame.Surface):
 
-        color = Graphics.ColorCycle(0.03)
+        # Draw AI stuff if MCTS has computed
+        if self.bestLeafNode is not None:
 
-        # Draw disc path from self.child
-        index = 0
-        pos1 = self.discs[index].position.screenRef
-        while True:
-            index = self.bestChild[index]
-            if index == -1:
-                break
-            pos2 = self.discs[index].position.screenRef
-            Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
-            pos1 = pos2
+            color = Graphics.ColorCycle(0.03)
+
+            # Draw disc path from self.child
+            node = self.bestLeafNode
+            while node.parent is not None:
+                pos1 = self.discs[node.discID].position.screenRef
+                pos2 = self.discs[node.parent.discID].position.screenRef
+                Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
+                node = node.parent
 
         # Draw discs
         for disc in self.discs:
             disc.draw(screen)
+

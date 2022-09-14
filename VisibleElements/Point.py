@@ -1,7 +1,7 @@
 from MouseInterfaces.Draggable import Draggable
 from SingletonState.UserInput import UserInput
 from SingletonState.ReferenceFrame import Ref, PointRef
-import Utility, pygame
+import Utility, pygame, Graphics
 from enum import Enum
 
 
@@ -49,4 +49,4 @@ class Point(Draggable):
             color = Utility.scaleTuple(color, 0.7 if self.isDragging else 0.85)
         else:
             radius = self.DRAW_RADIUS
-        Utility.drawCircle(screen, *position, color, radius)
+        Graphics.drawCircle(screen, *position, color, radius)
