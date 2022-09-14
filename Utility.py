@@ -8,7 +8,9 @@ PIXELS_TO_FIELD_CORNER = 19
 FIELD_SIZE_IN_PIXELS = 766
 FIELD_SIZE_IN_INCHES = 144
 
-
+def map_range(x, in_min, in_max, out_min, out_max):
+  return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
+  
 def scaleTuple(nums: tuple, scalar: float):
     return [i * scalar for i in nums]
 

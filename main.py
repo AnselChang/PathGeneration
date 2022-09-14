@@ -108,8 +108,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     # Draw a tooltip if there is one
     if state.objectHovering is not None and isinstance(state.objectHovering, TooltipOwner):
         state.objectHovering.drawTooltip(screen, userInput.mousePosition.screenRef)
-
-    
+        
     pygame.display.update()
 
 
