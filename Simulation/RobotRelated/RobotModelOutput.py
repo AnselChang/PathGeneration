@@ -19,6 +19,8 @@ class RobotModelOutput:
     # xPosition and yPosition in inches
     def __init__(self, xPosition: float, yPosition: float, headingRadians: float, clampedLeftVelocity: float, clampedRightVelocity: float, xVelocity: float = 0, yVelocity: float = 0, angularVelocity: float = 0):
         self.position = PointRef(self.transform, Ref.FIELD, (xPosition, yPosition))
+        self.leftVelocity = clampedLeftVelocity
+        self.rightVelocity = clampedRightVelocity
         self.xVelocity = xVelocity
         self.yVelocity = yVelocity
         self.angularVelocity = angularVelocity

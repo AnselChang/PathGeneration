@@ -1,16 +1,17 @@
 from Simulation.InterpolatedPoints import InterpolatedPoints
-from Simulation.ControllerClasses.AbstractController import AbstractController
+from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from Simulation.RobotModels.SimpleRobotModel import SimpleRobotModel
 from Simulation.RobotModels.ComplexRobotModel import ComplexRobotModel
-from Simulation.ControllerStateMachine import ControllerStateMachine
-from Simulation.RobotModelInput import RobotModelInput
-from Simulation.RobotModelOutput import RobotModelOutput
+from Simulation.ControllerRelated.ControllerStateMachine import ControllerStateMachine
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
-from Simulation.ControllerManager import ControllerManager
+from Simulation.ControllerRelated.ControllerManager import ControllerManager
 from SingletonState.FieldTransform import FieldTransform
-from Simulation.RobotDrawing import RobotDrawing
+from Simulation.RobotRelated.RobotDrawing import RobotDrawing
 from Simulation.Waypoint import Waypoint
+from Simulation.SimulationTimestep import SimulationTimestep
 from Panel.VelocityGUI import VelocityGUI
 from SingletonState.SoftwareState import SoftwareState
 from VisibleElements.FullPath import FullPath
@@ -37,7 +38,7 @@ class Simulation:
         self.robotDrawing = RobotDrawing(transform, robotSpecs.trackWidth)
 
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
-        self.recordedSimulation: list[RobotModelOutput] = []
+        self.recordedSimulation: list[SimulationTimestep] = []
 
         # simuation slider
         self.slider: Slider = Slider(Utility.SCREEN_SIZE + 120, 190, 115, 0, 1, 1, colors.LIGHTBLUE)
@@ -47,7 +48,7 @@ class Simulation:
         self.path = path
         self.robotSpecs = robotSpecs
 
-        self.velocityGUI: VelocityGUI = VelocityGUI(state)
+        self.velocityGUI: VelocityGUI = VelocityGUI(robotSpecs, state)
 
 
     # Return whether there is a simulation stored in this object
@@ -87,10 +88,10 @@ class Simulation:
             robotInput, isDone = controllerSM.runController(output)
 
             # Take in wheel velocities from controller and simulate the robot model for a tick
-            output: RobotModelOutput = robot.simulateTick(robotInput)
+            robotOutput: RobotModelOutput = robot.simulateTick(robotInput)
 
             # Store the robot position at each tick
-            self.recordedSimulation.append(output)
+            self.recordedSimulation.append(SimulationTimestep(timesteps * self.robotSpecs.timestep, robotInput, robotOutput))
 
             # Increment number of timesteps elapsed
             timesteps += 1
@@ -122,6 +123,30 @@ class Simulation:
         index = self.slider.getValue()
         self.slider.setValue(index + amount)
 
+    # return the current SimulationTimestep based on where the slider indicates we are
+    def getCurrent(self) -> SimulationTimestep:
+        return self.recordedSimulation[self.slider.getValue()]
+
+    # Called every tick before draw() to perform all update operations needed
+    # Increments recorded simulation index if playing simulation
+    # Syncs the actual and desired positions of self.velocityGUI
+    def update(self):
+
+        # go to next simulation frame if playing
+        if self.state.playingSimulation:
+            self.moveSlider(1)
+            if self.slider.getValue() >= len(self.recordedSimulation) - 1:
+                self.state.playingSimulation = False
+                self.slider.setValue(0)
+
+        if len(self.recordedSimulation) > 0:
+
+            current: SimulationTimestep = self.getCurrent()
+            self.velocityGUI.setDesiredVelocity(current.input.leftVelocity, current.input.rightVelocity)
+            self.velocityGUI.setActualVelocity(current.output.leftVelocity, current.output.rightVelocity)
+
+
+
     # Draw everything, but only if there is a simulation to draw
     def draw(self, screen: pygame.Surface):
 
@@ -132,13 +157,7 @@ class Simulation:
         self.drawSimulatedPathLine(screen)
         
         # draw the robot at the current timestep specified by slider
-        self.drawRobot(screen, self.recordedSimulation[self.slider.getValue()])
-            
-        # go to next simulation frame if playing
-        if self.state.playingSimulation:
-            self.moveSlider(1)
-            if self.slider.getValue() >= len(self.recordedSimulation) - 1:
-                self.state.playingSimulation = False
-                self.slider.setValue(0)
+        self.drawRobot(screen, self.getCurrent().output)
+        
             
         

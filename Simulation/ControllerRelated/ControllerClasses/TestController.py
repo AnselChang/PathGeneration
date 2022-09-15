@@ -1,6 +1,6 @@
-from Simulation.ControllerClasses.AbstractController import AbstractController
-from Simulation.RobotModelInput import RobotModelInput
-from Simulation.RobotModelOutput import RobotModelOutput
+from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Sliders.Slider import Slider
 
 from typing import Tuple
@@ -30,11 +30,13 @@ class TestController(AbstractController):
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
         #TODO implement this!
         self.ticks += 1
-        if self.ticks <= 50: # first 100 ticks, go straight
+        if self.ticks <= 40: # first 100 ticks, go straight
             return [RobotModelInput(20, 20), False]
         elif self.ticks <=80: # then turn left but slowly come to a stop
-            return [RobotModelInput(map_range(self.ticks,50,80,20,0), 0), False]
-        elif self.ticks <= 120: # let the robot slide with no power
-            return [RobotModelInput(0, 0), False]
+            return [RobotModelInput(10, 30), False]
+        elif self.ticks <= 200: # let the robot slide with no power
+            return [RobotModelInput(-20, -20), False]
+        elif self.ticks <= 400: # let the robot slide with no power
+            return [RobotModelInput(0,0), False]
         else: # next 100 ticks, stop
-            return [RobotModelInput(10, 10), True]
+            return [RobotModelInput(0, 0), True]

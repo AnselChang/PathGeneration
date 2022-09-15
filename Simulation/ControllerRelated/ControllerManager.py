@@ -1,7 +1,7 @@
-from Simulation.ControllerClasses.AbstractController import AbstractController
-from Simulation.ControllerClasses.PurePursuitController import PurePursuitController
-from Simulation.ControllerClasses.StanleyController import StanleyController
-from Simulation.ControllerClasses.TestController import TestController
+from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
+from Simulation.ControllerRelated.ControllerClasses.PurePursuitController import PurePursuitController
+from Simulation.ControllerRelated.ControllerClasses.StanleyController import StanleyController
+from Simulation.ControllerRelated.ControllerClasses.TestController import TestController
 
 """
 Store references to each controller, and manage which controller is currently selected

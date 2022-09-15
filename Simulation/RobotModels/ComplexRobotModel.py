@@ -1,5 +1,5 @@
-from Simulation.RobotModelOutput import RobotModelOutput
-from Simulation.RobotModelInput import RobotModelInput
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from RobotSpecs import RobotSpecs
 import math, Utility

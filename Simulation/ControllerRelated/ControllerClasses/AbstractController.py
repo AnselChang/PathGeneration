@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from SingletonState.ReferenceFrame import PointRef
-from Simulation.RobotModelOutput import RobotModelOutput
-from Simulation.RobotModelInput import RobotModelInput
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.InterpolatedPoints import InterpolatedPoints
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
