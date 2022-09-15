@@ -1,6 +1,6 @@
-from Simulation.ControllerClasses.AbstractController import AbstractController
-from Simulation.RobotModelOutput import RobotModelOutput
-from Simulation.RobotModelInput import RobotModelInput
+from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
 

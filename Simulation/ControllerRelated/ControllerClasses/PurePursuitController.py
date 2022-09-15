@@ -1,7 +1,7 @@
 from re import A
-from Simulation.ControllerClasses.AbstractController import AbstractController
-from Simulation.RobotModelInput import RobotModelInput
-from Simulation.RobotModelOutput import RobotModelOutput
+from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Sliders.Slider import Slider
 
 from typing import Tuple
