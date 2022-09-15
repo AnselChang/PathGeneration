@@ -11,7 +11,7 @@ from Simulation.ControllerManager import ControllerManager
 from SingletonState.FieldTransform import FieldTransform
 from Simulation.RobotDrawing import RobotDrawing
 from Simulation.Waypoint import Waypoint
-from Simulation.VelocityGUI import VelocityGUI
+from Panel.VelocityGUI import VelocityGUI
 from SingletonState.SoftwareState import SoftwareState
 from VisibleElements.FullPath import FullPath
 from RobotSpecs import RobotSpecs
