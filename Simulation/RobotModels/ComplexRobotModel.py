@@ -23,30 +23,31 @@ class ComplexRobotModel(AbstractRobotModel):
         self.leftVelocity, self.rightVelocity = 0,0
 
     # We account for slipping from self.robotSpecs friction coefficients
+    # SHOULD NOT MODIFY input
     def simulateTick(self, input: RobotModelInput) -> RobotModelOutput:
 
         # Clamp velocities within realistic range
-        input.leftVelocity = Utility.clamp(input.leftVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
-        input.rightVelocity = Utility.clamp(input.rightVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
+        clampedLeftVelocity = Utility.clamp(input.leftVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
+        clampedRightVelocity = Utility.clamp(input.rightVelocity, -self.robotSpecs.maximumVelocity, self.robotSpecs.maximumVelocity)
 
         # Limit the acceleration of the robot to robotSpecs.maximumAcceleration
-        input.leftVelocity = Utility.clamp(input.leftVelocity, self.leftVelocity - 
+        clampedLeftVelocity = Utility.clamp(clampedLeftVelocity, self.leftVelocity - 
         self.robotSpecs.maximumAcceleration, self.leftVelocity + self.robotSpecs.maximumAcceleration)
-        input.rightVelocity = Utility.clamp(input.rightVelocity, self.rightVelocity - 
+        clampedRightVelocity = Utility.clamp(clampedRightVelocity, self.rightVelocity - 
         self.robotSpecs.maximumAcceleration, self.rightVelocity + self.robotSpecs.maximumAcceleration)
 
         # Store the left and right velocities for the next tick
-        self.leftVelocity = input.leftVelocity
-        self.rightVelocity = input.rightVelocity
+        self.leftVelocity = clampedLeftVelocity
+        self.rightVelocity = clampedRightVelocity
 
         # Save the start locations to calculate the change in position later
         prevX, prevY = self.xPosition, self.yPosition
         
-        if(input.leftVelocity == input.rightVelocity):
+        if(clampedLeftVelocity == clampedRightVelocity):
             # Special case where we have no rotation
             # radius = "INFINITE"
             omega = 0
-            velocity = input.leftVelocity # left and right velocities are the same
+            velocity = clampedLeftVelocity # left and right velocities are the same
             distance = velocity * self.robotSpecs.timestep
 
             self.xPosition = self.xPosition + distance * math.cos(self.heading)
@@ -57,11 +58,11 @@ class ComplexRobotModel(AbstractRobotModel):
             # Normal case where we have rotation
 
             # Calculate the radius of the circle we are turning on
-            radius = (self.robotSpecs.trackWidth)*((input.leftVelocity+input.rightVelocity)/
-            (input.rightVelocity-input.leftVelocity))
+            radius = (self.robotSpecs.trackWidth)*((clampedLeftVelocity+clampedRightVelocity)/
+            (clampedRightVelocity-clampedLeftVelocity))
             
             # Calculate the angular velocity of the robot about the center of the circle
-            omega = (input.rightVelocity-input.leftVelocity)/self.robotSpecs.trackWidth
+            omega = (clampedRightVelocity-clampedLeftVelocity)/self.robotSpecs.trackWidth
         
             # Calculate the center of the circle we are turning on (Instantaneous center of curvature)
             icc = np.array([self.xPosition - radius*math.sin(self.heading),

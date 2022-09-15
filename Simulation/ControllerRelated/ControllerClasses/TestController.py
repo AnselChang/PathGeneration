@@ -36,7 +36,7 @@ class TestController(AbstractController):
             return [RobotModelInput(10, 30), False]
         elif self.ticks <= 200: # let the robot slide with no power
             return [RobotModelInput(-20, -20), False]
-        elif self.ticks <= 400: # let the robot slide with no power
+        elif self.ticks <= 250: # let the robot slide with no power
             return [RobotModelInput(0,0), False]
         else: # next 100 ticks, stop
             return [RobotModelInput(0, 0), True]
