@@ -24,6 +24,19 @@ class PurePursuitController(AbstractController):
     # init whatever is needed at the start of each path
     def initController(self):
         pass
+    
+        """
+        given current x, y, and theta;
+        given desired x, y, and theta of each waypoint
+        given list of waypoints
+
+        find closest waypoint; might be given via order of stored data
+        for (i>0, i<=maxi -1: i+=1):
+            read current pos info
+            read desired waypoint info
+            find lookahead distance (l=sqrt(xerror^2 + yerror^2))
+            
+        """
 
     # Performs one timestep of the pure pursuit algorithm
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
