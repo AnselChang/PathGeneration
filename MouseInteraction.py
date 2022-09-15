@@ -57,7 +57,7 @@ def handleRightClick(state: SoftwareState):
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:
     
-    if not fieldSurface.isCurrentlyDragging and userInput.mousewheelDelta != 0:
+    if not fieldSurface.isDragging and userInput.mousewheelDelta != 0:
 
         oldMouseX, oldMouseY = userInput.mousePosition.screenRef
 
@@ -112,7 +112,7 @@ def handleStartingPressingObject(userInput: UserInput, state: SoftwareState, fie
     # if the mouse is down on some object, try to drag that object
     if isinstance(state.objectHovering, Draggable):
         state.objectDragged = state.objectHovering
-        state.objectDragged.startDragging(userInput.mousePosition)
+        state.objectDragged._startDragging(userInput.mousePosition)
     elif isinstance(state.objectHovering, Clickable):
         objectClicked: Clickable = state.objectHovering # "cast" type hint to Clickable
         objectClicked.click()
@@ -129,7 +129,7 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
     
     elif userInput.mouseReleased: # released, so nothing should be dragged
         if state.objectDragged is not None: # there was an object being dragged, so release that
-            state.objectDragged.stopDragging()
+            state.objectDragged._stopDragging()
             state.objectDragged = None
 
     # Now that we know what's being dragged, actually drag the object

@@ -75,7 +75,8 @@ def main():
         if state.recomputeInterpolation:
             path.calculateInterpolatedPoints()
 
-        simulation.update()
+        if state.mode == Mode.SIMULATE:
+            simulation.update()
 
         # Draw everything on the screen
         drawEverything(shadowPointRef)
