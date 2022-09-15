@@ -39,6 +39,9 @@ class SimulationTab(AbstractTab):
 
     # A generator for all the hoverable UI objects
     def getHoverables(self) -> Iterator[Hoverable]:
+
+        yield self.simulation.velocityGUI
+
         yield self.leftButton
         yield self.rightButton
         yield self.playButton
@@ -62,4 +65,6 @@ class SimulationTab(AbstractTab):
 
         if self.simulation.exists():
             self.simulation.slider.draw(screen)
+
+        self.simulation.velocityGUI.draw(screen)
 

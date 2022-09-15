@@ -11,6 +11,7 @@ from Simulation.ControllerManager import ControllerManager
 from SingletonState.FieldTransform import FieldTransform
 from Simulation.RobotDrawing import RobotDrawing
 from Simulation.Waypoint import Waypoint
+from Simulation.VelocityGUI import VelocityGUI
 from SingletonState.SoftwareState import SoftwareState
 from VisibleElements.FullPath import FullPath
 from RobotSpecs import RobotSpecs
@@ -45,6 +46,8 @@ class Simulation:
         self.controllers = controllers
         self.path = path
         self.robotSpecs = robotSpecs
+
+        self.velocityGUI: VelocityGUI = VelocityGUI(state)
 
 
     # Return whether there is a simulation stored in this object
