@@ -71,8 +71,8 @@ class Simulation:
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
         initialPosition: PointRef = waypoints.get(0)
-        initialHeading: float = waypoints[0][0].heading
-        output: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading)
+        initialHeading: float = (waypoints.get(1) - waypoints.get(0)).theta()
+        output: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
 
         # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
         # different simulation implementations
