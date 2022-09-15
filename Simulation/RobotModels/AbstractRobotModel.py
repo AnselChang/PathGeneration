@@ -1,5 +1,5 @@
-from Simulation.RobotModelOutput import RobotModelOutput
-from Simulation.RobotModelInput import RobotModelInput
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from RobotSpecs import RobotSpecs
 from abc import ABC, abstractmethod
 

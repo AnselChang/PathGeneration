@@ -138,3 +138,27 @@ def drawRoundedLine(screen, color, x1, y1, x2, y2, thickness):
     drawLine(screen, color, x1, y1, x2, y2, thickness)
     drawCircle(screen, x1, y1, color, thickness/2)
     drawCircle(screen, x2, y2, color, thickness/2)
+
+
+# Draw anti-aliased filled rounded rectangle
+def drawRoundedRectangle(surface: pygame.Surface, rect: list[int], color: tuple, rad: int =20, border=0, inside=(0,0,0)):
+    """
+    Draw an antialiased rounded rect on the target surface.  Alpha is not
+    supported in this implementation but other than that usage is identical to
+    round_rect.
+    """
+    rect: pygame.Rect = pygame.Rect(rect)
+    _aa_render_region(surface, rect, color, rad)
+    if border:
+        rect.inflate_ip(-2*border, -2*border)
+        _aa_render_region(surface, rect, inside, rad)
+
+# helper function for drawRoundedRectangle()
+def _aa_render_region(image, rect: pygame.Rect, color, rad):
+    corners = rect.inflate(-2*rad-1, -2*rad-1)
+    for attribute in ("topleft", "topright", "bottomleft", "bottomright"):
+        x, y = getattr(corners, attribute)
+        pygame.gfxdraw.aacircle(image, x, y, rad, color)
+        pygame.gfxdraw.filled_circle(image, x, y, rad, color)
+    image.fill(color, rect.inflate(-2*rad,0))
+    image.fill(color, rect.inflate(0,-2*rad))

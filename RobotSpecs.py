@@ -13,6 +13,6 @@ class RobotSpecs:
         self.timestep = 0.05 # the duration of each timestep in seconds
 
         # Used only for robot simulation
-        self.maximumAcceleration = 1 # maximum change in velocity in inches/sec per second
+        self.maximumAcceleration = 0.5 # maximum change in velocity in inches/sec per second
         self.mesialFriction = 1 # coefficient of friction along heading of robot (Between 0 and 1 only)
         self.lateralFriction = 0.1# coefficient of friction perpendicular to heading of robot (Between 0 and 1)

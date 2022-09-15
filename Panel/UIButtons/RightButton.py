@@ -1,6 +1,6 @@
 from Panel.AbstractButtons.ClickButton import ClickButton
 import Utility, Graphics
-from Simulation.ControllerManager import ControllerManager
+from Simulation.ControllerRelated.ControllerManager import ControllerManager
 from VisibleElements.Tooltip import Tooltip
 from SingletonState.ReferenceFrame import PointRef
 import pygame

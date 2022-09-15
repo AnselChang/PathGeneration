@@ -4,7 +4,7 @@ from SingletonState.ReferenceFrame import PointRef
 from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
-from Simulation.ControllerManager import ControllerManager
+from Simulation.ControllerRelated.ControllerManager import ControllerManager
 from Simulation.Simulation import Simulation
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
@@ -74,6 +74,8 @@ def main():
         # Whenever the path is modified, the interpolated beizer points have to be recomputed again
         if state.recomputeInterpolation:
             path.calculateInterpolatedPoints()
+
+        simulation.update()
 
         # Draw everything on the screen
         drawEverything(shadowPointRef)

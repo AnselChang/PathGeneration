@@ -32,7 +32,7 @@ class Panel:
         self.editTab: EditTab.EditTab = EditTab.EditTab(state, path)
         self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(state, simulation)
         self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(simulation)
-        self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab()
+        self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab(simulation)
 
     # Given the mode, get the tab oject associated with that mode
     def getTab(self, mode: Mode) -> AbstractTab.AbstractTab:
