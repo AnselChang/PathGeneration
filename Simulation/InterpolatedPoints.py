@@ -58,3 +58,6 @@ class InterpolatedPoints:
     def convertToWaypoints(self) -> list[list[Waypoint]]:
         #TODO
         pass
+
+        # TEMPORARY, DELETE WHEN IMPLEMENTING
+        return [[Waypoint(pointRef, 0, 0) for pointRef in segment] for segment in self.points]
