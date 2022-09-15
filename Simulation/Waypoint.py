@@ -1,4 +1,4 @@
-from SingletonState.ReferenceFrame.PointRef import PointRef
+from SingletonState.ReferenceFrame import PointRef
 """
 An interpolated point but with more information like curvature
 Gets calculated in InterpolatedPoints.convertToWaypoints() which gets called in Simulation()

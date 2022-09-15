@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from Simulation.Waypoint import Waypoint
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.RobotModelOutput import RobotModelOutput
 from Simulation.RobotModelInput import RobotModelInput
@@ -30,9 +31,9 @@ class AbstractController(ABC):
         
 
     # To be called at the start of a simulation. Sets waypoints and initial state
-    def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[PointRef]):
+    def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[Waypoint]):
         self.robotSpecs = robotSpecs
-        self.waypoints: list[PointRef] = waypoints
+        self.waypoints: list[Waypoint] = waypoints
 
         self.initController()
 
