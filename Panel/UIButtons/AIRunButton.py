@@ -18,11 +18,14 @@ class AIRunButton(FlipFlopButton):
         self.tooltipRun = Tooltip("Run MCTS")
         self.tooltipRunning = Tooltip("Running...")
 
-        imageOn = Graphics.getImage("Images/Buttons/ai_on.png", 0.08)
-        imageHoveredOn = Graphics.getLighterImage(imageOn, 0.8)
-        imageHoveredOff = Graphics.getImage("Images/Buttons/ai_off_hovered.png", 0.08)
-        imageOff = Graphics.getImage("Images/Buttons/ai_off.png", 0.08)
-        super().__init__((Utility.SCREEN_SIZE + 50, 170), imageOff, imageHoveredOff, imageOn, imageHoveredOn)
+        imageOn = Graphics.getImage("Images/Buttons/ai_on.png", 0.3)
+        imageHoveredOn = Graphics.getLighterImage(imageOn, 0.75)
+        imageOff = Graphics.getImage("Images/Buttons/ai_off_hovered.png", 0.3)
+        imageHoveredOff = Graphics.getLighterImage(imageOff, 0.75)
+
+        self.on = False
+
+        super().__init__((Utility.SCREEN_SIZE + 75, Utility.SCREEN_SIZE - 180), imageOff, imageHoveredOff, imageOn, imageHoveredOn)
 
     # Draw right button tooltip
     def drawTooltip(self, screen: pygame.Surface, mousePosition: tuple) -> None:
@@ -33,9 +36,9 @@ class AIRunButton(FlipFlopButton):
 
      # Return whether MCTS algorithm is running
     def isOn(self) -> bool:
-        return False
+        return self.on
 
   # When clicked, either start or stop the MCTS
     def toggleButton(self) -> None:
-        pass
+        self.on = not self.on
 

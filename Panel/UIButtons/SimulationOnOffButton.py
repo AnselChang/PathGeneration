@@ -20,10 +20,10 @@ class SimulationOnOffButton(FlipFlopButton):
         self.tooltipPlay = Tooltip("Play simulation")
         self.tooltipPause = Tooltip("Pause simulation")
 
-        imageHoveredOn = Graphics.getImage("Images/Buttons/pause.png", 0.08)
-        imageOn = Graphics.getLighterImage(imageHoveredOn, 0.85)
-        imageHoveredOff = Graphics.getImage("Images/Buttons/play.png", 0.08)
-        imageOff = Graphics.getLighterImage(imageHoveredOn, 0.85)
+        imageOn = Graphics.getImage("Images/Buttons/pause.png", 0.08)
+        imageHoveredOn = Graphics.getLighterImage(imageOn, 0.75)
+        imageOff = Graphics.getImage("Images/Buttons/play.png", 0.08)
+        imageHoveredOff = Graphics.getLighterImage(imageOff, 0.75)
         super().__init__((Utility.SCREEN_SIZE + 50, 170), imageOff, imageHoveredOff, imageOn, imageHoveredOn)
 
     # Draw right button tooltip
