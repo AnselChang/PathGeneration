@@ -22,6 +22,7 @@ class ColorCycle:
 
 
 FONT20 = pygame.font.SysFont('Corbel', 20)
+FONT25 = pygame.font.SysFont('Corbel', 25)
 FONT30 = pygame.font.SysFont('Corbel', 30)
 FONT40 = pygame.font.SysFont('Corbel', 40)
 

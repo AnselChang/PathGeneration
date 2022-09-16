@@ -17,6 +17,8 @@ class MCTS:
         self.discData = discData
         MCTSNode.discData = discData
 
+        self.discOrder, self.totalDistance = [], math.inf
+
         self.root = MCTSNode()
         
     # Run the full four-step MCTS algorithm some number of times
@@ -43,10 +45,12 @@ class MCTS:
                 # Backpropagate the results of that simulation
                 selectedNode.backpropagate(distance)     
 
+        self.discOrder, self.totalDistance = self._getBestPath()
+
 
     # From the current MCTS tree, return a list of Disc objects (not MCTSNodes) representing the order of the
     # discs from start to end. Also, return the total distance of that path
-    def getBestPath(self) -> Tuple[list[Disc], float]:
+    def _getBestPath(self) -> Tuple[list[Disc], float]:
 
 
         # Get the best leaf node in the mcts tree so far. It is not necessarily a terminal node
@@ -59,7 +63,7 @@ class MCTS:
         # Generate the list of nodes from bestLeafNode to root
         discOrder: list[Disc] = []
         node: MCTSNode = bestLeafNode
-        while node.parent is not None:
+        while node is not None:
             currentDisc: Disc = self.discData[node.discID]
             discOrder.append(currentDisc)
             node = node.parent
@@ -67,4 +71,4 @@ class MCTS:
         # Now, discOrder is ordered from leaf to root. We reverse to get root to leaf
         discOrder.reverse()
 
-        return discOrder, bestLeafNode.shortestFullDistance
+        return discOrder, bestLeafNode.rollout()

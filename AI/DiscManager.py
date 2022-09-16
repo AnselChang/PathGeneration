@@ -1,7 +1,7 @@
 from SingletonState.FieldTransform import FieldTransform
 from AI.Disc import Disc, getAllDiscs
 from AI.MCTS import MCTS
-import Graphics, pygame
+import Graphics, pygame, colors, Utility
 
 
 class DiscManager:
@@ -31,21 +31,30 @@ class DiscManager:
     def draw(self, screen: pygame.Surface):
 
         # Get the disc order from self.mcts
-        discOrder, totalDistance = self.mcts.getBestPath()
+        discOrder = self.mcts.discOrder
 
-        # for slowly-changing line color between discs
-        color = Graphics.ColorCycle(0.03)
+        if len(discOrder) > 0:
 
-       # Draw lines between each disc in the discOrder
-        i = 0
-        while i < len(discOrder) - 1:
-            # Draw line between discOrder[i] and discOrder[i+1]
-            pos1 = discOrder[i].position.screenRef
-            pos2 = discOrder[i+1].position.screenRef
-            Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
-            i += 1
+            # for slowly-changing line color between discs
+            color = Graphics.ColorCycle(0.03)
 
+            # Draw lines between each disc in the discOrder
+            pos1 = discOrder[0].position.screenRef
+            i = 1
+            while i < len(discOrder):
+                # Draw line between discOrder[i] and discOrder[i+1]
+                pos2 = discOrder[i].position.screenRef
+                Graphics.drawLine(screen, color.next(), *pos1, *pos2, 3)
+
+                pos1 = pos2
+                i += 1
+        
+                
         # Draw each disc
         for disc in self.discs:
             disc.draw(screen)
+
+        # Display shortest distance
+        text: str = "Shortest Distance: {} inches".format(round(self.mcts.totalDistance, 2))
+        Graphics.drawText(screen, Graphics.FONT25, text, colors.BLACK, Utility.SCREEN_SIZE + 25, Utility.SCREEN_SIZE - 200, 0)
 
