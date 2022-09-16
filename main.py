@@ -1,3 +1,4 @@
+from this import d
 import pygame, sys
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
@@ -6,6 +7,7 @@ from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from Simulation.ControllerRelated.ControllerManager import ControllerManager
 from Simulation.Simulation import Simulation
+from Simulation.DriverControl.DriverSimulation import DriverSimulation
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Panel.Panel import Panel
@@ -31,7 +33,8 @@ path: FullPath = FullPath(fieldTransform)
 discNodes: DiscNodes = DiscNodes(fieldTransform)
 robotSpecs: RobotSpecs = RobotSpecs()
 simulation: Simulation = Simulation(state, fieldTransform, controllers, path, robotSpecs)
-panel: Panel = Panel(state, path, simulation)
+driver: DriverSimulation = DriverSimulation(robotSpecs, fieldTransform)
+panel: Panel = Panel(state, path, simulation, driver)
 
 
 def main():
@@ -77,6 +80,8 @@ def main():
 
         if state.mode == Mode.SIMULATE:
             simulation.update()
+        elif state.mode == Mode.ODOM:
+            driver.update()
 
         # Draw everything on the screen
         drawEverything(shadowPointRef)
@@ -96,6 +101,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     # Draw PathPoint shadow at mouse
     if state.mode == Mode.EDIT and state.objectDragged is None and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
         Graphics.drawCircle(screen, *shadowPointRef.screenRef, colors.GREEN, 10, 140)
+
             
     # Draw panel background
     border = 5

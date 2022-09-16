@@ -48,7 +48,7 @@ class Simulation:
         self.path = path
         self.robotSpecs = robotSpecs
 
-        self.velocityGUI: VelocityGUI = VelocityGUI(robotSpecs, state)
+        self.velocityGUI: VelocityGUI = VelocityGUI(robotSpecs, isInteractiveMode = False)
 
 
     # Return whether there is a simulation stored in this object

@@ -5,6 +5,7 @@ from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.FullPath import FullPath
 from MouseInterfaces.Hoverable import Hoverable
 from Simulation.Simulation import Simulation
+from Simulation.DriverControl.DriverSimulation import DriverSimulation
 import pygame
 from typing import Iterator
 
@@ -15,7 +16,7 @@ Stores all the Tab objects and draws all the UI from the selected Tab onto the s
 
 class Panel:
 
-    def __init__(self, state: SoftwareState, path: FullPath, simulation: Simulation):
+    def __init__(self, state: SoftwareState, path: FullPath, simulation: Simulation, driver: DriverSimulation):
 
         self.state: SoftwareState = state
         
@@ -32,7 +33,7 @@ class Panel:
         self.editTab: EditTab.EditTab = EditTab.EditTab(state, path)
         self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(state, simulation)
         self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(simulation)
-        self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab(simulation)
+        self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab(driver)
 
     # Given the mode, get the tab oject associated with that mode
     def getTab(self, mode: Mode) -> AbstractTab.AbstractTab:

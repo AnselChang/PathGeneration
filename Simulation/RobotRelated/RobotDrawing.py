@@ -53,5 +53,8 @@ class RobotDrawing:
         rightPoints: list[tuple] = getAbsolutePoints(rotateRect(self.rightWheel, heading), center)
         Graphics.drawPolygon(screen, (100,100,100), rightPoints)
 
+        # Draw vector to indicate direction        
+        Graphics.drawVector(screen, *center.screenRef, 10, heading)
+
 
 

@@ -2,11 +2,18 @@ import pygame, math, pygame.gfxdraw
 
 pygame.font.init()
 
-SCREEN_SIZE = 800
+SCREEN_SIZE = 700
 PANEL_WIDTH = 300
 PIXELS_TO_FIELD_CORNER = 19
 FIELD_SIZE_IN_PIXELS = 766
 FIELD_SIZE_IN_INCHES = 144
+
+def wrap(value, max):
+    if value < 0:
+        value += max
+    elif value > max:
+        value -= max
+    return value
 
 def map_range(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min

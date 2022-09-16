@@ -59,10 +59,10 @@ class ComplexRobotModel(AbstractRobotModel):
 
             # Calculate the radius of the circle we are turning on
             radius = (self.robotSpecs.trackWidth)*((clampedLeftVelocity+clampedRightVelocity)/
-            (clampedRightVelocity-clampedLeftVelocity))
+            (clampedLeftVelocity-clampedRightVelocity))
             
             # Calculate the angular velocity of the robot about the center of the circle
-            omega = (clampedRightVelocity-clampedLeftVelocity)/self.robotSpecs.trackWidth
+            omega = (clampedLeftVelocity-clampedRightVelocity)/self.robotSpecs.trackWidth
         
             # Calculate the center of the circle we are turning on (Instantaneous center of curvature)
             icc = np.array([self.xPosition - radius*math.sin(self.heading),
@@ -115,6 +115,10 @@ class ComplexRobotModel(AbstractRobotModel):
         self.xVelocity = self.xPosition - prevX
         self.yVelocity = self.yPosition - prevY
         self.angularVelocity = omega
+
+        # TEMPORARY: wraparound
+        self.xPosition = Utility.wrap(self.xPosition, 144)
+        self.yPosition = Utility.wrap(self.yPosition, 144)
 
         return RobotModelOutput(self.xPosition, self.yPosition, self.heading, self.leftVelocity, self.rightVelocity, self.xVelocity, self.yVelocity, self.angularVelocity)
 
