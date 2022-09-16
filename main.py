@@ -1,4 +1,3 @@
-from this import d
 import pygame, sys
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
@@ -17,24 +16,26 @@ from RobotSpecs import RobotSpecs
 import Utility, colors
 from typing import Iterator
 import Graphics
+import multiprocessing as mp 
 
+if __name__ == '__main__':
 
-# All the global singleton objects
-screen: pygame.Surface = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
-pygame.display.set_caption("Path Generation 2.0 by Ansel")
+    # All the global singleton objects
+    screen: pygame.Surface = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
+    pygame.display.set_caption("Path Generation 2.0 by Ansel")
 
-fieldTransform: FieldTransform = FieldTransform()
-fieldSurface: FieldSurface = FieldSurface(fieldTransform)
-userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
-controllers: ControllerManager = ControllerManager()
+    fieldTransform: FieldTransform = FieldTransform()
+    fieldSurface: FieldSurface = FieldSurface(fieldTransform)
+    userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
+    controllers: ControllerManager = ControllerManager()
 
-state: SoftwareState = SoftwareState()
-path: FullPath = FullPath(fieldTransform)
-discManager: DiscManager = DiscManager(fieldTransform)
-robotSpecs: RobotSpecs = RobotSpecs()
-simulation: Simulation = Simulation(state, fieldTransform, controllers, path, robotSpecs)
-driver: DriverSimulation = DriverSimulation(robotSpecs, fieldTransform)
-panel: Panel = Panel(state, path, simulation, driver, discManager)
+    state: SoftwareState = SoftwareState()
+    path: FullPath = FullPath(fieldTransform)
+    discManager: DiscManager = DiscManager(fieldTransform)
+    robotSpecs: RobotSpecs = RobotSpecs()
+    simulation: Simulation = Simulation(state, fieldTransform, controllers, path, robotSpecs)
+    driver: DriverSimulation = DriverSimulation(robotSpecs, fieldTransform)
+    panel: Panel = Panel(state, path, simulation, driver, discManager)
 
 
 def main():
@@ -153,7 +154,6 @@ def getHoverables() -> Iterator[Hoverable]:
     yield
 
 
-#import cProfile
-#import re
-#cProfile.run('main()')
-main()
+if __name__ == '__main__':
+    mp.freeze_support()
+    main()

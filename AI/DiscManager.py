@@ -23,15 +23,12 @@ class DiscManager:
         for disc in self.discs:
             disc.preprocess(self.discs)
 
-    # Run MCTS
-    def runMCTS(self, iterations = 10000):
-        self.mcts.run(iterations)
 
     # Draw each disc
     def draw(self, screen: pygame.Surface):
 
         # Get the disc order from self.mcts
-        discOrder = self.mcts.discOrder
+        discOrder, totalDistance = self.mcts.get()
 
         if len(discOrder) > 0:
 
@@ -55,6 +52,6 @@ class DiscManager:
             disc.draw(screen)
 
         # Display shortest distance
-        text: str = "Shortest Distance: {} inches".format(round(self.mcts.totalDistance, 2))
+        text: str = "Shortest Distance: {} inches".format(round(totalDistance, 2))
         Graphics.drawText(screen, Graphics.FONT25, text, colors.BLACK, Utility.SCREEN_SIZE + 25, Utility.SCREEN_SIZE - 200, 0)
 

@@ -2,6 +2,7 @@ from Panel.AbstractButtons.FlipFlopButton import FlipFlopButton
 import Utility, Graphics
 from VisibleElements.Tooltip import Tooltip
 from AI.DiscManager import DiscManager
+from AI.MCTS import MCTS
 
 import pygame
 
@@ -13,7 +14,7 @@ class AIRunButton(FlipFlopButton):
 
     def __init__(self, discManager: DiscManager):
 
-        self.discManager = discManager
+        self.mcts: MCTS = discManager.mcts
 
         self.tooltipRun = Tooltip("Run MCTS")
         self.tooltipRunning = Tooltip("Running...")
@@ -36,10 +37,13 @@ class AIRunButton(FlipFlopButton):
 
      # Return whether MCTS algorithm is running
     def isOn(self) -> bool:
-        return False
+        return self.mcts.isRunning()
 
   # When clicked, either start or stop the MCTS
     def toggleButton(self) -> None:
         
-        self.discManager.runMCTS()
+        if self.isOn():
+            self.mcts.disable()
+        else:
+            self.mcts.enable()
 

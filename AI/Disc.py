@@ -38,6 +38,7 @@ class Disc:
 
 
 # The position of every disc on the field
+# 31 DISCS
 def getAllDiscs(): 
     return [
         Disc(3.5, 5, True), # START NODE
