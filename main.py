@@ -12,7 +12,7 @@ from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Panel.Panel import Panel
 from MouseInterfaces.TooltipOwner import TooltipOwner
-from AI.DiscNodes import DiscNodes
+from AI.DiscManager import DiscManager
 from RobotSpecs import RobotSpecs
 import Utility, colors
 from typing import Iterator
@@ -30,11 +30,11 @@ controllers: ControllerManager = ControllerManager()
 
 state: SoftwareState = SoftwareState()
 path: FullPath = FullPath(fieldTransform)
-discNodes: DiscNodes = DiscNodes(fieldTransform)
+discManager: DiscManager = DiscManager(fieldTransform)
 robotSpecs: RobotSpecs = RobotSpecs()
 simulation: Simulation = Simulation(state, fieldTransform, controllers, path, robotSpecs)
 driver: DriverSimulation = DriverSimulation(robotSpecs, fieldTransform)
-panel: Panel = Panel(state, path, simulation, driver)
+panel: Panel = Panel(state, path, simulation, driver, discManager)
 
 
 def main():
@@ -109,7 +109,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     pygame.draw.rect(screen, colors.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
 
     if state.mode == Mode.AI:
-        discNodes.draw(screen)
+        discManager.draw(screen)
     
     # Draw panel buttons
     panel.draw(screen)

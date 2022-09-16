@@ -6,6 +6,7 @@ from VisibleElements.FullPath import FullPath
 from MouseInterfaces.Hoverable import Hoverable
 from Simulation.Simulation import Simulation
 from Simulation.DriverControl.DriverSimulation import DriverSimulation
+from AI.DiscManager import DiscManager
 import pygame
 from typing import Iterator
 
@@ -16,7 +17,7 @@ Stores all the Tab objects and draws all the UI from the selected Tab onto the s
 
 class Panel:
 
-    def __init__(self, state: SoftwareState, path: FullPath, simulation: Simulation, driver: DriverSimulation):
+    def __init__(self, state: SoftwareState, path: FullPath, simulation: Simulation, driver: DriverSimulation, discManager: DiscManager):
 
         self.state: SoftwareState = state
         
@@ -29,7 +30,7 @@ class Panel:
             OdomButton.OdomButton(state)
         ]
 
-        self.aiTab: AITab.AITab = AITab.AITab()
+        self.aiTab: AITab.AITab = AITab.AITab(discManager)
         self.editTab: EditTab.EditTab = EditTab.EditTab(state, path)
         self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(state, simulation)
         self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(simulation)

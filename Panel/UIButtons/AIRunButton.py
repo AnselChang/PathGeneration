@@ -1,9 +1,8 @@
 from Panel.AbstractButtons.FlipFlopButton import FlipFlopButton
 import Utility, Graphics
-from SingletonState.SoftwareState import SoftwareState
-from Simulation.Simulation import Simulation
 from VisibleElements.Tooltip import Tooltip
-from SingletonState.ReferenceFrame import PointRef
+from AI.DiscManager import DiscManager
+
 import pygame
 
 """
@@ -12,8 +11,9 @@ Right button for going to the previous controller in the Simulation tab
 
 class AIRunButton(FlipFlopButton):
 
-    def __init__(self):
+    def __init__(self, discManager: DiscManager):
 
+        self.discManager = discManager
 
         self.tooltipRun = Tooltip("Run MCTS")
         self.tooltipRunning = Tooltip("Running...")
@@ -36,9 +36,10 @@ class AIRunButton(FlipFlopButton):
 
      # Return whether MCTS algorithm is running
     def isOn(self) -> bool:
-        return self.on
+        return False
 
   # When clicked, either start or stop the MCTS
     def toggleButton(self) -> None:
-        self.on = not self.on
+        
+        self.discManager.runMCTS()
 

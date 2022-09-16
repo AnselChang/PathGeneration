@@ -2,6 +2,7 @@ from Panel.AbstractTab import AbstractTab
 from MouseInterfaces.Hoverable import Hoverable
 from Panel.UIButtons.AIRunButton import AIRunButton
 from typing import Iterator
+from AI.DiscManager import DiscManager
 import pygame
 
 
@@ -11,9 +12,9 @@ Stores all the UI for the Simulation tab
 
 class AITab(AbstractTab):
 
-    def __init__(self):
+    def __init__(self, discManager: DiscManager):
         
-        self.runButton: AIRunButton = AIRunButton()
+        self.runButton: AIRunButton = AIRunButton(discManager)
 
 
     # A generator for all the hoverable UI objects
