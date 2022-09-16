@@ -26,9 +26,11 @@ class MCTS:
         self.sharedRunning = mp.Value('i', 0)
         self.sharedOrder = mp.Array('i', [-1]*32)
         self.sharedDistance = mp.Value('d', -1)
+        self.sharedExplorationFactor = mp.Value('i', 100)
         self.lock = mp.Lock()
         atexit.register(self._kill)
-        self.p: mp.Process = mp.Process(target=self._startMultiprocesing, args=(self.lock, self.sharedRunning, self.sharedOrder, self.sharedDistance, discData))
+        args = args=(self.lock, self.sharedRunning, self.sharedOrder, self.sharedDistance, discData, self.sharedExplorationFactor)
+        self.p: mp.Process = mp.Process(target=self._startMultiprocesing, args = args)
 
         # Start process
         self.p.start()
@@ -68,26 +70,34 @@ class MCTS:
             totalDistance = self.sharedDistance.value
         return discOrder, totalDistance
 
-        
+    # Update the mcts explroation hyperparameter. Process safe
+    def updateExplorationParameter(self, value):
+        with self.lock:
+            self.sharedExplorationFactor.value = value
+
+
     # Run the full four-step MCTS algorithm in a different process
     # Every N iterations, update the shared variables
     # 1. Selection, 2. Expansion, 3. Simulation, 4. Backpropagation
-    def _startMultiprocesing(self, lock: mp.Lock, running: mp.Value, sharedOrder: mp.Array, sharedDistance: mp.Value, discData: list[Disc]):
+    def _startMultiprocesing(self, lock: mp.Lock, running: mp.Value, sharedOrder: mp.Array, sharedDistance: mp.Value, discData: list[Disc], sharedExplorationParameter: mp.Value):
         MCTSNode.discData = discData
         iterations = 5000
 
         print("start")
 
         isDone = False
+        numberEpochs = 0
         while not isDone:
 
             with lock:
+                MCTSNode.EXPLORATION_FACTOR = sharedExplorationParameter.value
                 if running.value == 0:
                     time.sleep(0.1)
                     continue
 
+            
             for i in range(iterations):
-                print(i)
+        
 
                 # Select the best node based on UTC value
                 selectedNode: MCTSNode = self.root.selectNode()
@@ -117,6 +127,9 @@ class MCTS:
                     sharedOrder[i] = -1
                 sharedDistance.value = totalDistance
                 isDone = running.value == 2
+
+            numberEpochs += 1
+            print("Finished iteration ", numberEpochs * iterations)
 
 
     # From the current MCTS tree, return a list of Disc objects (not MCTSNodes) representing the order of the

@@ -83,6 +83,8 @@ def main():
             simulation.update()
         elif state.mode == Mode.ODOM:
             driver.update()
+        elif state.mode == Mode.AI:
+            discManager.update()
 
         # Draw everything on the screen
         drawEverything(shadowPointRef)

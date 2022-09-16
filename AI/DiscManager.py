@@ -1,6 +1,7 @@
 from SingletonState.FieldTransform import FieldTransform
 from AI.Disc import Disc, getAllDiscs
 from AI.MCTS import MCTS
+from Sliders.Slider import Slider
 import Graphics, pygame, colors, Utility
 
 
@@ -12,6 +13,10 @@ class DiscManager:
         self.initDiscs(transform)
         
         self.mcts: MCTS = MCTS(self.discs)
+        self.explorationSlider: Slider = None
+
+    def initSlider(self, explorationSlider: Slider):
+        self.explorationSlider = explorationSlider
 
     # Initialize the disc list by creating disc objects at each location and specifying their coordinates
     def initDiscs(self, transform: FieldTransform) -> list[Disc]:
@@ -22,6 +27,12 @@ class DiscManager:
         # Pre-process by sorting each disc's distance to each other disc. O(n^2*log(n))
         for disc in self.discs:
             disc.preprocess(self.discs)
+
+    # update disk manager things. Called every tick
+    def update(self):
+        
+        # Get exploration slider value and update mcts process with it
+        self.mcts.updateExplorationParameter(self.explorationSlider.getValue())
 
 
     # Draw each disc
