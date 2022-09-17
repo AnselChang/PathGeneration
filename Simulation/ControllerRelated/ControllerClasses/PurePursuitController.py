@@ -60,7 +60,7 @@ class PurePursuitController(AbstractController):
         """
         find lookahead pt
         point to line distance from robot's heading vector
-         -> x = distanceTwoPoints(lookahead pt, pointOnLineClosestToPoint([robotHeadingVector], lookahead pt position))
+         -> distToWaypoint = distanceTwoPoints(lookahead pt, pointOnLineClosestToPoint([robotHeadingVector], lookahead pt position))
         radius of curvature from robot to point
          -> r = (distance to lookahead point)^2/2x
          -> C = 1/r     # Curvature
@@ -69,31 +69,50 @@ class PurePursuitController(AbstractController):
          -> R = robotSpecs.maxVelocity * (2 - C*robotSpecs.trackWidth)/2
         return RobotModelInput(L,R)
         """
+
+        
+        #distToWaypoint = distanceTwoPoints(self.waypoints[indexOfLookaheadPoint], pointOnLineClosestToPoint([robotHeadingVector], lookahead pt position))
+        #radiusOfCurvature = (distance to lookahead point)^2/(2*distToWaypoint)
+        #curvature = 1/radiusOfCurvature
+
+        #leftVelocity = robotSpecs.maxVelocity * (2 + curvature*robotSpecs.trackWidth)/2
+        #rightVelocity = robotSpecs.maxVelocity * (2 - curvature*robotSpecs.trackWidth)/2
+
+        #return RobotModelInput(leftVelocity, rightVelocity)
+    
+        
         pass
         
 
-    """
-    Step 1: calc distance from point to robot
-    Step 2: if that is closest to lookahead distance, save it
-    Step 3: if farther than lookahead, break out of loop
-    """
+    # Finding the lookahead point and information
+        # Step 1: calc distance from point to robot
+        # Step 2: if that is closest to lookahead distance, save it
+        # Step 3: if farther than lookahead, break out of loop
+    
     def findLookaheadPoint(self, robot: RobotModelOutput) -> Waypoint:
 
-        # Note sure if initialization values are necessary
-        indexOfLookaheadPoint = self.lookaheadIndex
-        lookaheadPointDist = 0      # Index Of Point Closest To Lookahead
+        # Not sure if initialization values are necessary
+        indexOfLookaheadPoint = self.lookaheadIndex # Sets current lookahead point to previous for the start of the next loop
+        lookaheadPointDist = 0                      # Index Of Point Closest To Lookahead 
 
         for i in range(self.lookaheadIndex, self.waypoints.len()-1):
-            pointPosition = self.waypoints[i].position.fieldRef
-            robotPosition = robot.position.fieldRef
-            pointDistance = distanceTwoPoints(robotPosition,pointPosition)
+            pointPosition = self.waypoints[i].position.fieldRef             # Finds position of the closest waypoint to the lookahead distance
+            robotPosition = robot.position.fieldRef                         # Finds current robot position
+            pointDistance = distanceTwoPoints(robotPosition,pointPosition)  # Finds distance from robot to waypoint
 
-            if pointDistance > lookaheadPointDist and pointDistance < self.lookaheadDistance:
-                indexOfLookaheadPoint = i
-                lookaheadPointDist = pointDistance
+            if pointDistance > lookaheadPointDist and pointDistance < self.lookaheadDistance: 
+                # If the distance to the closest waypoint is further than the current lookahead point disatnce and shorter than the ideal 
+                #   lookahead distance, it does the following. Basically, we want to find a waypoint as close to the lookahead distance as 
+                #   possible, but will ALWAYS round down if possible.
+                indexOfLookaheadPoint = i                                   # Sets the index of the lookahead point to i.
+                lookaheadPointDist = pointDistance                          # Sets the distance to the lookahead point distance so we calculate
+                                                                            #   the wheel velocities based on the target waypoint.
 
-            elif pointDistance > self.lookaheadDistance:
-                self.lookaheadIndex = indexOfLookaheadPoint
-                return self.waypoints[indexOfLookaheadPoint]
+            elif pointDistance > self.lookaheadDistance:        
+                # If the distance of the new closest waypointis further than the lookahead distance, do the following.
+                self.lookaheadIndex = indexOfLookaheadPoint                 # Sets the lookahead index to be the index of the current lookahead 
+                                                                            #   point so it doesn't change for this loop.
+                return self.waypoints[indexOfLookaheadPoint]                # Returns the waypoint of the index of the lookahead point above.
+
         # If we run out of points, use the last valid one
-        return self.waypoints[indexOfLookaheadPoint]
+        #return self.waypoints[indexOfLookaheadPoint] """ Why is is gray, did I break it? It says the code is unreachable T.T"""
