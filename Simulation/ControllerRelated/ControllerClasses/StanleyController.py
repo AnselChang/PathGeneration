@@ -1,7 +1,7 @@
 from xml.etree.ElementTree import PI
-from Simulation.ControllerClasses.AbstractController import AbstractController
-from Simulation.RobotModelInput import RobotModelInput
-from Simulation.RobotModelOutput import RobotModelOutput
+from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
+from Simulation.RobotRelated.RobotModelInput import RobotModelInput
+from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Simulation import Waypoint
 from Sliders.Slider import Slider
 
@@ -55,7 +55,7 @@ class StanleyController(AbstractController):
     """
     def findLookaheadPoint(self, robot: RobotModelOutput) -> Waypoint:
 
-        # Note sure if initialization values are necessary
+        # Not sure if initialization values are necessary
         indexOfLookaheadPoint = self.lookaheadIndex
         lookaheadPointDist = 0      # Index Of Point Closest To Lookahead
 
