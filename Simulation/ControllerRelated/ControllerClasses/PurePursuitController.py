@@ -56,6 +56,19 @@ class PurePursuitController(AbstractController):
         R = V*(2 - CT)/2
         """
 
+        """
+        angleOfLookaheadVectorFromRobot = atan2((waypoint.ypos - robotOutput.yPosition.fieldRef), (waypoint.xpos - robotOutput.xPosition.fieldRef))
+        angleBetweenRobotandLookaheadPoint = angleOfLookaheadVectorFromRobot - robotOutput.heading.fieldRef
+        distToWaypoint = cos(angleBetweenRobotandLookaheadPoint)*distTwoPoints(robot.position.fieldRef, findLookaheadPoint())
+
+
+        sin(atan2(
+                (waypoint.x1 - robotOutput.yPosition.fieldRef)
+                (waypoint.xpos - robotOutput.xPosition.fieldRef)
+            ) - robotOutput.heading )
+        *distTwoPoints(robot.position.fieldRef, findLookaheadPoint())
+        """
+
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
         """
         find lookahead pt
@@ -71,7 +84,7 @@ class PurePursuitController(AbstractController):
         """
 
         
-        #distToWaypoint = distanceTwoPoints(self.waypoints[indexOfLookaheadPoint], pointOnLineClosestToPoint([robotHeadingVector], lookahead pt position))
+        #distToWaypoint = distanceTwoPoints(self.waypoints[indexOfLookaheadPoint], pointOnLineClosestToPoint(self.robotOutput.robotHeading, self.waypoint(indexOfLookaheadPoint)))
         #radiusOfCurvature = (distance to lookahead point)^2/(2*distToWaypoint)
         #curvature = 1/radiusOfCurvature
 
