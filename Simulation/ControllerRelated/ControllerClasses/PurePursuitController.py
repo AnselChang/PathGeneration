@@ -92,16 +92,16 @@ class PurePursuitController(AbstractController):
         """
 
         """
-        angleOfLookaheadVectorFromXAxis = atan2((waypoint.ypos - robotOutput.yPosition.fieldRef), (waypoint.xpos - robotOutput.xPosition.fieldRef))
-        angleBetweenRobotheadingandLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading.fieldRef
-        distToWaypoint = cos(angleBetweenRobotandLookaheadPoint)*distTwoPoints(robot.position.fieldRef, findLookaheadPoint())
+
+        waypointXPos, waypointYPos = waypointChosen.fieldRef
 
 
-        sin(atan2(
-                (waypoint.x1 - robotOutput.yPosition.fieldRef)
-                (waypoint.xpos - robotOutput.xPosition.fieldRef)
-            ) - robotOutput.heading )
-        *distTwoPoints(robot.position.fieldRef, findLookaheadPoint())
+        angleOfLookaheadVectorFromXAxis = atan2((waypointYPos - robotOutput.yPosition.fieldRef), (waypointXPos - robotOutput.xPosition.fieldRef))
+        angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading.fieldRef
+        horizontalDistToWaypoint = cos(angleBetweenRobotandLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
+
+
+        verticalDistToWaypoint = sin(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
         """
 
     def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
