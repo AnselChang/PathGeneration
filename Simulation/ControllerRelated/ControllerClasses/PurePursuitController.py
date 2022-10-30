@@ -65,7 +65,6 @@ class PurePursuitController(AbstractController):
 
     # init whatever is needed at the start of each path
     def initController(self):
-        waypointChosen = findLookaheadPoint()
         pass
     
         """
@@ -104,30 +103,4 @@ class PurePursuitController(AbstractController):
         verticalDistToWaypoint = sin(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
         """
 
-    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
-        """
-        find lookahead pt
-        point to line distance from robot's heading vector
-         -> distToWaypoint = distanceTwoPoints(lookahead pt, pointOnLineClosestToPoint([robotHeadingVector], lookahead pt position))
-        radius of curvature from robot to point
-         -> r = (distance to lookahead point)^2/2x
-         -> C = 1/r     # Curvature
-        Curvature to robot wheel velocities:
-         -> L = robotSpecs.maxVelocity * (2 + C*robotSpecs.trackWidth)/2
-         -> R = robotSpecs.maxVelocity * (2 - C*robotSpecs.trackWidth)/2
-        return RobotModelInput(L,R)
-        """
-
-        
-        #distToWaypoint = distanceTwoPoints(self.waypoints[indexOfLookaheadPoint], pointOnLineClosestToPoint(self.robotOutput.robotHeading, self.waypoint(indexOfLookaheadPoint)))
-        #radiusOfCurvature = (distance to lookahead point)^2/(2*distToWaypoint)
-        #curvature = 1/radiusOfCurvature
-
-        #leftVelocity = robotSpecs.maxVelocity * (2 + curvature*robotSpecs.trackWidth)/2
-        #rightVelocity = robotSpecs.maxVelocity * (2 - curvature*robotSpecs.trackWidth)/2
-
-        #return RobotModelInput(leftVelocity, rightVelocity)
-    
-        
-        pass
         
