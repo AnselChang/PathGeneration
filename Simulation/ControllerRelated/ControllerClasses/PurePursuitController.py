@@ -42,10 +42,10 @@ class PurePursuitController(AbstractController):
         indexOfLookaheadPoint = self.lookaheadIndex # Sets current lookahead point to previous for the start of the next loop
         lookaheadPointDist = 0                      # Index Of Point Closest To Lookahead 
 
-        for i in range(self.lookaheadIndex, self.waypoints.len()-1):
+        for i in range(self.lookaheadIndex, len(self.waypoints)-1):
             pointPosition = self.waypoints[i].position.fieldRef             # Finds position of the closest waypoint to the lookahead distance
             robotPosition = robot.position.fieldRef                         # Finds current robot position
-            pointDistance = distanceTwoPoints(robotPosition,pointPosition)  # Finds distance from robot to waypoint
+            pointDistance = distanceTuples(robotPosition,pointPosition)  # Finds distance from robot to waypoint
 
             if pointDistance > lookaheadPointDist and pointDistance < self.lookaheadDistance: 
                 # If the distance to the closest waypoint is further than the current lookahead point disatnce and shorter than the ideal 
@@ -69,16 +69,18 @@ class PurePursuitController(AbstractController):
         pass
     
 
-    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs, chosenWaypoint: findLookaheadPoint()) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, robotOutput: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
+
+        chosenWaypoint: Waypoint = self.findLookaheadPoint(robotOutput)
 
         #point to line distance from robot's heading vector
         waypointXPos, waypointYPos = chosenWaypoint.position.fieldRef
-        angleOfLookaheadVectorFromXAxis = math.atan2((waypointYPos - robotOutput.yPosition.fieldRef), (waypointXPos - robotOutput.xPosition.fieldRef))
-        angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading.fieldRef
-        horizontalDistToWaypoint = math.cos(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robotOutput.position.fieldRef, chosenWaypoint)
-
-        #distToWaypoint = distanceTwoPoints(chosenWaypoint.position.fieldRef, pointOnLineClosestToPoint([robotHeadingVector], chosenWaypoint.position.fieldRef))
-        distToWaypoint = 1   #temporary arbitrary value so the code stops getting mad. Code is commented above
+        robotX, robotY = robotOutput.position.fieldRef
+        angleOfLookaheadVectorFromXAxis = math.atan2((waypointYPos - robotY), (waypointXPos - robotX))
+        angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading
+        
+        distToWaypoint = math.sqrt(distanceTuples(robotOutput.position.fieldRef, chosenWaypoint.position.fieldRef))   #temporary arbitrary value so the code stops getting mad. Code is commented above
+        horizontalDistToWaypoint = math.sin(angleBetweenRobotHeadingAndLookaheadPoint)*distToWaypoint
 
         # Radius of curvature from robot to point
         radiusOfCurvature = (distToWaypoint)^2/(2*horizontalDistToWaypoint)
@@ -120,7 +122,7 @@ class PurePursuitController(AbstractController):
         """
         given current x, y, and theta;
         given desired x, y, and theta of each waypoint
-        given list of waypoints
+        given list of waypoints 
 
         find closest waypoint; might be given via order of stored data
         for (i>0, i<=maxi -1: i+=1):
