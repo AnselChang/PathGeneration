@@ -30,7 +30,7 @@ class Tooltip:
         tooltipHeight = len(texts) * textHeight + (len(texts)-1) * insideMargin + 2 * outsideMargin
 
         # Create the background surfaces based on the calculated tooltip dimensions
-        tooltipSurface = pygame.Surface([tooltipWidth, tooltipHeight]).convert_alpha()
+        tooltipSurface = pygame.Surface([tooltipWidth, tooltipHeight], pygame.SRCALPHA).convert_alpha()
         pygame.draw.rect(tooltipSurface, BACKGROUND_COLOR, [0, 0, tooltipWidth, tooltipHeight], border_radius = 10)
         pygame.draw.rect(tooltipSurface, colors.BLACK, [0, 0, tooltipWidth, tooltipHeight], width = 3, border_radius = 10)
         
