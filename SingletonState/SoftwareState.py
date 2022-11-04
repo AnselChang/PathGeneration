@@ -19,6 +19,8 @@ class SoftwareState:
         self.mode: Mode = Mode.EDIT # edit or simulation mode
         self.objectHovering: Hoverable = None # object the mouse is currently hovering over
         self.objectDragged: Draggable = None # object the mouse is currently dragging
+        self.selected = [] # list of PathPoints that can currently be moved
+        self.dragging = False # triggers if the mouse actually moves on a drag
 
         self.recomputeInterpolation = False # Whether to recompute bezier interpolation from modifying path
 

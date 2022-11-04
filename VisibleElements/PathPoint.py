@@ -3,6 +3,7 @@ from VisibleElements.Point import Point, Shape
 from SingletonState.UserInput import UserInput
 from VisibleElements.ControlPoint import ControlPoint
 import Utility, Graphics, colors, pygame
+from MouseInterfaces.Clickable import Clickable
 
 """PathPoint objects are user-controllable points that consist of a main control point that is on the path, and 
 two "control" points not on  the actual path, in order to specify angle.
@@ -16,7 +17,7 @@ The location of the PathPoint itself and the two control points are stored as Po
 by some delta will also shift the control points the same amount.
 """
 
-class PathPoint(Point):
+class PathPoint(Point, Clickable):
 
     def __init__(self, spawnPosition: PointRef, spawnVector: tuple):
         self.position = spawnPosition
@@ -29,6 +30,9 @@ class PathPoint(Point):
         self.shape = Shape.SMOOTH
 
         super().__init__(hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
+
+    def click(self):
+        print("Clicking")
 
     # Given one of the points, return the other one. Useful when called from one of the control points
     def other(self, control: ControlPoint) -> ControlPoint:

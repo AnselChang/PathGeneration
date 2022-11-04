@@ -113,9 +113,6 @@ def handleStartingPressingObject(userInput: UserInput, state: SoftwareState, fie
     if isinstance(state.objectHovering, Draggable):
         state.objectDragged = state.objectHovering
         state.objectDragged._startDragging(userInput.mousePosition)
-    elif isinstance(state.objectHovering, Clickable):
-        objectClicked: Clickable = state.objectHovering # "cast" type hint to Clickable
-        objectClicked.click()
 
 
 # Determine what object is being dragged based on the mouse's rising and falling edges, and actually drag the object in question
@@ -124,19 +121,27 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
 
     if userInput.leftPressed and userInput.mousewheelDelta == 0: # left mouse button just pressed
 
-        # When the mouse has just clicked on the object, nothing should have been dragging before        
-        handleStartingPressingObject(userInput, state, fieldSurface)   
-    
+        # When the mouse has just clicked on the object, nothing should have been dragging before
+        handleStartingPressingObject(userInput, state, fieldSurface)
+
     elif userInput.mouseReleased: # released, so nothing should be dragged
+        if isinstance(state.objectHovering, Clickable) and not state.dragging:
+            objectClicked: Clickable = state.objectHovering  # "cast" type hint to Clickable
+            objectClicked.click()
         if state.objectDragged is not None: # there was an object being dragged, so release that
             state.objectDragged._stopDragging()
             state.objectDragged = None
+        state.dragging = False
 
     # Now that we know what's being dragged, actually drag the object
     if state.objectDragged is not None:
         changed = state.objectDragged.beDraggedByMouse(userInput)
         if changed and (isinstance(state.objectDragged, Point)):
             state.recomputeInterpolation = True
+
+        if round(userInput.mousePosition.screenRef[0]) != userInput._mousePressPosition[0] or \
+                round(userInput.mousePosition.screenRef[1]) != userInput._mousePressPosition[1]:
+            state.dragging = True
 
         # if an object is being dragged it always takes precedence over any object that might be "hovering"
         if state.objectHovering is not state.objectDragged:
