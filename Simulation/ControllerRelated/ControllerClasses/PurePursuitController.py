@@ -4,6 +4,7 @@ from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Simulation import Waypoint
 from Sliders.Slider import Slider
+from RobotSpecs import RobotSpecs
 
 from typing import Tuple
 
@@ -67,6 +68,55 @@ class PurePursuitController(AbstractController):
     def initController(self):
         pass
     
+
+    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs, chosenWaypoint: findLookaheadPoint()) -> Tuple[RobotModelInput, bool]:
+
+        #point to line distance from robot's heading vector
+        waypointXPos, waypointYPos = chosenWaypoint.position.fieldRef
+        angleOfLookaheadVectorFromXAxis = math.atan2((waypointYPos - robotOutput.yPosition.fieldRef), (waypointXPos - robotOutput.xPosition.fieldRef))
+        angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading.fieldRef
+        horizontalDistToWaypoint = math.cos(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robotOutput.position.fieldRef, chosenWaypoint)
+
+        #distToWaypoint = distanceTwoPoints(chosenWaypoint.position.fieldRef, pointOnLineClosestToPoint([robotHeadingVector], chosenWaypoint.position.fieldRef))
+        distToWaypoint = 1   #temporary arbitrary value so the code stops getting mad. Code is commented above
+
+        # Radius of curvature from robot to point
+        radiusOfCurvature = (distToWaypoint)^2/(2*horizontalDistToWaypoint)
+
+        # Curvature from robot to point
+        curvature = 1/radiusOfCurvature
+
+        # Curvature to robot wheel velocities:
+        leftWheelVelocity = robotSpecs.maxVelocity * (2 + curvature*robotSpecs.trackWidth)/2
+        rightWheelVelocity = robotSpecs.maxVelocity * (2 - curvature*robotSpecs.trackWidth)/2
+
+        return RobotModelInput(leftWheelVelocity,rightWheelVelocity)
+        
+
+
+        #distToWaypoint = distanceTwoPoints(self.waypoints[indexOfLookaheadPoint], pointOnLineClosestToPoint(self.robotOutput.robotHeading, self.waypoint(indexOfLookaheadPoint)))
+        #radiusOfCurvature = (distance to lookahead point)^2/(2*distToWaypoint)
+        #curvature = 1/radiusOfCurvature
+
+        #leftVelocity = robotSpecs.maxVelocity * (2 + curvature*robotSpecs.trackWidth)/2
+        #rightVelocity = robotSpecs.maxVelocity * (2 - curvature*robotSpecs.trackWidth)/2
+
+        #return RobotModelInput(leftVelocity, rightVelocity)
+
+        """
+        find lookahead pt
+        point to line distance from robot's heading vector
+         -> distToWaypoint = distanceTwoPoints(chosenWaypoint, pointOnLineClosestToPoint([robotHeadingVector], chosenWaypoint.position.fieldRef))
+        radius of curvature from robot to point
+         -> r = (distance to lookahead point)^2/2x
+         -> C = 1/r     # Curvature
+        Curvature to robot wheel velocities:
+         -> L = robotSpecs.maxVelocity * (2 + C*robotSpecs.trackWidth)/2
+         -> R = robotSpecs.maxVelocity * (2 - C*robotSpecs.trackWidth)/2
+        return RobotModelInput(L,R)
+        """
+    
+    
         """
         given current x, y, and theta;
         given desired x, y, and theta of each waypoint
@@ -97,7 +147,7 @@ class PurePursuitController(AbstractController):
 
         angleOfLookaheadVectorFromXAxis = atan2((waypointYPos - robotOutput.yPosition.fieldRef), (waypointXPos - robotOutput.xPosition.fieldRef))
         angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading.fieldRef
-        horizontalDistToWaypoint = cos(angleBetweenRobotandLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
+        horizontalDistToWaypoint = cos(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
 
 
         verticalDistToWaypoint = sin(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
