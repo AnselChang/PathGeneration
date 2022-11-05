@@ -142,9 +142,7 @@ class VelocityGUI(Draggable):
         if y == 0:
             return 0,0
 
-        #left /= y
-        #right /= y
-        x = (right - left) / 2
+        x = -(right - left) / 2 / y
 
         return x,y
 
