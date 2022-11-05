@@ -31,7 +31,7 @@ class PointTurnController(AbstractController):
 
     # Simulate a point turn to self.targetHeading
     # Simple non-blocking P control to desired heading
-    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool]:
           
         K_p = 5
 

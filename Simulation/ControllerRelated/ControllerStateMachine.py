@@ -38,7 +38,7 @@ class ControllerStateMachine:
         if self.isPointTurn:
             # Point turn controller
 
-            robotInput, isDone = self.pointTurnController.simulateTick(robotOutput)
+            robotInput, isDone = self.pointTurnController.simulateTick(robotOutput, self.robotSpecs)
 
             # If done with point turn, go onto next segment
             # (there is always a next segment in this case, we never end on point turn)
@@ -51,7 +51,7 @@ class ControllerStateMachine:
         else:
             # Path following controller
 
-            robotInput, isDone = self.pathController.simulateTick(robotOutput)
+            robotInput, isDone = self.pathController.simulateTick(robotOutput, self.robotSpecs)
 
             # If at last waypoint segment, then return true for exiting. Otherwise, go on to point turn
             if isDone:

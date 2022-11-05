@@ -45,5 +45,5 @@ class AbstractController(ABC):
     # To be implemented by each algorithm. Simulates path following at each timestep.
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
     @abstractmethod
-    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool]:
         pass
