@@ -20,11 +20,11 @@ class ColorCycle:
         return self._hsv2rgb(self.hue, self.brightness, self.brightness)
 
 
-
-FONT20 = pygame.font.SysFont('Corbel', 20)
-FONT25 = pygame.font.SysFont('Corbel', 25)
-FONT30 = pygame.font.SysFont('Corbel', 30)
-FONT40 = pygame.font.SysFont('Corbel', 40)
+FONT_PATH = 'Corbel.ttf'
+FONT20 = pygame.font.Font(FONT_PATH, 20)
+FONT25 = pygame.font.Font(FONT_PATH, 25)
+FONT30 = pygame.font.Font(FONT_PATH, 30)
+FONT40 = pygame.font.Font(FONT_PATH, 40)
 
 def getFont(size):
     if size < 25:
