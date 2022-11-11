@@ -172,7 +172,7 @@ class VelocityGUI(Draggable):
         # Draw desired point on gui (on top of actual possibly)
         if self.showDesired:
             dx, dy = self._convertToCartesian(*self.desired)
-            print(round(self.desired[0],1),round(self.desired[1],1),round(dx,1), round(dy,1))
+            # print(round(self.desired[0],1),round(self.desired[1],1),round(dx,1), round(dy,1))
             desiredX = self.cx + (self.width/2) * dx
             desiredY = self.cy + (self.height/2) * -dy
             Graphics.drawCircle(screen, desiredX, desiredY, DESIRED2, 10)

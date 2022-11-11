@@ -20,7 +20,7 @@ class PurePursuitController(AbstractController):
     def __init__(self):
         super().__init__("Pure Pursuit")
         self.lookaheadIndex = 0
-        self.lookaheadDistance = 4.20
+        self.lookaheadDistance = 15
     
 
     def defineParameterSliders(self) -> list[Slider]:
@@ -37,10 +37,13 @@ class PurePursuitController(AbstractController):
         # Step 3: if farther than lookahead, break out of loop
     
     def findLookaheadPoint(self, robot: RobotModelOutput) -> Waypoint:
-
+        if(self.lookaheadIndex < len(self.waypoints)-1):
+            # Iterate    
+            self.lookaheadIndex+=1
+        return self.waypoints[self.lookaheadIndex]
         # Not sure if initialization values are necessary
         indexOfLookaheadPoint = self.lookaheadIndex # Sets current lookahead point to previous for the start of the next loop
-        lookaheadPointDist = 0                      # Index Of Point Closest To Lookahead 
+        lookaheadPointDist = 0 # Index Of Point Closest To Lookahead 
 
         for i in range(self.lookaheadIndex, len(self.waypoints)-1):
             pointPosition = self.waypoints[i].position.fieldRef             # Finds position of the closest waypoint to the lookahead distance
@@ -48,19 +51,55 @@ class PurePursuitController(AbstractController):
             pointDistance = distanceTuples(robotPosition,pointPosition)  # Finds distance from robot to waypoint
 
             if pointDistance > lookaheadPointDist and pointDistance < self.lookaheadDistance: 
-                # If the distance to the closest waypoint is further than the current lookahead point disatnce and shorter than the ideal 
+                # If the distance to the closest waypoint is further than the current lookahead point distance and shorter than the ideal 
                 #   lookahead distance, it does the following. Basically, we want to find a waypoint as close to the lookahead distance as 
                 #   possible, but will ALWAYS round down if possible.
                 indexOfLookaheadPoint = i                                   # Sets the index of the lookahead point to i.
                 lookaheadPointDist = pointDistance                          # Sets the distance to the lookahead point distance so we calculate
+                self.lookaheadIndex = indexOfLookaheadPoint
+                i+=1
                                                                             #   the wheel velocities based on the target waypoint.
 
             elif pointDistance > self.lookaheadDistance:        
                 # If the distance of the new closest waypointis further than the lookahead distance, do the following.
-                self.lookaheadIndex = indexOfLookaheadPoint                 # Sets the lookahead index to be the index of the current lookahead 
+                indexOfLookaheadPoint = self.lookaheadIndex                # Sets the lookahead index to be the index of the current lookahead 
+
                                                                             #   point so it doesn't change for this loop.
             return self.waypoints[indexOfLookaheadPoint]                # Returns the waypoint of the index of the lookahead point above.
 
+        # If we run out of points, use the last valid one
+        #return self.waypoints[indexOfLookaheadPoint]
+
+    """def findLookaheadPoint2(self, robot: RobotModelOutput) -> Waypoint:
+
+        # Not sure if initialization values are necessary
+        innerLookaheadPointIndex = self.lookaheadIndex # Sets current lookahead point to previous for the start of the next loop
+        prevLookaheadPointDist = 0                      # Index Of Point Closest To Lookahead 
+
+        for i in range(self.lookaheadIndex, len(self.waypoints)-1):
+            pointPosition = self.waypoints[i].position.fieldRef             # Finds position of the closest waypoint to the lookahead distance
+            nextPointPosition = self.waypoints[i+1].position.fieldref
+            lastPointPosition = self.waypoints(i-1).position.fieldref
+            robotPosition = robot.position.fieldRef                         # Finds current robot position
+            pointDistance = distanceTuples(robotPosition,pointPosition)  # Finds distance from robot to waypoint
+            nextPointDistance = distanceTuples(robotPosition,nextPointPosition)
+            lastPointDistance = distanceTuples(robotPosition,lastPointPosition)
+
+            if (pointDistance > prevLookaheadPointDist and pointDistance < self.lookaheadDistance) and nextPointDistance > self.lookaheadDistance: 
+                # If the distance to the closest waypoint is further than the current lookahead point disatnce and shorter than the ideal 
+                #   lookahead distance, it does the following. Basically, we want to find a waypoint as close to the lookahead distance as 
+                #   possible, but will ALWAYS round down if possible.
+                innerLookaheadPointIndex = i
+                outerLookaheadPointIndex = i + 1                                #
+                prevLookaheadPointDist = nextPointDistance                          # Sets the distance to the lookahead point distance so we calculate
+                                                                            #   the wheel velocities based on the target waypoint.
+
+            elif pointDistance > self.lookaheadDistance:        
+                # If the distance of the new closest waypointis further than the lookahead distance, do the following.
+                self.lookaheadIndex = innerLookaheadPointIndex                 # Sets the lookahead index to be the index of the current lookahead 
+                                                                            #   point so it doesn't change for this loop.
+            return 1          # Returns the waypoint of the index of the lookahead point above.
+            """
         # If we run out of points, use the last valid one
         #return self.waypoints[indexOfLookaheadPoint] """ Why is is gray, did I break it? It says the code is unreachable T.T"""
 
@@ -79,21 +118,25 @@ class PurePursuitController(AbstractController):
         angleOfLookaheadVectorFromXAxis = math.atan2((waypointYPos - robotY), (waypointXPos - robotX))
         angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading
         
-        distToWaypoint = math.sqrt(distanceTuples(robotOutput.position.fieldRef, chosenWaypoint.position.fieldRef))   #temporary arbitrary value so the code stops getting mad. Code is commented above
+        distToWaypoint = distanceTuples(robotOutput.position.fieldRef, chosenWaypoint.position.fieldRef)   #temporary arbitrary value so the code stops getting mad. Code is commented above
         horizontalDistToWaypoint = math.sin(angleBetweenRobotHeadingAndLookaheadPoint)*distToWaypoint
-
+        
         if horizontalDistToWaypoint == 0:
-            return RobotModelInput(robotSpecs.maximumVelocity, robotSpecs.maximumVelocity), False
+            # This represents the case where the robot is either on the lookahead point (last point)
+            # Or is already at the right heading and doesn't need to curve
+            curvature = 0
+        else:
+            # Radius of curvature from robot to point
+            radiusOfCurvature = (distToWaypoint)**2/(2*horizontalDistToWaypoint)
 
-        # Radius of curvature from robot to point
-        radiusOfCurvature = (distToWaypoint)^2/(2*horizontalDistToWaypoint)
-
-        # Curvature from robot to point
-        curvature = 1/radiusOfCurvature
+            # Curvature from robot to point
+            curvature = 1/radiusOfCurvature
 
         # Curvature to robot wheel velocities:
         leftWheelVelocity = robotSpecs.maximumVelocity * (2 + curvature*robotSpecs.trackWidth)/2
         rightWheelVelocity = robotSpecs.maximumVelocity * (2 - curvature*robotSpecs.trackWidth)/2
+
+        print(f"x: {waypointXPos} y: {waypointYPos} distFromBotToPoint: {distToWaypoint}")
 
         return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False
         
