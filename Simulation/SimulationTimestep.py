@@ -12,3 +12,6 @@ class SimulationTimestep:
         self.timecode: float = timecode
         self.input: RobotModelInput = input
         self.output: RobotModelOutput = output
+
+    def __str__(self):
+        return "RobotModelOutput: " + str(self.output)

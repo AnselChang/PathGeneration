@@ -109,7 +109,6 @@ class PurePursuitController(AbstractController):
     
 
     def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool]:
-
         chosenWaypoint: Waypoint = self.findLookaheadPoint(robotOutput)
 
         #point to line distance from robot's heading vector

@@ -73,11 +73,11 @@ class Simulation:
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
         initialPosition: PointRef = waypoints[0][0].position
         initialHeading: float = waypoints[0][0].heading
-        output: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
+        robotOutput: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
 
         # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
         # different simulation implementations
-        robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, output)
+        robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, robotOutput)
 
         # Iterate until robot has reached the destination
         timesteps = 0
@@ -85,7 +85,7 @@ class Simulation:
         while timesteps < 10000 and not isDone: # hard limit of 10000 in case of getting stuck in simulation
 
             # Input robot position to controller and obtain wheel velocities
-            robotInput, isDone = controllerSM.runController(output)
+            robotInput, isDone = controllerSM.runController(robotOutput)
 
             # Take in wheel velocities from controller and simulate the robot model for a tick
             robotOutput: RobotModelOutput = robot.simulateTick(robotInput)
@@ -99,6 +99,9 @@ class Simulation:
 
         # Now that running simulation is complete, adjust slider bounds
         self.slider.setBounds(0, len(self.recordedSimulation) - 1)
+
+        #for step in self.recordedSimulation:
+        #    print(step)
 
 
     # Draw the line the robot takes in the simulation when following the path on the field
