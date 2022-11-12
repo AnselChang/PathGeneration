@@ -60,13 +60,12 @@ class PurePursuitController(AbstractController):
                 self.lookaheadIndex = indexOfLookaheadPoint
                 i+=1
                                                                             #   the wheel velocities based on the target waypoint.
-
             elif pointDistance > self.lookaheadDistance:        
                 # If the distance of the new closest waypointis further than the lookahead distance, do the following.
-                indexOfLookaheadPoint = self.lookaheadIndex                # Sets the lookahead index to be the index of the current lookahead 
-
+                indexOfLookaheadPoint = i - 1 #self.lookaheadIndex                # Sets the lookahead index to be the index of the current lookahead 
+                return self.waypoints[indexOfLookaheadPoint]
                                                                             #   point so it doesn't change for this loop.
-            return self.waypoints[indexOfLookaheadPoint]                # Returns the waypoint of the index of the lookahead point above.
+        return self.waypoints[indexOfLookaheadPoint]                # Returns the waypoint of the index of the lookahead point above.
 
         # If we run out of points, use the last valid one
         #return self.waypoints[indexOfLookaheadPoint]
@@ -99,14 +98,12 @@ class PurePursuitController(AbstractController):
             # Curvature from robot to point
             curvature = 1/radiusOfCurvature
 
-        kp = robotSpecs.maximumVelocity
-        error = kp #* (distToWaypoint/self.lookaheadDistance)
+        kp = robotSpecs.maximumVelocity/2
+        error = kp * (distToWaypoint/self.lookaheadDistance)
 
         # Curvature to robot wheel velocities:
         leftWheelVelocity = error * (2 + curvature*robotSpecs.trackWidth)/2
         rightWheelVelocity = error * (2 - curvature*robotSpecs.trackWidth)/2
-
-        print(f"{(2 + curvature*robotSpecs.trackWidth)/2}")
 
         return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
         
@@ -122,6 +119,8 @@ class PurePursuitController(AbstractController):
         #return RobotModelInput(leftVelocity, rightVelocity)
 
         """
+        FOR NOTEBOOKING:
+
         find lookahead pt
         point to line distance from robot's heading vector
          -> distToWaypoint = distanceTwoPoints(chosenWaypoint, pointOnLineClosestToPoint([robotHeadingVector], chosenWaypoint.position.fieldRef))

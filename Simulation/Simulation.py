@@ -70,7 +70,10 @@ class Simulation:
         
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
-        initialPosition: PointRef = waypoints[0][0] 
+        initialPosition: PointRef = waypoints[0][0]
+        print("first two waypoints:")
+        print(waypoints[0][0].fieldRef)
+        print(waypoints[0][1].fieldRef)
         initialHeading: float =  Utility.thetaTwoPoints(waypoints[0][0].fieldRef, waypoints[0][1].fieldRef)
         robotOutput: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
 
