@@ -2,6 +2,11 @@ from SingletonState.FieldTransform import FieldTransform
 import Utility, math
 from enum import Enum
 
+transform: FieldTransform = None
+def initFieldTransform(fieldTransform: FieldTransform):
+    global transform
+    transform = fieldTransform
+
 """
 A class that stores the location of a single point, which can be interpreted from both field and screen reference frames.
 The field reference frame is 144x144 inches while the screen has dimensions (SCREEN_SIZE + PANEL_WIDTH, SCREEN_SIZE) in pixels
@@ -23,8 +28,8 @@ class Ref(Enum):
 
 class PointRef:
 
-    def __init__(self, fieldTransform: FieldTransform, referenceMode: Ref = None, point: tuple = (0,0)):
-        self.transform = fieldTransform
+    def __init__(self, referenceMode: Ref = None, point: tuple = (0,0)):
+        self.transform = transform
         self._xf, self._yf = None, None
         if referenceMode == Ref.SCREEN:
             self.screenRef = point
@@ -80,9 +85,9 @@ class PointRef:
     # PointRef - PointRef = VectorRef
     def __sub__(self, other):
         if type(other) == PointRef:
-            return VectorRef(self.transform, Ref.FIELD, Utility.subtractTuples(self.fieldRef, other.fieldRef))
+            return VectorRef(Ref.FIELD, Utility.subtractTuples(self.fieldRef, other.fieldRef))
         else: # other is of type VectorRef
-            return PointRef(self.transform, Ref.FIELD, Utility.subtract(self.fieldRef, other.fieldRef))
+            return PointRef( Ref.FIELD, Utility.subtract(self.fieldRef, other.fieldRef))
 
     def __eq__(self, other):
 
@@ -93,7 +98,7 @@ class PointRef:
 
     # Create a deep copy of the object and return the copy
     def copy(self) -> 'PointRef':
-        return PointRef(self.transform, Ref.FIELD, self.fieldRef)
+        return PointRef(Ref.FIELD, self.fieldRef)
 
     def __str__(self):
         return "Point object:\nScreen: ({},{})\nField: ({},{})".format(*self.screenRef, *self.fieldRef)
@@ -108,8 +113,8 @@ VectorRef - VectorRef = VectorRef
 """
 class VectorRef:
 
-    def __init__(self, fieldTransform: FieldTransform, referenceMode: Ref = None, vector: tuple = (0,0)):
-        self.transform: FieldTransform = fieldTransform
+    def __init__(self, referenceMode: Ref = None, vector: tuple = (0,0)):
+        self.transform: FieldTransform = transform
         self._vxf, self._vyf = None, None
         if referenceMode == Ref.SCREEN:
             self.screenRef = vector
@@ -155,24 +160,24 @@ class VectorRef:
         st = math.sin(theta)
         x2 = ct * self._vxf - st * self._vyf
         y2 = st * self._vxf + ct * self._vyf
-        return VectorRef(self.transform, Ref.FIELD, (x2, y2))
+        return VectorRef(Ref.FIELD, (x2, y2))
 
     # Does not modify the current object but creates a new object with a magnitude of 1
     def normalize(self) -> 'VectorRef':
         mag = self.magnitude(Ref.FIELD)
-        return VectorRef(self.transform, Ref.FIELD, Utility.divideTuple(self.fieldRef, mag))
+        return VectorRef(Ref.FIELD, Utility.divideTuple(self.fieldRef, mag))
 
     # Vector addition. Does not modify but returns new VectorRef
     def __add__(self, other: 'VectorRef') -> 'VectorRef':
-        return VectorRef(self.transform, Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))
+        return VectorRef(Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))
 
     # Vector subtraction. Does not modify but returns new VectorRef
     def __sub__(self, other: 'VectorRef') -> 'VectorRef':
-        return VectorRef(self.transform, Ref.FIELD, Utility.subtractTuples(self.fieldRef, other.fieldRef))
+        return VectorRef(Ref.FIELD, Utility.subtractTuples(self.fieldRef, other.fieldRef))
 
     # Scales vector by some scalar. Does not modify but returns new VectorRef
     def __mul__(self, scalar: float) -> 'VectorRef':
-        return VectorRef(self.transform, Ref.FIELD, Utility.scaleTuple(self.fieldRef, scalar))
+        return VectorRef(Ref.FIELD, Utility.scaleTuple(self.fieldRef, scalar))
 
 
 # Testing code
