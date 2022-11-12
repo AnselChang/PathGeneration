@@ -87,3 +87,6 @@ def pointOnLineClosestToPoint(pointX: int, pointY: int, firstX: int, firstY: int
     scalar = (ax * bx + ay * by) / (bx * bx + by * by)
     return [firstX + scalar * bx, firstY + scalar * by]
 
+# Get the theta between positive x and the line from point A to point B
+def thetaTwoPoints(pointA: tuple, pointB: tuple) -> float:
+    return math.atan2(pointB[1] - pointA[1], pointB[0] - pointA[0])

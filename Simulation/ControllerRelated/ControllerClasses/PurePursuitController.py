@@ -2,9 +2,12 @@ from re import A
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
-from Simulation import Waypoint
+from SingletonState.ReferenceFrame import PointRef
 from Sliders.Slider import Slider
 from RobotSpecs import RobotSpecs
+from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
+from Simulation.HUDGraphics.PurePursuitGraphics import PPGraphics
+
 
 from typing import Tuple
 
@@ -36,7 +39,7 @@ class PurePursuitController(AbstractController):
         # Step 2: if that is closest to lookahead distance, save it
         # Step 3: if farther than lookahead, break out of loop
     
-    def findLookaheadPoint(self, robot: RobotModelOutput) -> Waypoint:
+    def findLookaheadPoint(self, robot: RobotModelOutput) -> PointRef:
     
         # return self.waypoints[len(self.waypoints)-1]
         # Not sure if initialization values are necessary
@@ -44,7 +47,7 @@ class PurePursuitController(AbstractController):
         lookaheadPointDist = 0 # Index Of Point Closest To Lookahead 
 
         for i in range(self.lookaheadIndex, len(self.waypoints)-1):
-            pointPosition = self.waypoints[i].position.fieldRef             # Finds position of the closest waypoint to the lookahead distance
+            pointPosition = self.waypoints[i].fieldRef             # Finds position of the closest waypoint to the lookahead distance
             robotPosition = robot.position.fieldRef                         # Finds current robot position
             pointDistance = distanceTuples(robotPosition,pointPosition)  # Finds distance from robot to waypoint
 
@@ -73,16 +76,16 @@ class PurePursuitController(AbstractController):
         pass
     
 
-    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool]:
-        chosenWaypoint: Waypoint = self.findLookaheadPoint(robotOutput)
+    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
+        chosenWaypoint: PointRef = self.findLookaheadPoint(robotOutput)
 
         #point to line distance from robot's heading vector
-        waypointXPos, waypointYPos = chosenWaypoint.position.fieldRef
+        waypointXPos, waypointYPos = chosenWaypoint.fieldRef
         robotX, robotY = robotOutput.position.fieldRef
         angleOfLookaheadVectorFromXAxis = math.atan2((waypointYPos - robotY), (waypointXPos - robotX))
         angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading
         
-        distToWaypoint = distanceTuples(robotOutput.position.fieldRef, chosenWaypoint.position.fieldRef)   #temporary arbitrary value so the code stops getting mad. Code is commented above
+        distToWaypoint = distanceTuples(robotOutput.position.fieldRef, chosenWaypoint.fieldRef)   #temporary arbitrary value so the code stops getting mad. Code is commented above
         horizontalDistToWaypoint = math.sin(angleBetweenRobotHeadingAndLookaheadPoint)*distToWaypoint
         
         if horizontalDistToWaypoint == 0:
@@ -105,7 +108,7 @@ class PurePursuitController(AbstractController):
 
         print(f"{(2 + curvature*robotSpecs.trackWidth)/2}")
 
-        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False
+        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False, PPGraphics(self.waypoints)
         
 
 

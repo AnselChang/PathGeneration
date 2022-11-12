@@ -3,6 +3,7 @@ from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Sliders.Slider import Slider
 from RobotSpecs import RobotSpecs
+from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 
 from typing import Tuple
 
@@ -27,6 +28,6 @@ class StanleyController(AbstractController):
 
     # Performs one timestep of the stanley algorithm
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
-    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
         #TODO implement this!
         pass

@@ -10,7 +10,6 @@ from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerRelated.ControllerManager import ControllerManager
 from SingletonState.FieldTransform import FieldTransform
 from Simulation.RobotRelated.RobotDrawing import RobotDrawing
-from Simulation.Waypoint import Waypoint
 from Simulation.SimulationTimestep import SimulationTimestep
 from Panel.VelocityGUI import VelocityGUI
 from SingletonState.SoftwareState import SoftwareState
@@ -64,15 +63,15 @@ class Simulation:
         # we're running a new simulation now, so delete the data from the old one
         self.recordedSimulation.clear() 
 
-        waypoints: list[list[Waypoint]] = self.path.waypoints.convertToWaypoints()
+        waypoints: list[list[PointRef]] = self.path.waypoints.points
 
         # Set up the controller state machine that alternates between path following and point turn controllers
         controllerSM = ControllerStateMachine(self.robotSpecs, waypoints, self.controllers.getController())
         
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
-        initialPosition: PointRef = waypoints[0][0].position
-        initialHeading: float = waypoints[0][0].heading
+        initialPosition: PointRef = waypoints[0][0] 
+        initialHeading: float =  Utility.thetaTwoPoints(waypoints[0][0].fieldRef, waypoints[0][1].fieldRef)
         robotOutput: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
 
         # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
@@ -85,13 +84,13 @@ class Simulation:
         while timesteps < 10000 and not isDone: # hard limit of 10000 in case of getting stuck in simulation
 
             # Input robot position to controller and obtain wheel velocities
-            robotInput, isDone = controllerSM.runController(robotOutput)
+            robotInput, isDone, graphics = controllerSM.runController(robotOutput)
 
             # Take in wheel velocities from controller and simulate the robot model for a tick
             robotOutput: RobotModelOutput = robot.simulateTick(robotInput)
 
             # Store the robot position at each tick
-            self.recordedSimulation.append(SimulationTimestep(timesteps * self.robotSpecs.timestep, robotInput, robotOutput))
+            self.recordedSimulation.append(SimulationTimestep(timesteps * self.robotSpecs.timestep, robotInput, robotOutput, graphics))
 
             # Increment number of timesteps elapsed
             timesteps += 1
@@ -158,9 +157,11 @@ class Simulation:
             return
 
         self.drawSimulatedPathLine(screen)
-        
-        # draw the robot at the current timestep specified by slider
-        self.drawRobot(screen, self.getCurrent().output)
+
+        # Draw the robot and HUD graphics at current simulation timestep
+        currentTimestep: SimulationTimestep = self.getCurrent()
+        self.drawRobot(screen, currentTimestep.output)
+        currentTimestep.graphics.draw(screen)
         
             
         
