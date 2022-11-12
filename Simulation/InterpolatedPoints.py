@@ -1,5 +1,4 @@
 from SingletonState.ReferenceFrame import PointRef
-from Simulation.Waypoint import Waypoint
 
 """
 Essentially a glorified list of list of PointRefs.
@@ -53,11 +52,3 @@ class InterpolatedPoints:
         # Weird python quirk to return empty iterator if self.points is empty
         return
         yield
-
-    # Preprocess points with more information for simulation. Returns a list of list of waypoints
-    def convertToWaypoints(self) -> list[list[Waypoint]]:
-        #TODO
-        pass
-
-        # TEMPORARY, DELETE WHEN IMPLEMENTING
-        return [[Waypoint(pointRef, 0, 0) for pointRef in segment] for segment in self.points]

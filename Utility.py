@@ -48,6 +48,7 @@ def clamp2D(point: tuple, minX: float, minY: float, maxX: float, maxY: float) ->
 def hypo(s1, s2):
     return math.sqrt(s1*s1 + s2*s2)
 
+# change to magnitude
 def distanceTuple(vector: tuple):
     return hypo(*vector)
 
@@ -58,6 +59,7 @@ def distanceTuples(vector1: tuple, vector2: tuple):
     return distance(*vector1, *vector2)
 
 # Distance between point (x0, y0) and line (x1, y1,),(x2,y2)
+# bad name
 def distanceTwoPoints(x0, y0, x1, y1, x2, y2):
     return abs((x2-x1)*(y1-y0)- (x1-x0)*(y2-y1)) / distance(x1, y1, x2, y2)
 
@@ -85,3 +87,6 @@ def pointOnLineClosestToPoint(pointX: int, pointY: int, firstX: int, firstY: int
     scalar = (ax * bx + ay * by) / (bx * bx + by * by)
     return [firstX + scalar * bx, firstY + scalar * by]
 
+# Get the theta between positive x and the line from point A to point B
+def thetaTwoPoints(pointA: tuple, pointB: tuple) -> float:
+    return math.atan2(pointB[1] - pointA[1], pointB[0] - pointA[0])

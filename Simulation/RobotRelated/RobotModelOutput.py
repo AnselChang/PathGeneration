@@ -25,3 +25,6 @@ class RobotModelOutput:
         self.yVelocity = yVelocity
         self.angularVelocity = angularVelocity
         self.heading = headingRadians
+
+    def __str__(self):
+        return str(self.position)
