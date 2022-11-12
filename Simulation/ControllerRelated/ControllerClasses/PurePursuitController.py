@@ -37,8 +37,8 @@ class PurePursuitController(AbstractController):
         # Step 3: if farther than lookahead, break out of loop
     
     def findLookaheadPoint(self, robot: RobotModelOutput) -> Waypoint:
-
-        return self.waypoints[len(self.waypoints)-1]
+    
+        # return self.waypoints[len(self.waypoints)-1]
         # Not sure if initialization values are necessary
         indexOfLookaheadPoint = self.lookaheadIndex # Sets current lookahead point to previous for the start of the next loop
         lookaheadPointDist = 0 # Index Of Point Closest To Lookahead 
@@ -97,7 +97,7 @@ class PurePursuitController(AbstractController):
             curvature = 1/radiusOfCurvature
 
         kp = robotSpecs.maximumVelocity
-        error = kp * (distToWaypoint/self.lookaheadDistance)
+        error = kp #* (distToWaypoint/self.lookaheadDistance)
 
         # Curvature to robot wheel velocities:
         leftWheelVelocity = error * (2 + curvature*robotSpecs.trackWidth)/2
@@ -132,6 +132,7 @@ class PurePursuitController(AbstractController):
         """
     
     
+
         """
         given current x, y, and theta;
         given desired x, y, and theta of each waypoint
