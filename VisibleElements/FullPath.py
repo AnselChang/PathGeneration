@@ -1,4 +1,3 @@
-
 from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint, Shape

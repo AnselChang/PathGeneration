@@ -79,7 +79,7 @@ class PointRef:
 
     # PointRef + VectorRef = PointRef
     def __add__(self, other: 'VectorRef') -> 'PointRef':
-        return PointRef(self.transform, Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))
+        return PointRef(Ref.FIELD, Utility.addTuples(self.fieldRef, other.fieldRef))
 
     # PointRef - VectorRef = PointRef
     # PointRef - PointRef = VectorRef
@@ -87,7 +87,7 @@ class PointRef:
         if type(other) == PointRef:
             return VectorRef(Ref.FIELD, Utility.subtractTuples(self.fieldRef, other.fieldRef))
         else: # other is of type VectorRef
-            return PointRef( Ref.FIELD, Utility.subtract(self.fieldRef, other.fieldRef))
+            return PointRef(Ref.FIELD, Utility.subtract(self.fieldRef, other.fieldRef))
 
     def __eq__(self, other):
 

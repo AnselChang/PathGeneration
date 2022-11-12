@@ -14,10 +14,9 @@ points are linked.
 class ControlPoint(Point):
 
     # delta x and delta y from PathPoint in inches
-    def __init__(self, pathTransform: FieldTransform, parent, deltaX: float, deltaY: float):
-        self.transform = pathTransform
+    def __init__(self, parent, deltaX: float, deltaY: float):
         self.parent = parent
-        self.vector = VectorRef(self.transform, Ref.FIELD, (deltaX, deltaY))
+        self.vector = VectorRef(Ref.FIELD, (deltaX, deltaY))
         
         self.DRAW_RADIUS = 5
         super().__init__(hoverRadius = 10, drawRadius = 5, drawRadiusBig = 6)

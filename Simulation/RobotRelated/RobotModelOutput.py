@@ -13,12 +13,10 @@ Everything is stored relative to the field
 
 class RobotModelOutput:
 
-    # Initialize transform reference at the creation of simulation object
-    transform: FieldTransform = None
 
     # xPosition and yPosition in inches
     def __init__(self, xPosition: float, yPosition: float, headingRadians: float, clampedLeftVelocity: float, clampedRightVelocity: float, xVelocity: float = 0, yVelocity: float = 0, angularVelocity: float = 0):
-        self.position = PointRef(self.transform, Ref.FIELD, (xPosition, yPosition))
+        self.position = PointRef(Ref.FIELD, (xPosition, yPosition))
         self.leftVelocity = clampedLeftVelocity
         self.rightVelocity = clampedRightVelocity
         self.xVelocity = xVelocity
