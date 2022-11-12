@@ -108,7 +108,7 @@ class PurePursuitController(AbstractController):
 
         print(f"{(2 + curvature*robotSpecs.trackWidth)/2}")
 
-        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False, PPGraphics(self.waypoints)
+        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
         
 
 
