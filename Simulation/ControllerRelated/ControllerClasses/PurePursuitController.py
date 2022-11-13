@@ -23,8 +23,8 @@ class PurePursuitController(AbstractController):
     def __init__(self):
         super().__init__("Pure Pursuit")
         self.lookaheadIndex = 0
-        self.lookaheadDistance = 15
-    
+        self.lookaheadDistance = 20
+        self.tolerance = 20
 
     def defineParameterSliders(self) -> list[Slider]:
         #TODO define the tunable parameters of this controller
@@ -98,14 +98,17 @@ class PurePursuitController(AbstractController):
             # Curvature from robot to point
             curvature = 1/radiusOfCurvature
 
-        kp = robotSpecs.maximumVelocity/2
+        kp = robotSpecs.maximumVelocity/3
+        kd = 1/(2*(1-curvature))
         error = kp * (distToWaypoint/self.lookaheadDistance)
 
         # Curvature to robot wheel velocities:
-        leftWheelVelocity = error * (2 + curvature*robotSpecs.trackWidth)/2
-        rightWheelVelocity = error * (2 - curvature*robotSpecs.trackWidth)/2
+        leftWheelVelocity = kd * error * (2 + curvature*robotSpecs.trackWidth)/2
+        rightWheelVelocity = kd * error * (2 - curvature*robotSpecs.trackWidth)/2
 
-        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
+        isDone = distToWaypoint < self.tolerance and chosenWaypoint==self.waypoints[len(self.waypoints)-1]
+
+        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), isDone, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
         
 
 

@@ -9,7 +9,7 @@ class RobotSpecs:
 
         # Used by both kinematics simulation and path following controllers
         self.trackWidth = 10 # in inches
-        self.maximumVelocity = 10 # linear velocity of a wheel / robot, inches per second
+        self.maximumVelocity = 20 # linear velocity of a wheel / robot, inches per second
         self.timestep = 0.05 # the duration of each timestep in seconds
 
         # Used only for robot simulation
