@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
-from Simulation.InterpolatedPoints import InterpolatedPoints
+from SingletonState.ReferenceFrame import PointRef
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
+from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 
 from typing import Tuple
 
@@ -45,5 +46,5 @@ class AbstractController(ABC):
     # To be implemented by each algorithm. Simulates path following at each timestep.
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
     @abstractmethod
-    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
         pass

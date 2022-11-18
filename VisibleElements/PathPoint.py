@@ -20,9 +20,8 @@ class PathPoint(Point):
 
     def __init__(self, spawnPosition: PointRef, spawnVector: tuple):
         self.position = spawnPosition
-        self.transform = spawnPosition.transform
-        self.controlA: ControlPoint = ControlPoint(self.transform, self, *spawnVector)
-        self.controlB: ControlPoint = ControlPoint(self.transform, self, 0, 0)
+        self.controlA: ControlPoint = ControlPoint(self, *spawnVector)
+        self.controlB: ControlPoint = ControlPoint(self, 0, 0)
         self.controlA.updateOtherVector()
 
         # By default, self.controlPositionA and self.controlPositionB are linked and the curve is continuous

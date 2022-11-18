@@ -13,15 +13,14 @@ _LEFT = 1
 _RIGHT = 3
 
 class UserInput:
-    def __init__(self, transform: FieldTransform, pygameMouseObject, pygameKeyObject):
+    def __init__(self, pygameMouseObject, pygameKeyObject):
         
         # Singleton state objects
         self._mouse = pygameMouseObject
         self._key = pygameKeyObject
-        self._transform = transform
 
         # Position of the mouse in both screen and field reference frames
-        self.mousePosition = PointRef(self._transform)
+        self.mousePosition = PointRef()
         self.isMouseOnField = True # whether mouse is on the field, as opposed to the panel
 
         # Key that was just pressed this frame

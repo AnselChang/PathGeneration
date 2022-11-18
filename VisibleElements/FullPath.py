@@ -1,6 +1,3 @@
-
-from pathlib import Path
-from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint, Shape
@@ -15,8 +12,7 @@ PathPoint change."""
 
 class FullPath:
 
-    def __init__(self, transform: FieldTransform):
-        self.transform = transform
+    def __init__(self):
         self.pathPoints: list[PathPoint] = [] # The user-defined points
         self.segments: list[PathSegment] = []
         self.waypoints: InterpolatedPoints = InterpolatedPoints()
@@ -93,7 +89,7 @@ class FullPath:
 
         while ns < 1:
             x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
-            self.waypoints.addPoint(PointRef(self.transform, Ref.FIELD, (x,y)))
+            self.waypoints.addPoint(PointRef(Ref.FIELD, (x,y)))
 
             dxds, dyds = BezierCurves.getBezierGradient(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
             dsdt = self.INTERPOLATED_POINT_DISTANCE / Utility.hypo(dxds, dyds)

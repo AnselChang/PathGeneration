@@ -14,7 +14,7 @@ Using mouse to control the robot in Odom tab. Uses Velocity GUI for input which 
 
 class DriverSimulation:
 
-    def __init__(self, robotSpecs: RobotSpecs, fieldTransform: FieldTransform):
+    def __init__(self, robotSpecs: RobotSpecs):
 
         # Define starting position
         startPosition: RobotModelOutput = RobotModelOutput(72, 72, 0, 0, 0)
@@ -24,7 +24,7 @@ class DriverSimulation:
 
         # Define robot model used
         self.robot: AbstractRobotModel = ComplexRobotModel(robotSpecs, startPosition)
-        self.robotDrawing: RobotDrawing = RobotDrawing(fieldTransform, robotSpecs.trackWidth)
+        self.robotDrawing: RobotDrawing = RobotDrawing(robotSpecs.trackWidth)
 
         self.velocityGUI: VelocityGUI = VelocityGUI(robotSpecs, isInteractiveMode = True)
 
