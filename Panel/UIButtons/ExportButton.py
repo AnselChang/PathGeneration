@@ -34,4 +34,4 @@ class RightButton(ClickButton):
 
     # When clicked, go to previous controller
     def clickEnabledButton(self) -> None:
-        self.controllers.next()
+        self.exporter.run()
