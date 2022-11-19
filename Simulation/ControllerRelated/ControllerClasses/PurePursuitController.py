@@ -58,7 +58,6 @@ class PurePursuitController(AbstractController):
                 indexOfLookaheadPoint = i                                   # Sets the index of the lookahead point to i.
                 lookaheadPointDist = pointDistance                          # Sets the distance to the lookahead point distance so we calculate
                 self.lookaheadIndex = indexOfLookaheadPoint
-                i+=1
                                                                             #   the wheel velocities based on the target waypoint.
 
             elif pointDistance > self.lookaheadDistance:        
