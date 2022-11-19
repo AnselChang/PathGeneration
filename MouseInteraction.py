@@ -26,7 +26,7 @@ def getShadowPosition(mousePosition: PointRef, state: SoftwareState) -> PointRef
         positionA = state.objectHovering.pointA.position.fieldRef
         positionB = state.objectHovering.pointB.position.fieldRef
         positionOnSegment = Utility.pointOnLineClosestToPoint(*mousePosition.fieldRef, *positionA, *positionB)
-        return PointRef(mousePosition.transform, Ref.FIELD, positionOnSegment)
+        return PointRef(Ref.FIELD, positionOnSegment)
     # otherwise, the shadow position is simply the position of hte mouse
     else:
         return mousePosition

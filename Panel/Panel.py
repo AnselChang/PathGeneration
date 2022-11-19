@@ -33,7 +33,7 @@ class Panel:
         self.aiTab: AITab.AITab = AITab.AITab(discManager)
         self.editTab: EditTab.EditTab = EditTab.EditTab(state, path)
         self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(state, simulation)
-        self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(simulation)
+        self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(path)
         self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab(driver)
 
     # Given the mode, get the tab oject associated with that mode
