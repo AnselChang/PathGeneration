@@ -9,3 +9,7 @@ class AbstractExporter:
     def export(self, collection: list, location: str):
         pass
 
+    @abstractmethod
+    def getExtension(self) -> tuple[str,str]:
+        pass
+
