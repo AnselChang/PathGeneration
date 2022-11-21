@@ -23,7 +23,7 @@ class PurePursuitController(AbstractController):
     def __init__(self):
         super().__init__("Pure Pursuit")
         self.lookaheadIndex = 0
-        self.lookaheadDistance = 20
+        self.lookaheadDistance = 10
         self.tolerance = 20
 
     def defineParameterSliders(self) -> list[Slider]:
@@ -32,6 +32,7 @@ class PurePursuitController(AbstractController):
         lookAheadDistance
         """
         pass
+
 
     # Indexes through the lost of waypoints to find the one futher along the path closest to lookahead circle.
     def findLookaheadPoint(self, robot: RobotModelOutput) -> PointRef:  
@@ -57,9 +58,11 @@ class PurePursuitController(AbstractController):
             # If the distance of the new closest waypointis further than the lookahead distance, do the following.
             elif pointDistance > self.lookaheadDistance:        
                 indexOfLookaheadPoint = i - 1                           # Sets the lookahead index to be one option before the 
-                                                                        #   current index. (Rounds down.)
-
+                                                                        #   current index. (Rounds down.)    
+                return self.waypoints[indexOfLookaheadPoint] 
         return self.waypoints[indexOfLookaheadPoint]                    # Returns the waypoint of the index chosen above.
+
+
 
     # init whatever is needed at the start of each path
     def initController(self):
@@ -98,7 +101,7 @@ class PurePursuitController(AbstractController):
             curvature = 1/radiusOfCurvature
 
         # Constant used to scale overall velocity up or down for tuning.
-        kp = 1/3 
+        kp = 1/3
 
         # Slows robot down around curves.
         kd = 1/(2*(1-curvature)) 
