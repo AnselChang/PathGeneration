@@ -24,7 +24,7 @@ class PurePursuitController(AbstractController):
         super().__init__("Pure Pursuit")
         self.lookaheadIndex = 0
         self.lookaheadDistance = 10
-        self.tolerance = 20
+        self.tolerance = 2
 
     def defineParameterSliders(self) -> list[Slider]:
         #TODO define the tunable parameters of this controller
@@ -41,7 +41,7 @@ class PurePursuitController(AbstractController):
         lookaheadPointDist = 0                                          # Initial value of the lookahead point distance is 0.
 
         # Looks at waypoints from the last lookahead point to the second to last point on the list
-        for i in range(self.lookaheadIndex, len(self.waypoints)-1):     
+        for i in range(self.lookaheadIndex, len(self.waypoints)):     
             pointPosition = self.waypoints[i].fieldRef                  # Finds position of the waypoint currently being 
                                                                         #   looked at.
             robotPosition = robot.position.fieldRef                     # Calls current robot position
@@ -114,8 +114,7 @@ class PurePursuitController(AbstractController):
         rightWheelVelocity = kd * error * (2 - curvature*robotSpecs.trackWidth)/2
 
         # Tells the system that the PP loop is done.
-        isDone = distToWaypoint < self.tolerance and chosenWaypoint==self.waypoints[len(self.waypoints)-1]
-
+        isDone = distToWaypoint < self.tolerance and chosenWaypoint==self.waypoints[-1]
         # Returns the desired wheel velocities to be used in RobotModelInput.
         return RobotModelInput(leftWheelVelocity,rightWheelVelocity), isDone, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
         

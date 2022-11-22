@@ -77,6 +77,7 @@ def main():
 
         # Whenever the path is modified, the interpolated beizer points have to be recomputed again
         if state.recomputeInterpolation:
+            state.rerunSimulation = True
             path.calculateInterpolatedPoints()
 
         if state.mode == Mode.SIMULATE:

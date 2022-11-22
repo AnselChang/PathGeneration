@@ -101,6 +101,7 @@ class Simulation:
 
         # Now that running simulation is complete, adjust slider bounds
         self.slider.setBounds(0, len(self.recordedSimulation) - 1)
+        self.slider.setValue(0)
 
         #for step in self.recordedSimulation:
         #    print(step)
