@@ -1,6 +1,7 @@
 import pygame, sys
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
+import SingletonState.ReferenceFrame as ReferenceFrame
 from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
@@ -25,16 +26,18 @@ if __name__ == '__main__':
     pygame.display.set_caption("Path Generation 2.0 by Ansel")
 
     fieldTransform: FieldTransform = FieldTransform()
+    ReferenceFrame.initFieldTransform(fieldTransform)
+
     fieldSurface: FieldSurface = FieldSurface(fieldTransform)
-    userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
+    userInput: UserInput = UserInput(pygame.mouse, pygame.key)
     controllers: ControllerManager = ControllerManager()
 
     state: SoftwareState = SoftwareState()
-    path: FullPath = FullPath(fieldTransform)
-    discManager: DiscManager = DiscManager(fieldTransform)
+    path: FullPath = FullPath()
+    discManager: DiscManager = DiscManager()
     robotSpecs: RobotSpecs = RobotSpecs()
-    simulation: Simulation = Simulation(state, fieldTransform, controllers, path, robotSpecs)
-    driver: DriverSimulation = DriverSimulation(robotSpecs, fieldTransform)
+    simulation: Simulation = Simulation(state, controllers, path, robotSpecs)
+    driver: DriverSimulation = DriverSimulation(robotSpecs)
     panel: Panel = Panel(state, path, simulation, driver, discManager)
 
 

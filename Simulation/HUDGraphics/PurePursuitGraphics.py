@@ -12,7 +12,7 @@ Currently, displays only the position of the lookahead
 class PPGraphics(HUDGraphics):
 
     def __init__(self, robotPosition: PointRef, waypoint: PointRef, lookaheadDistance: float):
-        self.positon = robotPosition.copy()
+        self.position = robotPosition.copy()
         self.waypoint: PointRef = waypoint
 
     def draw(self, screen: pygame.Surface):

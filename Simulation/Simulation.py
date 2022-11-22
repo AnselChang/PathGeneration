@@ -8,7 +8,6 @@ from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerRelated.ControllerManager import ControllerManager
-from SingletonState.FieldTransform import FieldTransform
 from Simulation.RobotRelated.RobotDrawing import RobotDrawing
 from Simulation.SimulationTimestep import SimulationTimestep
 from Panel.VelocityGUI import VelocityGUI
@@ -29,12 +28,9 @@ It then runs a full simulation (not in real time), and ultimately generates a li
 
 class Simulation:
 
-    def __init__(self, state: SoftwareState, transform: FieldTransform, controllers: ControllerManager, path: FullPath, robotSpecs: RobotSpecs):
+    def __init__(self, state: SoftwareState, controllers: ControllerManager, path: FullPath, robotSpecs: RobotSpecs):
 
-        # Initialize RobotModelOutput class's transform reference
-        RobotModelOutput.transform = transform
-
-        self.robotDrawing = RobotDrawing(transform, robotSpecs.trackWidth)
+        self.robotDrawing = RobotDrawing(robotSpecs.trackWidth)
 
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[SimulationTimestep] = []

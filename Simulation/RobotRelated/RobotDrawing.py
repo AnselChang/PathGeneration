@@ -9,12 +9,12 @@ Draws the robot given a PointRef as the center of the robot
 """
 
 # Define a rectangle as four vectors from the center
-def getRect(transform: FieldTransform, deltaX: float, deltaY: float, width: float, height: float):
+def getRect(deltaX: float, deltaY: float, width: float, height: float):
     return (
-        VectorRef(transform, Ref.FIELD, (deltaX - width/2, deltaY - height/2)),
-        VectorRef(transform, Ref.FIELD, (deltaX + width/2, deltaY - height/2)),
-        VectorRef(transform, Ref.FIELD, (deltaX + width/2, deltaY + height/2)),
-        VectorRef(transform, Ref.FIELD, (deltaX - width/2, deltaY + height/2)),
+        VectorRef(Ref.FIELD, (deltaX - width/2, deltaY - height/2)),
+        VectorRef(Ref.FIELD, (deltaX + width/2, deltaY - height/2)),
+        VectorRef(Ref.FIELD, (deltaX + width/2, deltaY + height/2)),
+        VectorRef(Ref.FIELD, (deltaX - width/2, deltaY + height/2)),
         
     )
 
@@ -28,16 +28,14 @@ def getAbsolutePoints(rect: list[VectorRef], center: PointRef):
 
 class RobotDrawing:
 
+    def __init__(self, size: float):
 
-    def __init__(self, transform: FieldTransform, size: float):
-
-
-        self.robot = getRect(transform, 0, 0, size, size)
+        self.robot = getRect(0, 0, size, size)
 
         WHEEL_HEIGHT = 1
         WHEEL_WIDTH = 3
-        self.leftWheel = getRect(transform, 0, -size/2 + WHEEL_HEIGHT/2, WHEEL_WIDTH, WHEEL_HEIGHT)
-        self.rightWheel = getRect(transform, 0, size/2 - WHEEL_HEIGHT/2, WHEEL_WIDTH, WHEEL_HEIGHT)
+        self.leftWheel = getRect(0, -size/2 + WHEEL_HEIGHT/2, WHEEL_WIDTH, WHEEL_HEIGHT)
+        self.rightWheel = getRect(0, size/2 - WHEEL_HEIGHT/2, WHEEL_WIDTH, WHEEL_HEIGHT)
 
     # Draw the robot centered around the center PointRef onto the screen
     def draw(self, screen: pygame.Surface, center: PointRef, heading: float):

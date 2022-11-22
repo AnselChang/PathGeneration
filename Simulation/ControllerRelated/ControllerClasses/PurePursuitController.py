@@ -47,14 +47,14 @@ class PurePursuitController(AbstractController):
             robotPosition = robot.position.fieldRef                     # Calls current robot position
             pointDistance = distanceTuples(robotPosition,pointPosition) # Finds distance from robot to waypoint
 
-            # If the distance to the closest waypoint is further than the last lookahead point distance and shorter than the 
-            #   ideal lookahead distance, do the following. 
             if pointDistance > lookaheadPointDist and pointDistance < self.lookaheadDistance: 
-                indexOfLookaheadPoint = i                               # Sets the index of the lookahead point to i.
-                lookaheadPointDist = pointDistance                      # Sets the distance to the lookahead point distance so 
-                                                                        #   we calculate.
-                self.lookaheadIndex = indexOfLookaheadPoint             # Sets lookaheadIndex to be the new index.
-                
+                # If the distance to the closest waypoint is further than the current lookahead point distance and shorter than the ideal 
+                #   lookahead distance, it does the following. Basically, we want to find a waypoint as close to the lookahead distance as 
+                #   possible, but will ALWAYS round down if possible.
+                indexOfLookaheadPoint = i                                   # Sets the index of the lookahead point to i.
+                lookaheadPointDist = pointDistance                          # Sets the distance to the lookahead point distance so we calculate
+                self.lookaheadIndex = indexOfLookaheadPoint
+                                                                            #   the wheel velocities based on the target waypoint.      
             # If the distance of the new closest waypointis further than the lookahead distance, do the following.
             elif pointDistance > self.lookaheadDistance:        
                 indexOfLookaheadPoint = i - 1                           # Sets the lookahead index to be one option before the 
