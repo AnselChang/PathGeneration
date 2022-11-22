@@ -95,6 +95,7 @@ class StanleyController(AbstractController):
         currentVelocity = (output.leftVelocity + output.rightVelocity)/2
 
         # Calculates the steering angle (the normal output of a Stanley controller)
+        # The second controller is a crosstrack error-based controller, within an atan to convert to a steering angle by adjusting by the current velocity
         steeringAngle = headingError + math.atan2(self.crossTrackKP*crossTrackError,self.softeningConstant+currentVelocity)
 
         # Use basic trig to calculate the radius resulting from such a steering angle
