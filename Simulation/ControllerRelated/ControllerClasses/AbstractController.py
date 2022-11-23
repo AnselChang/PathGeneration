@@ -4,8 +4,9 @@ from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from SingletonState.ReferenceFrame import PointRef
 from RobotSpecs import RobotSpecs
-from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
+from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState, buildControllerSliders
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
+from Sliders.Slider import Slider
 
 from typing import Tuple
 
@@ -20,15 +21,22 @@ class AbstractController(ABC):
 
     def __init__(self, name: str):
         self.name : str = name
-        self.sliderInfo: list[ControllerSliderState] = self.defineParameterSliders() # sliders for tuning the simulation robot
-
-
+        self.sliders: list[Slider] = [buildControllerSliders(sliderState) for sliderState in self.defineParameterSliders()]
+        
     # Any controller that implements AbstractController must return a list of sliders for the tunable parameters
     # of that controller
     @abstractmethod
     def defineParameterSliders(self) -> list[ControllerSliderState]:
         pass
-        
+
+    
+    # Get the slider value based on the slider's string label
+    # since it's O(n) it's probably a good idea to store this and cache for entire simulation
+    def getSliderValue(self, label: str) -> float:
+        for slider in self.sliders:
+            if slider.text == label:
+                return slider.getValue()
+        raise Exception("Slider not found from label")
 
     # To be called at the start of a simulation. Sets waypoints and initial state
     def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[PointRef]):

@@ -20,8 +20,7 @@ class ControllerManager:
         ]
 
         self.names = [controller().name for controller in self.controllers]
-        sliderInfos: list[ControllerSliderState] =  [controller().sliderInfo for controller in self.controllers]
-        self.sliders = [buildControllerSliders(sliderInfo) for sliderInfo in sliderInfos]
+        self.sliders: list[list[Slider]] = [controller().sliders for controller in self.controllers]
         
         self.index = 0 # index of selected controller in controller list
 
