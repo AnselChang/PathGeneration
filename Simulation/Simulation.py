@@ -62,7 +62,7 @@ class Simulation:
         waypoints: list[list[PointRef]] = self.path.waypoints.points
 
         # Set up the controller state machine that alternates between path following and point turn controllers
-        controllerSM = ControllerStateMachine(self.robotSpecs, waypoints, self.controllers.getController())
+        controllerSM = ControllerStateMachine(self.robotSpecs, waypoints, self.controllers.getController()())
         
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint

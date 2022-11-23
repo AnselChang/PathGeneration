@@ -17,11 +17,17 @@ class ControllerManager:
             StanleyController
         ]
 
+        self.names = [controller().name for controller in self.controllers]
+
         self.index = 0 # index of selected controller in controller list
 
     # return the currently-selected controller
     def getController(self) -> AbstractController:
-        return self.controllers[self.index]()
+        return self.controllers[self.index]
+    
+    # get the name of the currently-selected controller
+    def getCurrentName(self) -> str:
+        return self.names[self.index]
 
     # Whether there is a controller before the currently-selected one
     def isPrevious(self) -> bool:

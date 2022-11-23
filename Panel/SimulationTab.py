@@ -55,7 +55,7 @@ class SimulationTab(AbstractTab):
 
         # Draw text horizontally centered in panel
         textPosition = (Utility.SCREEN_SIZE + Utility.PANEL_WIDTH/2, 120)
-        controllerName: str = self.simulation.controllers.getController().name
+        controllerName: str = self.simulation.controllers.getCurrentName()
         Graphics.drawText(screen, Graphics.FONT40, controllerName, colors.BLACK, *textPosition)
 
         self.simulation.draw(screen)

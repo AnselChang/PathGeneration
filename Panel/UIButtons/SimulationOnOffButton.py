@@ -40,7 +40,8 @@ class SimulationOnOffButton(FlipFlopButton):
   # The action to do when the button is toggled on
     def toggleButton(self) -> None:
         self.state.playingSimulation = not self.state.playingSimulation
-        if self.state.playingSimulation and self.state.rerunSimulation:
+        if self.state.playingSimulation and (self.state.rerunSimulation or self.state.simulationController is not self.simulation.controllers.getController()):
             self.state.rerunSimulation = False
+            self.state.simulationController = self.simulation.controllers.getController()
             self.simulation.runSimulation()
 

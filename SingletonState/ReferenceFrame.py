@@ -145,9 +145,9 @@ class VectorRef:
     # Return the magnitude of the vector based on the given reference frame
     def magnitude(self, referenceFrame: Ref) -> float:
         if referenceFrame == Ref.FIELD:
-            return Utility.distanceTuple(self.fieldRef)
+            return Utility.distance(0, 0, *self.fieldRef)
         else:
-            return Utility.distanceTuple(self.screenRef)
+            return Utility.distance(0, 0, *self.screenRef)
 
     # Get the angle of the vector in radians
     def theta(self) -> float:
