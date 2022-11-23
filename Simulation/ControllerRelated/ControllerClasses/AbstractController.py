@@ -21,7 +21,7 @@ class AbstractController(ABC):
 
     def __init__(self, name: str):
         self.name : str = name
-        self.sliders: list[Slider] = [buildControllerSliders(sliderState) for sliderState in self.defineParameterSliders()]
+        self.sliders: list[Slider] = buildControllerSliders(self.defineParameterSliders())
         
     # Any controller that implements AbstractController must return a list of sliders for the tunable parameters
     # of that controller
