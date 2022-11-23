@@ -31,7 +31,7 @@ class AbstractController(ABC):
         
 
     # To be called at the start of a simulation. Sets waypoints and initial state
-    def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[Waypoint]):
+    def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[PointRef]):
         self.robotSpecs = robotSpecs
         self.waypoints: list[PointRef] = waypoints
 

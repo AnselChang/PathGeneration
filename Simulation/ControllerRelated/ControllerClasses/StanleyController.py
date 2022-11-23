@@ -34,7 +34,7 @@ class StanleyController(AbstractController):
     # init whatever is needed at the start of each path
     def initController(self):
         self.ticks = 0
-        
+
     def findClosestPoint(self, robot: RobotModelOutput) -> PointRef:
         """
         Finds closest point for use with Stanley Control
@@ -43,7 +43,7 @@ class StanleyController(AbstractController):
         for i in range(self.closestIndex, len(self.waypoints)):
             pointPosition = self.waypoints[i].fieldRef
             robotPosition = robot.position.fieldRef
-            pointDistance = distanceTwoPoints(robotPosition,pointPosition)
+            pointDistance = distanceTuples(robotPosition,pointPosition)
 
             if pointDistance > previousPointDistance:
                 # Iterates until the distance increases, then returns
@@ -71,7 +71,7 @@ class StanleyController(AbstractController):
 
         
 
-    def simulateTick(self, output: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
+    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool]:
         """
             Performs one timestep of the stanley algorithm
             Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
@@ -83,7 +83,7 @@ class StanleyController(AbstractController):
         headingError = output.heading-self.getCurrentPointHeading()
 
         # Calculates the angle from the origin to the point
-        angleOfClosestPointFromOrigin = math.atan2((closestPoint.fieldRef[1] - output.position.fieldRef[1]), (closestPoint.position.fieldRef[0] - output.position.fieldRef[0]))
+        angleOfClosestPointFromOrigin = math.atan2((closestPoint.fieldRef[1] - output.position.fieldRef[1]), (closestPoint.fieldRef[0] - output.position.fieldRef[0]))
         # Uses that to calculate the angle from the robot heading to the point
         angleBetweenRobotHeadingAndClosestPoint = angleOfClosestPointFromOrigin - output.heading
 
