@@ -2,7 +2,7 @@ from xml.etree.ElementTree import PI
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
-from Simulation import Waypoint
+from SingletonState.ReferenceFrame import PointRef
 from Sliders.Slider import Slider
 
 from typing import Tuple
@@ -34,12 +34,12 @@ class StanleyController(AbstractController):
         self.ticks = 0
        
 
-    def findClosestPoint(self, robot: RobotModelOutput) -> Waypoint:
+    def findClosestPoint(self, robot: RobotModelOutput) -> PointRef:
         """
         Finds closest point for use with Stanley Control
         """
         previousPointDistance = 145 # impossible init value given the field
-        for i in range(self.closestIndex, self.waypoints.len()-1):
+        for i in range(self.closestIndex, len(self.waypoints)):
             pointPosition = self.waypoints[i].position.fieldRef
             robotPosition = robot.position.fieldRef
             pointDistance = distanceTwoPoints(robotPosition,pointPosition)
@@ -51,7 +51,7 @@ class StanleyController(AbstractController):
             else:
                 return self.waypoints[self.closestIndex]
         # If we run out of points, use the last valid one
-        return self.waypoints[len(self.waypoints0)-1]
+        return self.waypoints[-1]
 
     def getCurrentPointHeading(self) -> float:
         """
@@ -76,13 +76,13 @@ class StanleyController(AbstractController):
             Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
         """
         # Get the closest waypoint to the robot (Starting from the previously found waypoint)
-        closestPoint: Waypoint = self.findClosestPoint(output)
+        closestPoint: PointRef = self.findClosestPoint(output)
 
         # One of the two controllers in Stanley Control is just a direct heading controller
         headingError = output.heading-self.getCurrentPointHeading()
 
         # Calculates the angle from the origin to the point
-        angleOfClosestPointFromOrigin = math.atan2((closestPoint.position.fieldRef[1] - output.position.fieldRef[1]), (closestPoint.position.fieldRef[0] - output.position.fieldRef[0]))
+        angleOfClosestPointFromOrigin = math.atan2((closestPoint.fieldRef[1] - output.position.fieldRef[1]), (closestPoint.position.fieldRef[0] - output.position.fieldRef[0]))
         # Uses that to calculate the angle from the robot heading to the point
         angleBetweenRobotHeadingAndClosestPoint = angleOfClosestPointFromOrigin - output.heading
 
@@ -104,7 +104,7 @@ class StanleyController(AbstractController):
         curvature = 1 / radius
 
         # Slow down the robot linearly as it approaches the final waypoint
-        if (lastPointDist := distanceTuples(output.position.fieldRef, self.waypoints[len(self.waypoints)-1])) < self.slowdownDistance:
+        if (lastPointDist := distanceTuples(output.position.fieldRef, self.waypoints[-1])) < self.slowdownDistance:
             velocity = (lastPointDist/self.slowdownDistance)*self.robotSpecs.maximumVelocity
         else:
             velocity = self.robotSpecs.maximumVelocity
@@ -114,7 +114,7 @@ class StanleyController(AbstractController):
         rightWheelVelocity = velocity * (2 - curvature*self.robotSpecs.trackWidth)/2
 
         # Tells the system that this Stanley Control loop is done.
-        isDone = distToWaypoint < self.tolerance and closestPoint==self.waypoints[len(self.waypoints)-1]
+        isDone = distToWaypoint < self.tolerance and closestPoint==self.waypoints[-1]
 
         # Returns the desired wheel velocities to be used in RobotModelInput.
         return RobotModelInput(leftWheelVelocity,rightWheelVelocity), isDone, None
