@@ -4,7 +4,7 @@ from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from SingletonState.ReferenceFrame import PointRef
 from RobotSpecs import RobotSpecs
-from Sliders.Slider import Slider
+from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 
 from typing import Tuple
@@ -20,14 +20,13 @@ class AbstractController(ABC):
 
     def __init__(self, name: str):
         self.name : str = name
-        self.simulationSliders: list[Slider] = self.defineParameterSliders() # sliders for tuning the simulation robot
-        self.robotSliders: list[Slider] = self.defineParameterSliders() # sliders for tuning the actual robot
+        self.sliderInfo: list[ControllerSliderState] = self.defineParameterSliders() # sliders for tuning the simulation robot
 
 
     # Any controller that implements AbstractController must return a list of sliders for the tunable parameters
     # of that controller
     @abstractmethod
-    def defineParameterSliders(self) -> list[Slider]:
+    def defineParameterSliders(self) -> list[ControllerSliderState]:
         pass
         
 

@@ -3,7 +3,7 @@ from Simulation.ControllerRelated.ControllerClasses.AbstractController import Ab
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
-from Sliders.Slider import Slider
+from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
 from RobotSpecs import RobotSpecs
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 from Simulation.HUDGraphics.PurePursuitGraphics import PPGraphics
@@ -26,12 +26,9 @@ class PurePursuitController(AbstractController):
         self.lookaheadDistance = 10
         self.tolerance = 2
 
-    def defineParameterSliders(self) -> list[Slider]:
+    def defineParameterSliders(self) -> list[ControllerSliderState]:
         #TODO define the tunable parameters of this controller
-        """
-        lookAheadDistance
-        """
-        pass
+        return []
 
 
     # Indexes through the lost of waypoints to find the one futher along the path closest to lookahead circle.

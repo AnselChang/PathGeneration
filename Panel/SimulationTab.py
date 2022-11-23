@@ -49,6 +49,9 @@ class SimulationTab(AbstractTab):
         if self.simulation.exists():
             yield self.simulation.slider
 
+        for slider in self.simulation.controllers.getCurrentSliders():
+            yield slider
+
 
     # Draw all the UI onto the screen
     def draw(self, screen: pygame.Surface):
@@ -65,6 +68,9 @@ class SimulationTab(AbstractTab):
 
         if self.simulation.exists():
             self.simulation.slider.draw(screen)
+
+        for slider in self.simulation.controllers.getCurrentSliders():
+            slider.draw(screen)
 
         self.simulation.velocityGUI.draw(screen)
 
