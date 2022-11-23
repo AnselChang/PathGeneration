@@ -4,6 +4,8 @@ from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 from Sliders.Slider import Slider
+from RobotSpecs import RobotSpecs
+from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 
 from typing import Tuple
 
@@ -32,15 +34,14 @@ class StanleyController(AbstractController):
     # init whatever is needed at the start of each path
     def initController(self):
         self.ticks = 0
-       
-
+        
     def findClosestPoint(self, robot: RobotModelOutput) -> PointRef:
         """
         Finds closest point for use with Stanley Control
         """
         previousPointDistance = 145 # impossible init value given the field
         for i in range(self.closestIndex, len(self.waypoints)):
-            pointPosition = self.waypoints[i].position.fieldRef
+            pointPosition = self.waypoints[i].fieldRef
             robotPosition = robot.position.fieldRef
             pointDistance = distanceTwoPoints(robotPosition,pointPosition)
 
@@ -60,12 +61,12 @@ class StanleyController(AbstractController):
         """
         if (self.closestIndex == len(self.waypoints)-1):
             # at last point, use previous point and current for heading
-            dy = self.waypoints[self.closestIndex].position.fieldRef[1] - self.waypoints[self.closestIndex-1].position.fieldRef[1]
-            dx = self.waypoints[self.closestIndex].position.fieldRef[0] - self.waypoints[self.closestIndex-1].position.fieldRef[0]
+            dy = self.waypoints[self.closestIndex].fieldRef[1] - self.waypoints[self.closestIndex-1].fieldRef[1]
+            dx = self.waypoints[self.closestIndex].fieldRef[0] - self.waypoints[self.closestIndex-1].fieldRef[0]
         else:
             # Normally just uses current and next
-            dy = self.waypoints[self.closestIndex+1].position.fieldRef[1] - self.waypoints[self.closestIndex].position.fieldRef[1]
-            dx = self.waypoints[self.closestIndex+1].position.fieldRef[0] - self.waypoints[self.closestIndex].position.fieldRef[0]
+            dy = self.waypoints[self.closestIndex+1].fieldRef[1] - self.waypoints[self.closestIndex].fieldRef[1]
+            dx = self.waypoints[self.closestIndex+1].fieldRef[0] - self.waypoints[self.closestIndex].fieldRef[0]
         return math.atan2(dy,dx)
 
         

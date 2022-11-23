@@ -12,16 +12,16 @@ class ControllerManager:
     def __init__(self):
 
         self.controllers: list[AbstractController] = [
-            TestController(),
-            PurePursuitController(),
-            StanleyController()
+            TestController,
+            PurePursuitController,
+            StanleyController
         ]
 
         self.index = 0 # index of selected controller in controller list
 
     # return the currently-selected controller
     def getController(self) -> AbstractController:
-        return self.controllers[self.index]
+        return self.controllers[self.index]()
 
     # Whether there is a controller before the currently-selected one
     def isPrevious(self) -> bool:

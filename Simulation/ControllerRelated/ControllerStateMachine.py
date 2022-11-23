@@ -1,9 +1,11 @@
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.ControllerRelated.ControllerClasses.PointTurnController import PointTurnController
-from Simulation.Waypoint import Waypoint
+from SingletonState.ReferenceFrame import PointRef
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from RobotSpecs import RobotSpecs
+from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
+import Utility
 
 from typing import Tuple
 
@@ -15,10 +17,10 @@ all the logic switching between the selected controller and the point turn contr
 
 class ControllerStateMachine:
 
-    def __init__(self, robotSpecs: RobotSpecs, waypoints: list[list[Waypoint]], pathController: AbstractController):
+    def __init__(self, robotSpecs: RobotSpecs, waypoints: list[list[PointRef]], pathController: AbstractController):
 
         self.robotSpecs = robotSpecs
-        self.waypoints: list[list[Waypoint]] =  waypoints
+        self.waypoints: list[list[PointRef]] =  waypoints
         self.pathController: AbstractController = pathController
         self.pointTurnController: PointTurnController = PointTurnController()
 
@@ -32,13 +34,13 @@ class ControllerStateMachine:
     
     # Run either the path or point turn controller depending on whether the robot just finished a segment
     # Return the RobotModelInput (the velocities of the wheels), and whether the entire path was finished
-    def runController(self, robotOutput: RobotModelOutput) -> Tuple[RobotModelInput, bool]:
-
+    def runController(self, robotOutput: RobotModelOutput) -> Tuple[RobotModelInput, bool, HUDGraphics]:
         
         if self.isPointTurn:
+
             # Point turn controller
 
-            robotInput, isDone = self.pointTurnController.simulateTick(robotOutput)
+            robotInput, isDone, graphics = self.pointTurnController.simulateTick(robotOutput, self.robotSpecs)
 
             # If done with point turn, go onto next segment
             # (there is always a next segment in this case, we never end on point turn)
@@ -46,28 +48,27 @@ class ControllerStateMachine:
                 self.isPointTurn = False
                 
 
-            return (robotInput, False)
+            return (robotInput, False, graphics)
 
         else:
             # Path following controller
-
-            robotInput, isDone = self.pathController.simulateTick(robotOutput)
-
+            robotInput, isDone, graphics = self.pathController.simulateTick(robotOutput, self.robotSpecs)
             # If at last waypoint segment, then return true for exiting. Otherwise, go on to point turn
             if isDone:
 
                 if self.segmentIndex == len(self.waypoints) - 1: # last waypoint segment
-                    return (robotInput, True)
+                    return (robotInput, True, graphics)
 
                 else: # not last, go to point turn
                     self.isPointTurn = True
 
                     # Get ready for next path segment once point turn ends
                     self.segmentIndex += 1
-                    nextSubset = self.waypoints.points[self.segmentIndex]
+                    nextSubset = self.waypoints[self.segmentIndex]
                     self.pathController.initSimulation(self.robotSpecs, nextSubset)
 
                     # Set heading for upcoming point turn
-                    self.pointTurnController.initSimulation(self.robotSpecs, self.waypoints[self.segmentIndex][0].heading)
+                    theta: float = Utility.thetaTwoPoints(self.waypoints[self.segmentIndex][0].fieldRef, self.waypoints[self.segmentIndex][1].fieldRef)
+                    self.pointTurnController.initSimulation(self.robotSpecs, theta)
 
-            return (robotInput, False)
+            return (robotInput, False, graphics)

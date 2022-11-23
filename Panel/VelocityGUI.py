@@ -33,10 +33,10 @@ DESIRED2 = (120,110,254)
 
 class VelocityGUI(Draggable):
 
-    def __init__(self, robotSpecs: RobotSpecs, state: SoftwareState):
+    def __init__(self, robotSpecs: RobotSpecs, isInteractiveMode: bool):
 
         self.maximumVelocity = robotSpecs.maximumVelocity
-        self.state: SoftwareState = state
+        self.isInteractiveMode: bool = isInteractiveMode # whether the velocityGUI can take inputs from the mouse
 
         self.desired: tuple = (0,0) # desired percent velocity from [-1, 1]
         self.actual: tuple = (0,0) # desired actual veloctiy from [-1, 1]
@@ -51,6 +51,9 @@ class VelocityGUI(Draggable):
 
         self.height = 150
         self.y = Utility.SCREEN_SIZE - MARGIN - self.height
+
+        self.cx = self.x + self.width/2
+        self.cy = self.y + self.height/2
 
         super().__init__()
 
@@ -72,11 +75,15 @@ class VelocityGUI(Draggable):
     def setActualVelocity(self, leftVelocity: float, rightVelocity: float):
         self.setActualPercent(leftVelocity / self.maximumVelocity, rightVelocity / self.maximumVelocity)
 
+    # Get the desired velocity, which was probably computed from user input
+    def getDesiredVelocity(self) -> tuple:
+        return self.desired[0] * self.maximumVelocity, self.desired[1] * self.maximumVelocity
+
     # Called to determine if the mouse is touching this object (and if is the first object touched, would be considered hovered)
     def checkIfHovering(self, userInput: UserInput) -> bool:
 
         # can only interact with mouse in odometry mode
-        if self.state.mode != Mode.ODOM:
+        if not self.isInteractiveMode:
             return False
 
         mx, my = userInput.mousePosition.screenRef
@@ -86,14 +93,59 @@ class VelocityGUI(Draggable):
     def startDragging(self, userInput: UserInput):
         pass
 
-    # Called every frame that the object is being dragged. Most likely used to update the position of the object based
-    # on where the mouse is
+    # Only applicable in odom mode
+    # if mouse is down on object, set the desired velocity to the location of the mouse pointer
     def beDraggedByMouse(self, userInput: UserInput):
-        pass
+        
+
+        pos = userInput.mousePosition.screenRef
+        straight = (self.cy - pos[1]) / (self.height/2) # the power from -1 to 1
+        turn = (pos[0] - self.cx) / (self.width/2) # the amount to turn from -1 (counterclockwise), 0 (straight), and 1 (clockwise)
+        
+        straight = Utility.clamp(straight, -1, 1)
+        turn = Utility.clamp(turn, -0.999, 0.999)
+        print("\t",straight, turn)
+        
+        """
+        At the leftmost point, wheel velocities are at (-V, V)
+        At the center point, wheel velocities are at (V, V)
+        At the rightmost point, wheel velocities are at (V, -V)
+
+        At the topmost, center, and bottom-most points, V is at maximumVelocity, 0, and -maximumVelocity respectively
+        """
+
+        if turn >= 0:
+            # turn right
+            left = straight
+            right = 2 * (-turn + 0.5) * straight
+        else:
+            # turn left
+            left = 2 * (turn + 0.5) * straight
+            right = straight
+        self.setDesiredPercent(left, right)
+
 
     # Callback when the dragged object was just released
     def stopDragging(self):
-        pass
+        self.setDesiredPercent(0,0) # if mouse is released, brake
+
+    # Given left and right velocities, convert to cartesian for purposes of drawing
+    # x and y in range [-1, 1]
+    def _convertToCartesian(self, left, right):
+        mx = max(left, right)
+        mn = min(left, right)
+        if abs(mx) > abs(mn):
+            y = mx
+        else:
+            y = mn
+
+        if y == 0:
+            return 0,0
+
+        x = -(right - left) / 2 / y
+
+        return x,y
+
 
     def draw(self, screen: pygame.Surface):
 
@@ -102,15 +154,14 @@ class VelocityGUI(Draggable):
         Graphics.drawRoundedRectangle(screen, (self.x-self.PADDING, self.y-self.PADDING, self.width+self.PADDING*2, self.height+self.PADDING*2), color, 10)
 
         # Draw axes
-        midX = self.x + self.width/2
-        midY = self.y + self.height/2
-        Graphics.drawLine(screen, GRID, midX, self.y-self.PADDING, midX, self.y + self.height+self.PADDING, 2)
-        Graphics.drawLine(screen, GRID, self.x-self.PADDING, midY, self.x + self.width+self.PADDING, midY, 2)
+        Graphics.drawLine(screen, GRID, self.cx, self.y-self.PADDING, self.cx, self.y + self.height+self.PADDING, 2)
+        Graphics.drawLine(screen, GRID, self.x-self.PADDING, self.cy, self.x + self.width+self.PADDING, self.cy, 2)
 
         # Draw actual point on gui
         if self.showActual:
-            actualX = self.x + self.width/2 + (self.width/2) * self.actual[0]
-            actualY = self.y + self.height/2 + (self.height/2) * self.actual[1]
+            ax, ay = self._convertToCartesian(*self.actual)
+            actualX = self.cx + (self.width/2) * ax
+            actualY = self.cy + (self.height/2) * -ay
             Graphics.drawCircle(screen, actualX, actualY, ACTUAL2, 10)
             Graphics.drawCircle(screen, actualX, actualY, ACTUAL, 7)
             
@@ -118,8 +169,10 @@ class VelocityGUI(Draggable):
 
         # Draw desired point on gui (on top of actual possibly)
         if self.showDesired:
-            desiredX = self.x + self.width/2 + (self.width/2) * self.desired[0]
-            desiredY = self.y + self.height/2 + (self.height/2) * self.desired[1]
+            dx, dy = self._convertToCartesian(*self.desired)
+            # print(round(self.desired[0],1),round(self.desired[1],1),round(dx,1), round(dy,1))
+            desiredX = self.cx + (self.width/2) * dx
+            desiredY = self.cy + (self.height/2) * -dy
             Graphics.drawCircle(screen, desiredX, desiredY, DESIRED2, 10)
             Graphics.drawCircle(screen, desiredX, desiredY, DESIRED, 7)
             self.showDesired = False

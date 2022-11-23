@@ -11,6 +11,8 @@ class MCTSNode:
     totalSimulations = 0 # class variable to store the total number of simulations across all nodes in MCTS
     globalShortestDistance = math.inf # shortest distance across entire MCTS tree
     EXPLORATION_FACTOR = 100
+
+    discData: list[Disc] = None # preprocessed information for each disc
     
     def __init__(self, childArray: list[int] = None, discID: int = 0, parent: 'MCTSNode' = None, startDistance = 0, depth = 0):
 
@@ -34,9 +36,7 @@ class MCTSNode:
         self.numSimulations = 0
         self.shortestFullDistance = math.inf
 
-
-
-    # the exploration-exploitation value for this node
+    # the exploration-exploitation value for this node. Selection picks the node with the highest UCT value
     def getUCT(self):
 
         if self.numSimulations == 0:
@@ -46,19 +46,8 @@ class MCTSNode:
         exploration = math.sqrt(math.log(MCTSNode.totalSimulations) / self.numSimulations)
         return exploitation + MCTSNode.EXPLORATION_FACTOR * exploration
 
-    def getExploitation(self):
-        if self.numSimulations == 0:
-            return -1
 
-        return MCTSNode.globalShortestDistance / self.globalShortestDistance
-
-    def getExplroation(self):
-        if self.numSimulations == 0:
-            return math.inf
-        return math.sqrt(math.log(self.numSimulations) / MCTSNode.totalSimulations)
-
-
-    # Only called on top-leveled node. Selects a leaf node based on highest UTC value
+    # Selects a leaf node based on highest UTC value recursively, by expanding layer by layer until leaf node is reached
     def selectNode(self) -> 'MCTSNode':
 
         # If the node is a leaf node, return it
@@ -77,26 +66,62 @@ class MCTSNode:
         return bestNode.selectNode()
 
 
-    # Expand all possible children of the node, but do not perform rollout
+    # Expand all possible children of the node, but do not perform rollout on each child
     # Expand in order of closest to furthest disc away
-    def expandNode(self, discs: list[Disc]):
+    def expandNode(self):
 
         LIMIT = 3
 
         i = 0
 
-        for child in discs[self.discID].neighbors:
+        for child in MCTSNode.discData[self.discID].neighbors:
 
             # Append only if child disc is unvisited
             if self.childArray[child.id] == -1:
                 i += 1
-                childDistance = self.startDistance + discs[self.discID].distanceTo(child)
+                childDistance = self.startDistance + MCTSNode.discData[self.discID].distanceTo(child)
                 self.children.append(MCTSNode(self.childArray, child.id, self, childDistance, self.depth + 1))
 
                 if i == LIMIT:
                     return
 
-    # Backpropagate distance for leaf node
+    # Rollout policy is simply to select the closest unvisited disc 
+    # Return the evaluation of this position
+    def rollout(self) -> float:
+
+        # Make a copy of the child array during simulation to not affect the actual MCTS nodes
+        childArray: list[int] = self.childArray.copy()
+
+        currentID = self.discID # current disc element
+
+        totalDistance = self.startDistance # we add the distance to the current disc to the totalDistance
+
+        while True:
+            
+            # Look for nearest unvisited neighbor
+            nextID = -1
+            for neighbor in MCTSNode.discData[currentID].neighbors:
+                if childArray[neighbor.id] == -1:
+                    nextID = neighbor.id
+                    break # We found nearest neighbor, don't keep searching
+            # Exhausted search, unvisited neighbor not founded. Terminate loop
+            if nextID == -1:
+                break
+
+            # we have found closest unvisited neighbor
+            childArray[currentID] = nextID
+
+            # update total distance
+            totalDistance += MCTSNode.discData[currentID].distanceTo(MCTSNode.discData[nextID])
+
+            currentID = nextID
+            #print(round(totalDistance, 1), child)
+
+        return totalDistance
+
+
+
+    # Backpropagate distances and number of simulations from leaf node all the way to root
     def backpropagate(self, fullDistance: float):
         self.numSimulations += 1
         #print("backpropagate", self.discID, self.numSimulations)
@@ -111,6 +136,7 @@ class MCTSNode:
         else:
             # Otherwise, backpropagate up!
             self.parent.backpropagate(fullDistance)
+
 
     # Get best leaf node so far
     def getBestNode(self) -> 'MCTSNode':

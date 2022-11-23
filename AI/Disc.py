@@ -1,5 +1,4 @@
 from SingletonState.ReferenceFrame import PointRef, Ref
-from SingletonState.FieldTransform import FieldTransform
 import Graphics, pygame
 
 """
@@ -8,11 +7,10 @@ A class that stores the complete list of discs on the field as PointRefs
 
 class Disc:
 
-    transform: FieldTransform = None # gets initialized in DiscNodes
 
     # For convenience, the location of the disc is in field tile units.
     def __init__(self, fieldTileX: float, fieldTileY: float, isStartNode: bool = False):
-        self.position: PointRef = PointRef(Disc.transform, Ref.FIELD, (fieldTileX*24 - 0.5, fieldTileY*24 - 0.5))
+        self.position: PointRef = PointRef(Ref.FIELD, (fieldTileX*24 - 0.5, fieldTileY*24 - 0.5))
 
         # The index of this node in relation to DiscNodes.discs. Initialied in sortOtherDiscs()
         self.id = -1
@@ -38,6 +36,7 @@ class Disc:
 
 
 # The position of every disc on the field
+# 31 DISCS
 def getAllDiscs(): 
     return [
         Disc(3.5, 5, True), # START NODE

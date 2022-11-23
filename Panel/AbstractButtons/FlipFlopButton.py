@@ -41,4 +41,4 @@ class FlipFlopButton(AbstactButton):
         if self.isOn():
             return self.imageOnHovered if self.isHovering else self.imageOn
         else:
-            return self.imageOffHovered if self.isHovering else self.imageOffHovered
+            return self.imageOffHovered if self.isHovering else self.imageOff

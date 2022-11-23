@@ -16,10 +16,10 @@ class FieldSurface(Draggable):
         self.rawFieldSurface: pygame.Surface = pygame.image.load("Images/squarefield.png")
         self.updateScaledSurface()
 
-        self.isCurrentlyDragging = False
-
         self.startDragX, self.startDragY = None, None # For calculating mouse dragging delta to determine panning amount
         self.startPanX, self.startPanY = None, None
+
+        super().__init__()
 
     # Whenever the zoom is changed, this function should be called to scale the raw surface into the scaled one
     def updateScaledSurface(self):
@@ -34,7 +34,6 @@ class FieldSurface(Draggable):
     # Called when the field was just pressed at the start of the drag.
     # Get the current mouse and pan position so that new pan based on changes in mouse position can be calculated
     def startDragging(self, mousePosition: PointRef):
-        self.isCurrentlyDragging = True
         self.startDragX, self.startDragY = mousePosition.screenRef
         self.startPanX, self.startPanY = self.transform.pan
 
@@ -50,7 +49,7 @@ class FieldSurface(Draggable):
 
     # Called when the dragged object was just released
     def stopDragging(self):
-        self.isCurrentlyDragging = False
+        pass
 
     # Draw the scaled field with the stored pan
     def draw(self, screen: pygame.Surface):

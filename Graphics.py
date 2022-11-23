@@ -20,10 +20,11 @@ class ColorCycle:
         return self._hsv2rgb(self.hue, self.brightness, self.brightness)
 
 
-
-FONT20 = pygame.font.SysFont('Corbel', 20)
-FONT30 = pygame.font.SysFont('Corbel', 30)
-FONT40 = pygame.font.SysFont('Corbel', 40)
+FONT_PATH = 'Corbel.ttf'
+FONT20 = pygame.font.Font(FONT_PATH, 20)
+FONT25 = pygame.font.Font(FONT_PATH, 25)
+FONT30 = pygame.font.Font(FONT_PATH, 30)
+FONT40 = pygame.font.Font(FONT_PATH, 40)
 
 def getFont(size):
     if size < 25:
@@ -125,11 +126,13 @@ def drawLine(screen: pygame.Surface, color: tuple, x1: int, y1: int, x2: int, y2
     pygame.gfxdraw.aapolygon(screen, (UL, UR, BR, BL), color)
     pygame.gfxdraw.filled_polygon(screen, (UL, UR, BR, BL), color)
 
-def drawVector(screen, x1, y1, x2, y2, zoom = 1):
+def drawVector(screen: pygame.Surface, x1: int, y1: int, magnitude: float, heading: float):
 
-    drawLine(screen, colors.VECTORCOLOR, x1, y1, x2, y2, 3 * zoom)
-    theta = math.atan2(y2-y1, x2-x1)
-    drawPolarTriangle(screen, colors.VECTORCOLOR, x2, y2, theta, 5 * zoom, 2, 1.6)
+    x2 = int(x1 + magnitude * math.cos(heading))
+    y2 = int(y1 + magnitude * math.sin(heading))
+
+    drawLine(screen, colors.VECTORCOLOR, x1, y1, x2, y2, 3)
+    drawPolarTriangle(screen, colors.VECTORCOLOR, x2, y2, heading, 5, 2, 1.6)
 
 
 

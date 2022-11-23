@@ -13,6 +13,12 @@ class Draggable(Hoverable):
 
     def __init__(self):
         super().__init__()
+        self.isDragging = False
+
+    # Call the implemented startDragging method, but first set the isDragging state
+    def _startDragging(self, userInput: UserInput):
+        self.isDragging = True
+        self.startDragging(userInput)
 
     # Called when the object was just pressed at the start of a drag
     @abstractmethod
@@ -24,6 +30,11 @@ class Draggable(Hoverable):
     @abstractmethod
     def beDraggedByMouse(self, userInput: UserInput):
         pass
+
+    # Call the implemented startDragging method, but first set the isDragging state
+    def _stopDragging(self):
+        self.isDragging = False
+        self.stopDragging()
 
     # Callback when the dragged object was just released
     @abstractmethod

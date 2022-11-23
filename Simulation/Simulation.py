@@ -8,9 +8,7 @@ from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerRelated.ControllerManager import ControllerManager
-from SingletonState.FieldTransform import FieldTransform
 from Simulation.RobotRelated.RobotDrawing import RobotDrawing
-from Simulation.Waypoint import Waypoint
 from Simulation.SimulationTimestep import SimulationTimestep
 from Panel.VelocityGUI import VelocityGUI
 from SingletonState.SoftwareState import SoftwareState
@@ -30,12 +28,9 @@ It then runs a full simulation (not in real time), and ultimately generates a li
 
 class Simulation:
 
-    def __init__(self, state: SoftwareState, transform: FieldTransform, controllers: ControllerManager, path: FullPath, robotSpecs: RobotSpecs):
+    def __init__(self, state: SoftwareState, controllers: ControllerManager, path: FullPath, robotSpecs: RobotSpecs):
 
-        # Initialize RobotModelOutput class's transform reference
-        RobotModelOutput.transform = transform
-
-        self.robotDrawing = RobotDrawing(transform, robotSpecs.trackWidth)
+        self.robotDrawing = RobotDrawing(robotSpecs.trackWidth)
 
         # Full simulations are stored as lists of RobotModelOutputs, which contain robot position and orientation
         self.recordedSimulation: list[SimulationTimestep] = []
@@ -48,7 +43,7 @@ class Simulation:
         self.path = path
         self.robotSpecs = robotSpecs
 
-        self.velocityGUI: VelocityGUI = VelocityGUI(robotSpecs, state)
+        self.velocityGUI: VelocityGUI = VelocityGUI(robotSpecs, isInteractiveMode = False)
 
 
     # Return whether there is a simulation stored in this object
@@ -64,20 +59,23 @@ class Simulation:
         # we're running a new simulation now, so delete the data from the old one
         self.recordedSimulation.clear() 
 
-        waypoints: list[list[Waypoint]] = self.path.waypoints.convertToWaypoints()
+        waypoints: list[list[PointRef]] = self.path.waypoints.points
 
         # Set up the controller state machine that alternates between path following and point turn controllers
         controllerSM = ControllerStateMachine(self.robotSpecs, waypoints, self.controllers.getController())
         
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
-        initialPosition: PointRef = waypoints[0][0].position
-        initialHeading: float = waypoints[0][0].heading
-        output: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
+        initialPosition: PointRef = waypoints[0][0]
+        print("first two waypoints:")
+        print(waypoints[0][0].fieldRef)
+        print(waypoints[0][1].fieldRef)
+        initialHeading: float =  Utility.thetaTwoPoints(waypoints[0][0].fieldRef, waypoints[0][1].fieldRef)
+        robotOutput: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
 
         # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
         # different simulation implementations
-        robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, output)
+        robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, robotOutput)
 
         # Iterate until robot has reached the destination
         timesteps = 0
@@ -85,13 +83,13 @@ class Simulation:
         while timesteps < 10000 and not isDone: # hard limit of 10000 in case of getting stuck in simulation
 
             # Input robot position to controller and obtain wheel velocities
-            robotInput, isDone = controllerSM.runController(output)
+            robotInput, isDone, graphics = controllerSM.runController(robotOutput)
 
             # Take in wheel velocities from controller and simulate the robot model for a tick
             robotOutput: RobotModelOutput = robot.simulateTick(robotInput)
 
             # Store the robot position at each tick
-            self.recordedSimulation.append(SimulationTimestep(timesteps * self.robotSpecs.timestep, robotInput, robotOutput))
+            self.recordedSimulation.append(SimulationTimestep(timesteps * self.robotSpecs.timestep, robotInput, robotOutput, graphics))
 
             # Increment number of timesteps elapsed
             timesteps += 1
@@ -99,6 +97,10 @@ class Simulation:
 
         # Now that running simulation is complete, adjust slider bounds
         self.slider.setBounds(0, len(self.recordedSimulation) - 1)
+        self.slider.setValue(0)
+
+        #for step in self.recordedSimulation:
+        #    print(step)
 
 
     # Draw the line the robot takes in the simulation when following the path on the field
@@ -155,9 +157,11 @@ class Simulation:
             return
 
         self.drawSimulatedPathLine(screen)
-        
-        # draw the robot at the current timestep specified by slider
-        self.drawRobot(screen, self.getCurrent().output)
+
+        # Draw the robot and HUD graphics at current simulation timestep
+        currentTimestep: SimulationTimestep = self.getCurrent()
+        self.drawRobot(screen, currentTimestep.output)
+        currentTimestep.graphics.draw(screen)
         
             
         

@@ -1,37 +1,44 @@
 import pygame, sys
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.ReferenceFrame import PointRef
+import SingletonState.ReferenceFrame as ReferenceFrame
 from SingletonState.SoftwareState import SoftwareState, Mode
 from SingletonState.UserInput import UserInput
 from VisibleElements.FieldSurface import FieldSurface
 from Simulation.ControllerRelated.ControllerManager import ControllerManager
 from Simulation.Simulation import Simulation
+from Simulation.DriverControl.DriverSimulation import DriverSimulation
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Panel.Panel import Panel
 from MouseInterfaces.TooltipOwner import TooltipOwner
-from AI.DiscNodes import DiscNodes
+from AI.DiscManager import DiscManager
 from RobotSpecs import RobotSpecs
 import Utility, colors
 from typing import Iterator
 import Graphics
+import multiprocessing as mp 
 
+if __name__ == '__main__':
 
-# All the global singleton objects
-screen: pygame.Surface = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
-pygame.display.set_caption("Path Generation 2.0 by Ansel")
+    # All the global singleton objects
+    screen: pygame.Surface = pygame.display.set_mode((Utility.SCREEN_SIZE + Utility.PANEL_WIDTH, Utility.SCREEN_SIZE))
+    pygame.display.set_caption("Path Generation 2.0 by Ansel")
 
-fieldTransform: FieldTransform = FieldTransform()
-fieldSurface: FieldSurface = FieldSurface(fieldTransform)
-userInput: UserInput = UserInput(fieldTransform, pygame.mouse, pygame.key)
-controllers: ControllerManager = ControllerManager()
+    fieldTransform: FieldTransform = FieldTransform()
+    ReferenceFrame.initFieldTransform(fieldTransform)
 
-state: SoftwareState = SoftwareState()
-path: FullPath = FullPath(fieldTransform)
-discNodes: DiscNodes = DiscNodes(fieldTransform)
-robotSpecs: RobotSpecs = RobotSpecs()
-simulation: Simulation = Simulation(state, fieldTransform, controllers, path, robotSpecs)
-panel: Panel = Panel(state, path, simulation)
+    fieldSurface: FieldSurface = FieldSurface(fieldTransform)
+    userInput: UserInput = UserInput(pygame.mouse, pygame.key)
+    controllers: ControllerManager = ControllerManager()
+
+    state: SoftwareState = SoftwareState()
+    path: FullPath = FullPath()
+    discManager: DiscManager = DiscManager()
+    robotSpecs: RobotSpecs = RobotSpecs()
+    simulation: Simulation = Simulation(state, controllers, path, robotSpecs)
+    driver: DriverSimulation = DriverSimulation(robotSpecs)
+    panel: Panel = Panel(state, path, simulation, driver, discManager)
 
 
 def main():
@@ -73,9 +80,15 @@ def main():
 
         # Whenever the path is modified, the interpolated beizer points have to be recomputed again
         if state.recomputeInterpolation:
+            state.rerunSimulation = True
             path.calculateInterpolatedPoints()
 
-        simulation.update()
+        if state.mode == Mode.SIMULATE:
+            simulation.update()
+        elif state.mode == Mode.ODOM:
+            driver.update()
+        elif state.mode == Mode.AI:
+            discManager.update()
 
         # Draw everything on the screen
         drawEverything(shadowPointRef)
@@ -95,6 +108,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     # Draw PathPoint shadow at mouse
     if state.mode == Mode.EDIT and state.objectDragged is None and (state.objectHovering is fieldSurface or isinstance(state.objectHovering, PathSegment)):
         Graphics.drawCircle(screen, *shadowPointRef.screenRef, colors.GREEN, 10, 140)
+
             
     # Draw panel background
     border = 5
@@ -102,7 +116,7 @@ def drawEverything(shadowPointRef: PointRef) -> None:
     pygame.draw.rect(screen, colors.BORDER_GREY, [Utility.SCREEN_SIZE, 0, border, Utility.SCREEN_SIZE])
 
     if state.mode == Mode.AI:
-        discNodes.draw(screen)
+        discManager.draw(screen)
     
     # Draw panel buttons
     panel.draw(screen)
@@ -146,7 +160,6 @@ def getHoverables() -> Iterator[Hoverable]:
     yield
 
 
-#import cProfile
-#import re
-#cProfile.run('main()')
-main()
+if __name__ == '__main__':
+    mp.freeze_support()
+    main()
