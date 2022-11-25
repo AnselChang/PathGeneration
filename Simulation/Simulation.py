@@ -36,7 +36,7 @@ class Simulation:
         self.recordedSimulation: list[SimulationTimestep] = []
 
         # simuation slider
-        self.slider: Slider = Slider(Utility.SCREEN_SIZE + 120, 190, 115, 0, 1, 1, colors.LIGHTBLUE)
+        self.slider: Slider = Slider(Utility.SCREEN_SIZE + 150, 190, 115, 0, 1, 1, colors.LIGHTBLUE)
 
         self.state = state
         self.controllers = controllers

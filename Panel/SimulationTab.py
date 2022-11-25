@@ -2,6 +2,7 @@ from Panel.AbstractTab import AbstractTab
 from Panel.UIButtons.LeftButton import LeftButton
 from Panel.UIButtons.RightButton import RightButton
 from Panel.UIButtons.SimulationOnOffButton import SimulationOnOffButton
+from Panel.UIButtons.ParamResetButton import ParamResetButton
 from SingletonState.SoftwareState import SoftwareState, Mode
 from MouseInterfaces.Hoverable import Hoverable
 from typing import Iterator
@@ -23,6 +24,7 @@ class SimulationTab(AbstractTab):
 
         self.leftButton: LeftButton = LeftButton(simulation.controllers)
         self.rightButton: RightButton = RightButton(simulation.controllers)
+        self.resetButton: ParamResetButton = ParamResetButton(simulation.controllers)
         self.playButton: SimulationOnOffButton = SimulationOnOffButton(state, simulation)
 
     # If space key pressed, toggle play button.
@@ -44,6 +46,7 @@ class SimulationTab(AbstractTab):
 
         yield self.leftButton
         yield self.rightButton
+        yield self.resetButton
         yield self.playButton
 
         if self.simulation.exists():
@@ -62,6 +65,8 @@ class SimulationTab(AbstractTab):
         Graphics.drawText(screen, Graphics.FONT40, controllerName, colors.BLACK, *textPosition)
 
         self.simulation.draw(screen)
+
+        self.resetButton.draw(screen)
         self.leftButton.draw(screen)
         self.rightButton.draw(screen)
         self.playButton.draw(screen)

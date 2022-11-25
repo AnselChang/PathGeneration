@@ -29,8 +29,8 @@ class AnselPPController(AbstractController):
 
         return [
             ControllerSliderState("Target Delta", 10, 0, 30, 1),
-            ControllerSliderState("Base Speed %", 0, 0.2, 1, 0.01),
-            ControllerSliderState("Heading KP", 0, 7, 20, 0.1),
+            ControllerSliderState("Base Speed %", 0.2, 0.0, 1, 0.01),
+            ControllerSliderState("Heading KP", 7, 0.1, 20, 0.1),
             ControllerSliderState("Tolerance (in.)", 5, 3, 10, 0.1)
         ]
 

@@ -24,7 +24,7 @@ class SimulationOnOffButton(FlipFlopButton):
         imageHoveredOn = Graphics.getLighterImage(imageOn, 0.75)
         imageOff = Graphics.getImage("Images/Buttons/play.png", 0.08)
         imageHoveredOff = Graphics.getLighterImage(imageOff, 0.75)
-        super().__init__((Utility.SCREEN_SIZE + 50, 170), imageOff, imageHoveredOff, imageOn, imageHoveredOn)
+        super().__init__((Utility.SCREEN_SIZE + 80, 170), imageOff, imageHoveredOff, imageOn, imageHoveredOn)
 
     # Draw right button tooltip
     def drawTooltip(self, screen: pygame.Surface, mousePosition: tuple) -> None:
