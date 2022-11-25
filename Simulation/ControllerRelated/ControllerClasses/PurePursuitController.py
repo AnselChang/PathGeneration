@@ -22,13 +22,16 @@ class PurePursuitController(AbstractController):
 
     def __init__(self):
         super().__init__("Pure Pursuit")
-        self.lookaheadIndex = 0
-        self.lookaheadDistance = 10
-        self.tolerance = 2
 
     def defineParameterSliders(self) -> list[ControllerSliderState]:
         #TODO define the tunable parameters of this controller
         return []
+    
+    # init whatever is needed at the start of each path
+    def initController(self):
+        self.lookaheadIndex = 0
+        self.lookaheadDistance = 10
+        self.tolerance = 2
 
 
     # Indexes through the lost of waypoints to find the one futher along the path closest to lookahead circle.
@@ -59,11 +62,6 @@ class PurePursuitController(AbstractController):
                 return self.waypoints[indexOfLookaheadPoint] 
         return self.waypoints[indexOfLookaheadPoint]                    # Returns the waypoint of the index chosen above.
 
-
-
-    # init whatever is needed at the start of each path
-    def initController(self):
-        pass
 
     def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
         # Calls findLookaheadPoint function to find the desired lookahead 

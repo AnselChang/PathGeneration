@@ -22,7 +22,7 @@ class Slider(Draggable, TooltipOwner):
         else:
             return 0
 
-    def __init__(self, x: int, y: int, width: int, min: float, max: float, step: float, color: tuple, text: str = ""):
+    def __init__(self, x: int, y: int, width: int, min: float, max: float, step: float, color: tuple, text: str = "", defaultValue = None, onSet = lambda: None):
         self.x = x
         self.y = y
         self.width = width
@@ -31,10 +31,12 @@ class Slider(Draggable, TooltipOwner):
         self.step = step
         self.color = color
         self.text = text
+        self.onSet = onSet
 
         self.rounding = self.getRounding(str(self.step))
 
-        self.setValue(self.min)
+        self.default = defaultValue
+        self.setValue(self.min if defaultValue is None else defaultValue, True)
 
         super().__init__()
 
@@ -68,9 +70,18 @@ class Slider(Draggable, TooltipOwner):
             return self.val
 
     # Manually override the slider position. One example would when playing a simulation, and the slider moves by itself
-    def setValue(self, val: float):
-        self.val = Utility.clamp(val, self.min, self.max)
-        self.tooltip = Tooltip(str(round(self.val, self.rounding)))
+    def setValue(self, val: float, isFirst: bool = False):
+        newVal = Utility.clamp(val, self.min, self.max)
+        if isFirst or newVal != self.val:
+            self.val = newVal
+            self.tooltip = Tooltip(str(round(self.val, self.rounding)))
+
+            if not isFirst:
+                self.onSet() # run callback
+
+    # reset to value
+    def reset(self):
+        self.setValue(self.default)
 
     def getCircleX(self) -> int:
         return self.x + ((self.val - self.min) / (self.max - self.min)) * self.width

@@ -86,3 +86,17 @@ def pointOnLineClosestToPoint(pointX: int, pointY: int, firstX: int, firstY: int
 # Get the theta between positive x and the line from point A to point B
 def thetaTwoPoints(pointA: tuple, pointB: tuple) -> float:
     return math.atan2(pointB[1] - pointA[1], pointB[0] - pointA[0])
+
+# Bound angle to between -pi and pi, preferring the smaller magnitude
+def boundAngleRadians(angle: float) -> float:
+    PI = 3.1415
+    angle %= 2 * PI
+    if angle < -PI:
+        angle += 2*PI
+    if angle > PI:
+        angle -= 2*PI
+    return angle
+    
+# Find the closest angle between two universal angles
+def deltaInHeading(targetHeading: float, currentHeading: float) -> float:
+    return boundAngleRadians(targetHeading - currentHeading)

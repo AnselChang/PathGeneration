@@ -12,7 +12,7 @@ from typing import Tuple
 
 """
 An abstract class for an algorithm that follows a given path. Example subclasses are Pure Pursuit, Stanley, etc.
-This takes in a Waypoints object at initiailization, and at every tick computes new inputs to the robot model (velocities)
+This takes in a list of PointRefs at initialization, and at every tick computes new inputs to the robot model (velocities)
 given the robot outputs (robot position and orientation)
 """
 

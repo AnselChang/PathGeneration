@@ -14,14 +14,10 @@ class ControllerManager:
     def __init__(self):
 
         self.controllers: list[AbstractController] = [
-            AnselPPController,
-            PurePursuitController,
-            StanleyController
+            AnselPPController(),
+            PurePursuitController(),
+            #StanleyController()
         ]
-
-        self.names = [controller().name for controller in self.controllers]
-        self.sliders: list[list[Slider]] = [controller().sliders for controller in self.controllers]
-        
         self.index = 0 # index of selected controller in controller list
 
     # return the currently-selected controller
@@ -30,11 +26,11 @@ class ControllerManager:
     
     # get the name of the currently-selected controller
     def getCurrentName(self) -> str:
-        return self.names[self.index]
+        return self.controllers[self.index].name
     
     # get the list of sliders for the currently-selected controller
     def getCurrentSliders(self) -> list[Slider]:
-        return self.sliders[self.index]
+        return self.controllers[self.index].sliders
 
     # Whether there is a controller before the currently-selected one
     def isPrevious(self) -> bool:

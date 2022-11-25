@@ -6,7 +6,7 @@ from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
 from RobotSpecs import RobotSpecs
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
-from Simulation.HUDGraphics.PurePursuitGraphics import PPGraphics
+from Simulation.HUDGraphics.AnselGraphics import AnselGraphics
 
 
 from typing import Tuple
@@ -22,64 +22,62 @@ class AnselPPController(AbstractController):
 
     def __init__(self):
         super().__init__("Ansel")
-        self.lookaheadIndex = 0
-        self.lookaheadDistance = 10
-        self.tolerance = 2
+        
 
     def defineParameterSliders(self) -> list[ControllerSliderState]:
         #TODO define the tunable parameters of this controller
 
         return [
-            ControllerSliderState("Param 1", 0, 10, 1),
-            ControllerSliderState("Param 2", -5, 5, 0.1),
-            ControllerSliderState("Param 3", 10, 20, 0.1)
+            ControllerSliderState("Target Delta", 10, 0, 30, 1),
+            ControllerSliderState("Base Speed %", 0, 0.2, 1, 0.01),
+            ControllerSliderState("Heading KP", 0, 7, 20, 0.1),
+            ControllerSliderState("Tolerance (in.)", 5, 3, 10, 0.1)
         ]
 
-
     # Indexes through the lost of waypoints to find the one futher along the path closest to lookahead circle.
-    def findLookaheadPoint(self, robot: RobotModelOutput) -> PointRef:  
+    def findClosestWaypointIndex(self, robot: RobotModelOutput) -> int:
 
-        for i in range(self.lookaheadIndex, min(self.lookaheadIndex + 10, len(self.waypoints))):     
-            pointPosition = self.waypoints[i].fieldRef                  # Finds position of the waypoint currently being 
-                                                                        #   looked at.
-            robotPosition = robot.position.fieldRef                     # Calls current robot position
-            pointDistance = distanceTuples(robotPosition,pointPosition) # Finds distance from robot to waypoint
+        closestDistance = distanceTuples(self.waypoints[self.closestIndex].fieldRef, robot.position.fieldRef)
 
-            if pointDistance > self.lookaheadDistance:
-                break
+        for i in range(self.closestIndex, min(self.closestIndex + 10, len(self.waypoints))):     
+            pointPosition = self.waypoints[i].fieldRef
+            robotPosition = robot.position.fieldRef
+            distanceToWaypoint = distanceTuples(robotPosition,pointPosition)
+            if distanceToWaypoint < closestDistance:
+                self.closestIndex = i
+                closestDistance = distanceToWaypoint
 
-        self.lookaheadIndex = i
-        return self.waypoints[i]                    # Returns the waypoint of the index chosen above.
+        return self.closestIndex
 
 
 
     # init whatever is needed at the start of each path
     def initController(self):
-        pass
+        self.closestIndex = 0
+        self.TARGET_INDEX_DELTA = self.getSliderValue("Target Delta")
+        self.BASE_SPEED_PCT = self.getSliderValue("Base Speed %")
+        self.HEADING_KP = self.getSliderValue("Heading KP")
+        self.TOLERANCE = self.getSliderValue("Tolerance (in.)")
 
     def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
-        # Calls findLookaheadPoint function to find the desired lookahead 
-        #   waypoint and saves it to chosenWayppint.
-        chosenWaypoint: PointRef = self.findLookaheadPoint(robotOutput)   
 
-        # Finds position of waypoint and robot respectively and separates them into X and Y components
-        waypointXPos, waypointYPos = chosenWaypoint.fieldRef    # Waypoint
-        robotX, robotY = robotOutput.position.fieldRef          # Robot
+        closestIndex = self.findClosestWaypointIndex(robotOutput)
+        index = min(closestIndex + self.TARGET_INDEX_DELTA, len(self.waypoints) - 1)
+        targetPosition: PointRef = self.waypoints[index]
 
         # Calculates the angle in which the robot needs to travel, then finds the distance between this 
         #   and the robot heading.
-        angleOfLookaheadVectorFromXAxis = math.atan2((waypointYPos - robotY), (waypointXPos - robotX))
-        angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading
+        headingToTarget = thetaTwoPoints(robotOutput.position.fieldRef, targetPosition.fieldRef)
+        headingError = deltaInHeading(headingToTarget, robotOutput.heading)
         
-        baseSpeed = robotSpecs.maximumVelocity * 0.3
-        kp = 3
-        leftWheelVelocity = baseSpeed + kp * angleBetweenRobotHeadingAndLookaheadPoint
-        rightWheelVelocity = baseSpeed - kp * angleBetweenRobotHeadingAndLookaheadPoint
+        baseSpeed = robotSpecs.maximumVelocity * self.BASE_SPEED_PCT
+        leftWheelVelocity = baseSpeed + self.HEADING_KP * headingError
+        rightWheelVelocity = baseSpeed - self.HEADING_KP * headingError
 
 
         # Tells the system that the PP loop is done.
-        distance = distanceTuples((robotX, robotY), self.waypoints[-1].fieldRef)
-        isDone = distance < self.tolerance and chosenWaypoint==self.waypoints[-1]
+        distance = distanceTuples(robotOutput.position.fieldRef, self.waypoints[-1].fieldRef)
+        isDone = distance < self.TOLERANCE and index == len(self.waypoints) - 1
         # Returns the desired wheel velocities to be used in RobotModelInput.
-        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), isDone, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
+        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), isDone, AnselGraphics(self.waypoints[closestIndex], targetPosition)
         
