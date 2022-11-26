@@ -7,7 +7,7 @@ from SingletonState.ReferenceFrame import PointRef
 import pygame
 
 """
-Right button for going to the previous controller in the Simulation tab
+Play and pause the simulation. Also initiates simulation calculation
 """
 
 class SimulationOnOffButton(FlipFlopButton):

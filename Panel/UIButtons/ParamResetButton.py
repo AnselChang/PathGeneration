@@ -5,7 +5,7 @@ from VisibleElements.Tooltip import Tooltip
 import pygame
 
 """
-Right button for going to the previous controller in the Simulation tab
+Reset all the controller parameters for the currently-selected controller
 """
 
 class ParamResetButton(ClickButton):
