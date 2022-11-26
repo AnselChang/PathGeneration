@@ -148,7 +148,7 @@ class PathSection:
                 pathPoint.controlA.draw(screen)
                 pathPoint.controlB.draw(screen)
             
-            #first = False
+            first = False
 
     # Draw all the interpolated points that have been calculated from PathPoint and ControlPoints
     def drawInterpolatedPoints(self, screen: pygame.Surface):
