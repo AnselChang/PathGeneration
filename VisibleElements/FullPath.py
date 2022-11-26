@@ -3,7 +3,6 @@ from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint
 from VisibleElements.PathSection import PathSection
 from VisibleElements.PathSegment import PathSegment
-from Simulation.InterpolatedPoints import InterpolatedPoints
 import BezierCurves, Utility, colors, pygame, Graphics
 from typing import Tuple
 
@@ -23,11 +22,12 @@ class FullPath:
     def isEmptyInterpolated(self) -> bool:
         if len(self.sections) == 0:
             return True
-        
+        print("new")
         for section in self.sections:
+            print(len(section.waypoints))
             if len(section.waypoints) < 2:
-                return False
-        return True
+                return True
+        return False
 
     def getSegmentIndex(self, segment: PathSegment) -> Tuple[int, int]:
         for i in range(len(self.sections)):
@@ -43,7 +43,7 @@ class FullPath:
 
     def createPathPoint(self, position: PointRef, sectionIndex: int, index: int = -1):
         self.sections[sectionIndex].createPathPoint(position, index)
-        self.sections[sectionIndex].calculateInterpolatedPoints()
+        
 
     def createSection(self, position: PointRef):
         self.currentSection = len(self.sections)
@@ -55,9 +55,11 @@ class FullPath:
         sectionIndex, pathPointIndex = self.getPathPointIndex(point)
         isDeleteSection: bool = self.sections[sectionIndex].deletePathPoint(point)
         if isDeleteSection:
-            if self.currentSection == sectionIndex:
-                self.currentSection = 0
-                del self.sections[sectionIndex]
+
+            del self.sections[sectionIndex]
+            for i in range(sectionIndex, len(self.sections)):
+                self.sections[i].sectionIndex -= 1
+            self.currentSection = len(self.sections) - 1
         else:
             self.sections[sectionIndex].calculateInterpolatedPoints()
 

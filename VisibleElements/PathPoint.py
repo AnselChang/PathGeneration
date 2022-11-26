@@ -18,9 +18,9 @@ by some delta will also shift the control points the same amount.
 
 class PathPoint(Point):
 
-    def __init__(self, spawnPosition: PointRef, spawnVector: tuple, sectionIndex: int):
+    def __init__(self, spawnPosition: PointRef, spawnVector: tuple, section):
 
-        super().__init__(sectionIndex, hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
+        super().__init__(section, hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
 
         self.position = spawnPosition
         self.controlA: ControlPoint = ControlPoint(self, *spawnVector)

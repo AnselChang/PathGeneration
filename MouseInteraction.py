@@ -45,7 +45,7 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
                 path.createPathPoint(shadowPointRef, path.currentSection)
         elif isinstance(state.objectHovering, PathSegment):
             sectionIndex, segmentIndex = path.getSegmentIndex(state.objectHovering)
-            path.currentSection = segmentIndex
+            path.currentSection = sectionIndex
             path.createPathPoint(shadowPointRef, sectionIndex, segmentIndex + 1)
 
 # Handle right clicks for dealing with the field
@@ -55,7 +55,7 @@ def handleRightClick(state: SoftwareState, path: FullPath, mousePosition: PointR
         path.createSection(mousePosition)
     elif type(state.objectHovering) == PathPoint:
         hoveredPathPoint: PathPoint = state.objectHovering
-        path.currentSection = hoveredPathPoint.section # set the active section to be the clicked one
+        path.currentSection = hoveredPathPoint.section.sectionIndex # set the active section to be the clicked one
         print("right pathpoint", hoveredPathPoint.section)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
@@ -139,7 +139,8 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
         changed = state.objectDragged.beDraggedByMouse(userInput)
         if changed and (isinstance(state.objectDragged, Point)):
             point: Point = state.objectDragged
-            path.sections[point.section].calculateInterpolatedPoints()
+            path.currentSection = point.section.sectionIndex
+            path.sections[point.section.sectionIndex].calculateInterpolatedPoints()
 
         # if an object is being dragged it always takes precedence over any object that might be "hovering"
         if state.objectHovering is not state.objectDragged:

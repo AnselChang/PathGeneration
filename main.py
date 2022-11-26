@@ -50,7 +50,6 @@ def main():
 
     # Main software loop
     while True:
-
         print(path.currentSection)
 
         userInput.getUserInput()

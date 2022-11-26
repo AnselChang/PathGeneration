@@ -1,4 +1,3 @@
-from Simulation.InterpolatedPoints import InterpolatedPoints
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from Simulation.RobotModels.SimpleRobotModel import SimpleRobotModel

@@ -2,7 +2,6 @@ from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.SoftwareState import SoftwareState, Mode
 from VisibleElements.PathPoint import PathPoint
 from VisibleElements.PathSegment import PathSegment
-from Simulation.InterpolatedPoints import InterpolatedPoints
 import BezierCurves, Utility, colors, pygame, Graphics
 from typing import Tuple
 
@@ -10,7 +9,7 @@ class PathSection:
     def __init__(self, sectionIndex):
         self.pathPoints: list[PathPoint] = []
         self.segments: list[PathSegment] = []
-        self.waypoints: InterpolatedPoints = InterpolatedPoints()
+        self.waypoints: list[PointRef] = []
 
         self.INTERPOLATED_POINT_DISTANCE = 0.75 # distance in inches between each interpolated bezier point
         self.sectionIndex = sectionIndex
@@ -37,17 +36,19 @@ class PathSection:
         else: # index == 0
             controlVector = (3,3)
 
-        newPoint = PathPoint(position.copy(), controlVector, self.sectionIndex)
+        newPoint = PathPoint(position.copy(), controlVector, self)
 
         self.pathPoints.insert(index, newPoint)
 
         if len(self.pathPoints) == 1: # no segment
             return
         elif index == len(self.pathPoints) - 1: # added a node at the end, so segment links last two nodes
-            self.segments.append(PathSegment(self.pathPoints[-2], self.pathPoints[-1], self.sectionIndex))
+            self.segments.append(PathSegment(self.pathPoints[-2], self.pathPoints[-1], self))
         else: # added a node between two segments
             self.segments[index-1].pointB = newPoint
-            self.segments.insert(index, PathSegment(newPoint, self.pathPoints[index+1], self.sectionIndex))
+            self.segments.insert(index, PathSegment(newPoint, self.pathPoints[index+1], self))
+
+        self.calculateInterpolatedPoints()
 
     # Delete a path point given the point object. Finds and deletes the segment as well
     # return whether whole section should be deleted
@@ -87,7 +88,7 @@ class PathSection:
 
         while ns < 1:
             x, y = BezierCurves.getBezierPoint(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
-            self.waypoints.addPoint(PointRef(Ref.FIELD, (x,y)))
+            self.waypoints.append(PointRef(Ref.FIELD, (x,y)))
 
             dxds, dyds = BezierCurves.getBezierGradient(ns, P1, [V1[0], V1[1]], [V2[0], V2[1]], P2)
             dsdt = self.INTERPOLATED_POINT_DISTANCE / Utility.hypo(dxds, dyds)
@@ -99,9 +100,9 @@ class PathSection:
 
     # Based on the location of the PathPoint and ControlPoints, recalculate the beizer curve points
     def calculateInterpolatedPoints(self):
-
+        print("calculate", self.sectionIndex)
         # Reset the list
-        self.waypoints.reset()
+        self.waypoints = []
 
         # Nothing to interpolate if there aren't at least two PathPoints
         if len(self.pathPoints) < 2:
@@ -154,5 +155,5 @@ class PathSection:
 
         radius = 2
         
-        for point in self.waypoints.iterator(): # point is a PointRef
+        for point in self.waypoints: # point is a PointRef
             Graphics.drawCircle(screen, *point.screenRef, colors.RED, radius)
