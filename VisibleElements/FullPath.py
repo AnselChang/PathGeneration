@@ -20,6 +20,15 @@ class FullPath:
 
         self.currentSection = 0
 
+    def isEmptyInterpolated(self) -> bool:
+        if len(self.sections) == 0:
+            return True
+        
+        for section in self.sections:
+            if len(section.waypoints) < 2:
+                return False
+        return True
+
     def getSegmentIndex(self, segment: PathSegment) -> Tuple[int, int]:
         for i in range(len(self.sections)):
             for j in range(len(self.sections[i].segments)):
@@ -37,8 +46,8 @@ class FullPath:
         self.sections[sectionIndex].calculateInterpolatedPoints()
 
     def createSection(self, position: PointRef):
-        self.sections.append(PathSection())
-        self.currentSection = len(self.sections) - 1
+        self.currentSection = len(self.sections)
+        self.sections.append(PathSection(self.currentSection))
         self.createPathPoint(position, self.currentSection)
         
     # Delete a path point given the point object. Finds and deletes the segment as well
@@ -49,6 +58,8 @@ class FullPath:
             if self.currentSection == sectionIndex:
                 self.currentSection = 0
                 del self.sections[sectionIndex]
+        else:
+            self.sections[sectionIndex].calculateInterpolatedPoints()
 
 
     # Draw a segment from each path to the next. This will be drawn under the points themselves

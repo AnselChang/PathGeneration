@@ -39,7 +39,10 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
 
         # If nothing is hovered, create a new PathPoint at that location
         if state.objectHovering is fieldSurface:
-            path.createPathPoint(shadowPointRef, path.currentSection)
+            if len(path.sections) == 0:
+                path.createSection(shadowPointRef)
+            else:
+                path.createPathPoint(shadowPointRef, path.currentSection)
         elif isinstance(state.objectHovering, PathSegment):
             sectionIndex, segmentIndex = path.getSegmentIndex(state.objectHovering)
             path.currentSection = segmentIndex
@@ -48,13 +51,12 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
 # Handle right clicks for dealing with the field
 def handleRightClick(state: SoftwareState, path: FullPath, mousePosition: PointRef):
     print("Right click")
-    if state.objectHovering is None:
+    if type(state.objectHovering) == FieldSurface:
         path.createSection(mousePosition)
     elif type(state.objectHovering) == PathPoint:
         hoveredPathPoint: PathPoint = state.objectHovering
-        sectionIndex, pathPointIndex = path.getPathPointIndex(hoveredPathPoint)
         path.currentSection = hoveredPathPoint.section # set the active section to be the clicked one
-
+        print("right pathpoint", hoveredPathPoint.section)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:

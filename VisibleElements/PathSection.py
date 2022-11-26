@@ -7,13 +7,13 @@ import BezierCurves, Utility, colors, pygame, Graphics
 from typing import Tuple
 
 class PathSection:
-    def __init__(self):
+    def __init__(self, sectionIndex):
         self.pathPoints: list[PathPoint] = []
         self.segments: list[PathSegment] = []
         self.waypoints: InterpolatedPoints = InterpolatedPoints()
 
         self.INTERPOLATED_POINT_DISTANCE = 0.75 # distance in inches between each interpolated bezier point
-
+        self.sectionIndex = sectionIndex
 
     # Append a PathPoint at at the specified position.
     # Index = -1 means that we'll add it at the end
@@ -37,17 +37,17 @@ class PathSection:
         else: # index == 0
             controlVector = (3,3)
 
-        newPoint = PathPoint(position.copy(), controlVector)
+        newPoint = PathPoint(position.copy(), controlVector, self.sectionIndex)
 
         self.pathPoints.insert(index, newPoint)
 
         if len(self.pathPoints) == 1: # no segment
             return
         elif index == len(self.pathPoints) - 1: # added a node at the end, so segment links last two nodes
-            self.segments.append(PathSegment(self.pathPoints[-2], self.pathPoints[-1]))
+            self.segments.append(PathSegment(self.pathPoints[-2], self.pathPoints[-1], self.sectionIndex))
         else: # added a node between two segments
             self.segments[index-1].pointB = newPoint
-            self.segments.insert(index, PathSegment(newPoint, self.pathPoints[index+1]))
+            self.segments.insert(index, PathSegment(newPoint, self.pathPoints[index+1], self.sectionIndex))
 
     # Delete a path point given the point object. Finds and deletes the segment as well
     # return whether whole section should be deleted
@@ -128,7 +128,7 @@ class PathSection:
 
     # Iterate through each PathPoint and draw it
     def drawPathPoints(self, screen: pygame.Surface, drawControl: bool):
-        index = 0
+        first = True
         for pathPoint in self.pathPoints:
             
             if drawControl:
@@ -137,14 +137,17 @@ class PathSection:
                 pathPoint.controlB.drawOwnershipLine(screen)
 
             # Draw the path point itself
-            pathPoint.draw(screen, index)
+            if first:
+                pathPoint.draw(screen, self.sectionIndex)
+            else:
+                pathPoint.draw(screen)
 
             # Then draw the control point on top
             if drawControl:
                 pathPoint.controlA.draw(screen)
                 pathPoint.controlB.draw(screen)
             
-            index += 1
+            #first = False
 
     # Draw all the interpolated points that have been calculated from PathPoint and ControlPoints
     def drawInterpolatedPoints(self, screen: pygame.Surface):

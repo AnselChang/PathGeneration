@@ -51,6 +51,8 @@ def main():
     # Main software loop
     while True:
 
+        print(path.currentSection)
+
         userInput.getUserInput()
         if userInput.isQuit:
             pygame.quit()
@@ -66,7 +68,7 @@ def main():
         handleHoverables(state, userInput, getHoverables())
         
         # Now that the hovered object is computed, handle what object is being dragged and then actually dragging the object
-        handleDragging(userInput, state, fieldSurface)
+        handleDragging(userInput, state, fieldSurface, path)
 
         # If the X key is pressed, delete hovered PathPoint/segment
         handleDeleting(userInput, state, path)
@@ -79,7 +81,7 @@ def main():
             if userInput.leftClicked:
                 handleLeftClick(state, shadowPointRef, fieldSurface, path)
             elif userInput.rightClicked:
-                handleRightClick(state)
+                handleRightClick(state, path, userInput.mousePosition)
 
         if state.mode == Mode.SIMULATE:
             simulation.update()
@@ -135,14 +137,16 @@ def getHoverables() -> Iterator[Hoverable]:
 
         if state.mode == Mode.EDIT: # the path is only interactable when on edit mode
             # For each pathPoint, iterate through the control points then the pathPoint itself
-            for pathPoint in path.pathPoints:
-                yield pathPoint.controlA
-                yield pathPoint.controlB
-                yield pathPoint
+            for section in path.sections:
+                for pathPoint in section.pathPoints:
+                    yield pathPoint.controlA
+                    yield pathPoint.controlB
+                    yield pathPoint
 
             # After checking all the points, check the segments
-            for segment in path.segments:
-                yield segment
+            for section in path.sections:
+                for segment in section.segments:
+                    yield segment
 
         # If nothing has been hovered, then finally check fieldSurface
         yield fieldSurface

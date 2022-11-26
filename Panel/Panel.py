@@ -25,8 +25,8 @@ class Panel:
             
             AIButton.AIButton(state),
             EditButton.EditButton(state),
-            SimulateButton.SimulateButton(state, path.waypoints),
-            RobotButton.RobotButton(state, path.waypoints),
+            SimulateButton.SimulateButton(state, path),
+            RobotButton.RobotButton(state, path),
             OdomButton.OdomButton(state)
         ]
 

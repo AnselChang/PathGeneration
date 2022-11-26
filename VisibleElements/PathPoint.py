@@ -19,13 +19,16 @@ by some delta will also shift the control points the same amount.
 class PathPoint(Point):
 
     def __init__(self, spawnPosition: PointRef, spawnVector: tuple, sectionIndex: int):
+
+        super().__init__(sectionIndex, hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
+
         self.position = spawnPosition
         self.controlA: ControlPoint = ControlPoint(self, *spawnVector)
         self.controlB: ControlPoint = ControlPoint(self, 0, 0)
         self.controlA.updateOtherVector()
 
 
-        super().__init__(sectionIndex, hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
+        
 
     # Given one of the points, return the other one. Useful when called from one of the control points
     def other(self, control: ControlPoint) -> ControlPoint:
@@ -50,11 +53,12 @@ class PathPoint(Point):
         return False
 
 
-    def draw(self, screen: pygame.Surface, index: int):
+    def draw(self, screen: pygame.Surface, label = None):
 
         position = self.position.screenRef
         super().draw(screen, position, colors.GREEN) # draw circle
-        Graphics.drawText(screen, Graphics.FONT20, str(index), colors.BLACK, *position)
+        if label is not None:
+            Graphics.drawText(screen, Graphics.FONT20, str(label), colors.BLACK, *position)
 
 
     def __str__(self):

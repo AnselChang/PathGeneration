@@ -10,7 +10,7 @@ mouse detection and drawing the segment.
 """
 class PathSegment(Hoverable):
 
-    def __init__(self, pointA: PathPoint, pointB: PathPoint, section: int):
+    def __init__(self, pointA: PathPoint, pointB: PathPoint, sectionIndex: int):
 
         super().__init__()
 
