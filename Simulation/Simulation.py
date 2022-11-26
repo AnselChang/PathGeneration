@@ -134,10 +134,10 @@ class Simulation:
 
         # go to next simulation frame if playing
         if self.state.playingSimulation:
+
             self.moveSlider(1)
             if self.slider.getValue() >= len(self.recordedSimulation) - 1:
                 self.state.playingSimulation = False
-                self.slider.setValue(0)
 
         if len(self.recordedSimulation) > 0:
 

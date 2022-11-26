@@ -40,6 +40,8 @@ class SimulationOnOffButton(FlipFlopButton):
   # The action to do when the button is toggled on
     def toggleButton(self) -> None:
         self.state.playingSimulation = not self.state.playingSimulation
+
+        # Rerun simulation if it has changed
         if self.state.playingSimulation and (self.state.rerunSimulation or self.state.simulationController != self.simulation.controllers.getController()):
             
             print("rerunning simulation")
@@ -53,3 +55,6 @@ class SimulationOnOffButton(FlipFlopButton):
             self.state.simulationController = self.simulation.controllers.getController()
             self.simulation.runSimulation()
 
+        # restart recording if at end
+        if self.state.playingSimulation and self.simulation.slider.getValue() == len(self.simulation.recordedSimulation) - 1:
+            self.simulation.slider.setValue(0)
