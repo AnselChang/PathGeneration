@@ -1,6 +1,6 @@
 from SingletonState.ReferenceFrame import PointRef, Ref
 from SingletonState.SoftwareState import SoftwareState, Mode
-from VisibleElements.PathPoint import PathPoint, Shape
+from VisibleElements.PathPoint import PathPoint
 from VisibleElements.PathSegment import PathSegment
 from Simulation.InterpolatedPoints import InterpolatedPoints
 import BezierCurves, Utility, colors, pygame, Graphics
@@ -110,6 +110,7 @@ class FullPath:
             return
 
         spillover = 0 # the distance before the first interpolated point, spilled over from the previous curve
+        i = 0 # index in self.pathPoints
         for i in range(len(self.pathPoints) - 1):
 
             # If the two pathpoints are practically in the same location (<0.1 inches), ignore the pathpoint
@@ -119,11 +120,6 @@ class FullPath:
             # Actually interpolate between these two points
             spillover = self.interpolateSplineCurve(self.pathPoints[i], self.pathPoints[i+1], spillover)
 
-            # If the PathPoint is sharp, do not spillover to the next path
-            # Also, add a point turn
-            if self.pathPoints[i+1].shape == Shape.SHARP:
-                spillover = 0
-                self.waypoints.addPointTurn()
 
 
 

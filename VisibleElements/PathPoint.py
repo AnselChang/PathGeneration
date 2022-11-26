@@ -1,5 +1,5 @@
 from SingletonState.ReferenceFrame import PointRef, Ref
-from VisibleElements.Point import Point, Shape
+from VisibleElements.Point import Point
 from SingletonState.UserInput import UserInput
 from VisibleElements.ControlPoint import ControlPoint
 import Utility, Graphics, colors, pygame
@@ -24,8 +24,6 @@ class PathPoint(Point):
         self.controlB: ControlPoint = ControlPoint(self, 0, 0)
         self.controlA.updateOtherVector()
 
-        # By default, self.controlPositionA and self.controlPositionB are linked and the curve is continuous
-        self.shape = Shape.SMOOTH
 
         super().__init__(hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
 
@@ -36,14 +34,6 @@ class PathPoint(Point):
         elif control is self.controlB:
             return self.controlA
         raise Exception("Given ControlPoint object not found in PathPoint")
-
-    # Toggle the shape of the point (whether control points and synced and whether to point turn or curve)
-    def toggleShape(self):
-        if self.shape == Shape.SMOOTH:
-            self.shape = Shape.SHARP
-        else:
-            self.shape = Shape.SMOOTH
-            self.controlA.updateOtherVector()
 
     # Implementing Hoverable
     # Check whether the mouse is hovering over object
@@ -63,8 +53,7 @@ class PathPoint(Point):
     def draw(self, screen: pygame.Surface, index: int):
 
         position = self.position.screenRef
-        color: tuple = colors.ORANGE if self.shape == Shape.SHARP else colors.GREEN
-        super().draw(screen, position, color) # draw circle
+        super().draw(screen, position, colors.GREEN) # draw circle
         Graphics.drawText(screen, Graphics.FONT20, str(index), colors.BLACK, *position)
 
 

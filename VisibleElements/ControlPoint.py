@@ -1,7 +1,7 @@
 from re import U
 from SingletonState.FieldTransform import FieldTransform
 from SingletonState.UserInput import UserInput
-from VisibleElements.Point import Point, Shape
+from VisibleElements.Point import Point
 from SingletonState.ReferenceFrame import VectorRef, Ref
 import Utility, colors, pygame, Graphics
 

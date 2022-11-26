@@ -5,10 +5,6 @@ import Utility, pygame, Graphics
 from enum import Enum
 
 
-class Shape(Enum):
-    SMOOTH = 1
-    SHARP = 2
-
 """
 Abstract class defined as a draggable point drawn on the screen
 Implemented by PathPoint and ControlPoint

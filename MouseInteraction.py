@@ -49,10 +49,7 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
 # Handle right clicks for dealing with the field
 def handleRightClick(state: SoftwareState):
     print("Right click")
-    # Right clicking PathPoint toggles its shape
-    if isinstance(state.objectHovering, PathPoint):
-        state.objectHovering.toggleShape()
-        state.recomputeInterpolation = True
+
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:
