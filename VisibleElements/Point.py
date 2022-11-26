@@ -12,11 +12,13 @@ Implemented by PathPoint and ControlPoint
 class Point(Draggable):
 
 
-    def __init__(self, hoverRadius: int, drawRadius: int, drawRadiusBig: int):
+    def __init__(self, sectionIndex: int, hoverRadius: int, drawRadius: int, drawRadiusBig: int):
 
         self.HOVER_RADIUS = hoverRadius
         self.DRAW_RADIUS = drawRadius
         self.DRAW_RADIUS_BIG = drawRadiusBig
+
+        self.section: int = sectionIndex
 
         super().__init__()
 

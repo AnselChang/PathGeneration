@@ -20,7 +20,6 @@ class SoftwareState:
         self.objectHovering: Hoverable = None # object the mouse is currently hovering over
         self.objectDragged: Draggable = None # object the mouse is currently dragging
 
-        self.recomputeInterpolation = False # Whether to recompute bezier interpolation from modifying path
 
         self.playingSimulation = False # Whether the simulation is currently stepping through each frame
         self.rerunSimulation = True

@@ -51,8 +51,6 @@ def main():
     # Main software loop
     while True:
 
-        state.recomputeInterpolation = False
-
         userInput.getUserInput()
         if userInput.isQuit:
             pygame.quit()
@@ -82,11 +80,6 @@ def main():
                 handleLeftClick(state, shadowPointRef, fieldSurface, path)
             elif userInput.rightClicked:
                 handleRightClick(state)
-
-        # Whenever the path is modified, the interpolated beizer points have to be recomputed again
-        if state.recomputeInterpolation:
-            state.rerunSimulation = True
-            path.calculateInterpolatedPoints()
 
         if state.mode == Mode.SIMULATE:
             simulation.update()

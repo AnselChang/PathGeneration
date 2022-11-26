@@ -18,14 +18,14 @@ by some delta will also shift the control points the same amount.
 
 class PathPoint(Point):
 
-    def __init__(self, spawnPosition: PointRef, spawnVector: tuple):
+    def __init__(self, spawnPosition: PointRef, spawnVector: tuple, sectionIndex: int):
         self.position = spawnPosition
         self.controlA: ControlPoint = ControlPoint(self, *spawnVector)
         self.controlB: ControlPoint = ControlPoint(self, 0, 0)
         self.controlA.updateOtherVector()
 
 
-        super().__init__(hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
+        super().__init__(sectionIndex, hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
 
     # Given one of the points, return the other one. Useful when called from one of the control points
     def other(self, control: ControlPoint) -> ControlPoint:

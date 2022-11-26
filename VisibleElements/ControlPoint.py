@@ -19,7 +19,7 @@ class ControlPoint(Point):
         self.vector = VectorRef(Ref.FIELD, (deltaX, deltaY))
         
         self.DRAW_RADIUS = 5
-        super().__init__(hoverRadius = 10, drawRadius = 5, drawRadiusBig = 6)
+        super().__init__(parent.section, hoverRadius = 10, drawRadius = 5, drawRadiusBig = 6)
 
     # When the location of this control point has moved, update the other control point also associated with the PathPoint
     # pathPoint.controlA = 0 - pathPoint.controlB (opposite sides of pathPoint)
@@ -48,7 +48,7 @@ class ControlPoint(Point):
                 self.vector *= (MIN_MAGNITUDE / mag) # scale self.vector magnitude to MIN_MAGNITUDE
 
             # If we're in continuous mode, we need to keep both control points opposite one another
-            if self.parent.shape == Shape.SMOOTH:
+            if True:
                 self.updateOtherVector()
 
             return True
