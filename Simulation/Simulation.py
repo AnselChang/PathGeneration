@@ -82,6 +82,7 @@ class Simulation:
 
         # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
         # different simulation implementations
+        print("initial heading: ", initialHeading*180/3.1415, waypoints[0].fieldRef, waypoints[1].fieldRef)
         robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, robotOutput)
 
         # Iterate until robot has reached the destination

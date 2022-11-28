@@ -40,3 +40,4 @@ class SimulateButton(ToggleButton):
     # When toggled on, set mode to edit
     def toggleButtonOn(self):
         self.softwareState.mode = Mode.SIMULATE
+        self.softwareState.rerunSimulation = True
