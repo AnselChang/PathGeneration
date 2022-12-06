@@ -1,7 +1,9 @@
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.ControllerRelated.ControllerClasses.PurePursuitController import PurePursuitController
 from Simulation.ControllerRelated.ControllerClasses.StanleyController import StanleyController
-from Simulation.ControllerRelated.ControllerClasses.TestController import TestController
+from Simulation.ControllerRelated.ControllerClasses.AnselPPController import AnselPPController
+from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState, buildControllerSliders
+from Sliders.Slider import Slider
 
 """
 Store references to each controller, and manage which controller is currently selected
@@ -12,16 +14,23 @@ class ControllerManager:
     def __init__(self):
 
         self.controllers: list[AbstractController] = [
-            TestController(),
+            AnselPPController(),
             PurePursuitController(),
-            StanleyController()
+            #StanleyController()
         ]
-
         self.index = 0 # index of selected controller in controller list
 
     # return the currently-selected controller
     def getController(self) -> AbstractController:
         return self.controllers[self.index]
+    
+    # get the name of the currently-selected controller
+    def getCurrentName(self) -> str:
+        return self.controllers[self.index].name
+    
+    # get the list of sliders for the currently-selected controller
+    def getCurrentSliders(self) -> list[Slider]:
+        return self.controllers[self.index].sliders
 
     # Whether there is a controller before the currently-selected one
     def isPrevious(self) -> bool:

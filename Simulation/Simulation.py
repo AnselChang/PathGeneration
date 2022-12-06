@@ -36,7 +36,7 @@ class Simulation:
         self.recordedSimulation: list[SimulationTimestep] = []
 
         # simuation slider
-        self.slider: Slider = Slider(Utility.SCREEN_SIZE + 120, 190, 115, 0, 1, 1, colors.LIGHTBLUE)
+        self.slider: Slider = Slider(Utility.SCREEN_SIZE + 150, 190, 115, 0, 1, 1, colors.LIGHTBLUE)
 
         self.state = state
         self.controllers = controllers
@@ -66,7 +66,8 @@ class Simulation:
         
 
         # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
-        initialPosition: PointRef = waypoints[0][0] 
+        initialPosition: PointRef = waypoints[0][0]
+
         initialHeading: float =  Utility.thetaTwoPoints(waypoints[0][0].fieldRef, waypoints[0][1].fieldRef)
         robotOutput: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
 
@@ -94,6 +95,7 @@ class Simulation:
 
         # Now that running simulation is complete, adjust slider bounds
         self.slider.setBounds(0, len(self.recordedSimulation) - 1)
+        self.slider.setValue(0)
 
         #for step in self.recordedSimulation:
         #    print(step)
@@ -132,10 +134,10 @@ class Simulation:
 
         # go to next simulation frame if playing
         if self.state.playingSimulation:
+
             self.moveSlider(1)
             if self.slider.getValue() >= len(self.recordedSimulation) - 1:
                 self.state.playingSimulation = False
-                self.slider.setValue(0)
 
         if len(self.recordedSimulation) > 0:
 

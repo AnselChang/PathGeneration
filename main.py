@@ -8,6 +8,7 @@ from VisibleElements.FieldSurface import FieldSurface
 from Simulation.ControllerRelated.ControllerManager import ControllerManager
 from Simulation.Simulation import Simulation
 from Simulation.DriverControl.DriverSimulation import DriverSimulation
+import Simulation.ControllerRelated.ControllerSliderBuilder as ControllerSliderBuilder
 from MouseInteraction import *
 from VisibleElements.FullPath import FullPath
 from Panel.Panel import Panel
@@ -30,15 +31,19 @@ if __name__ == '__main__':
 
     fieldSurface: FieldSurface = FieldSurface(fieldTransform)
     userInput: UserInput = UserInput(pygame.mouse, pygame.key)
-    controllers: ControllerManager = ControllerManager()
+    
 
     state: SoftwareState = SoftwareState()
+    ControllerSliderBuilder.initState(state)
+
+    controllers: ControllerManager = ControllerManager()
     path: FullPath = FullPath()
     discManager: DiscManager = DiscManager()
     robotSpecs: RobotSpecs = RobotSpecs()
     simulation: Simulation = Simulation(state, controllers, path, robotSpecs)
     driver: DriverSimulation = DriverSimulation(robotSpecs)
     panel: Panel = Panel(state, path, simulation, driver, discManager)
+
 
 
 def main():
@@ -80,6 +85,7 @@ def main():
 
         # Whenever the path is modified, the interpolated beizer points have to be recomputed again
         if state.recomputeInterpolation:
+            state.rerunSimulation = True
             path.calculateInterpolatedPoints()
 
         if state.mode == Mode.SIMULATE:

@@ -3,7 +3,7 @@ from Simulation.ControllerRelated.ControllerClasses.AbstractController import Ab
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
-from Sliders.Slider import Slider
+from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
 from RobotSpecs import RobotSpecs
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 from Simulation.HUDGraphics.PurePursuitGraphics import PPGraphics
@@ -22,34 +22,30 @@ class PurePursuitController(AbstractController):
 
     def __init__(self):
         super().__init__("Pure Pursuit")
-        self.lookaheadIndex = 0
-        self.lookaheadDistance = 15
-    
 
-    def defineParameterSliders(self) -> list[Slider]:
+    def defineParameterSliders(self) -> list[ControllerSliderState]:
         #TODO define the tunable parameters of this controller
-        """
-        lookAheadDistance
-        """
-        pass
+        return []
+    
+    # init whatever is needed at the start of each path
+    def initController(self):
+        self.lookaheadIndex = 0
+        self.lookaheadDistance = 10
+        self.tolerance = 2
 
-    
-    # Finding the lookahead point and information
-        # Step 1: calc distance from point to robot
-        # Step 2: if that is closest to lookahead distance, save it
-        # Step 3: if farther than lookahead, break out of loop
-    
-    def findLookaheadPoint(self, robot: RobotModelOutput) -> PointRef:
-    
-        # return self.waypoints[len(self.waypoints)-1]
-        # Not sure if initialization values are necessary
-        indexOfLookaheadPoint = self.lookaheadIndex # Sets current lookahead point to previous for the start of the next loop
-        lookaheadPointDist = 0 # Index Of Point Closest To Lookahead 
 
-        for i in range(self.lookaheadIndex, len(self.waypoints)-1):
-            pointPosition = self.waypoints[i].fieldRef             # Finds position of the closest waypoint to the lookahead distance
-            robotPosition = robot.position.fieldRef                         # Finds current robot position
-            pointDistance = distanceTuples(robotPosition,pointPosition)  # Finds distance from robot to waypoint
+    # Indexes through the lost of waypoints to find the one futher along the path closest to lookahead circle.
+    def findLookaheadPoint(self, robot: RobotModelOutput) -> PointRef:  
+        indexOfLookaheadPoint = self.lookaheadIndex                     # Sets current lookahead point to previous for the 
+                                                                        #   start of the next loop.
+        lookaheadPointDist = 0                                          # Initial value of the lookahead point distance is 0.
+
+        # Looks at waypoints from the last lookahead point to the second to last point on the list
+        for i in range(self.lookaheadIndex, len(self.waypoints)):     
+            pointPosition = self.waypoints[i].fieldRef                  # Finds position of the waypoint currently being 
+                                                                        #   looked at.
+            robotPosition = robot.position.fieldRef                     # Calls current robot position
+            pointDistance = distanceTuples(robotPosition,pointPosition) # Finds distance from robot to waypoint
 
             if pointDistance > lookaheadPointDist and pointDistance < self.lookaheadDistance: 
                 # If the distance to the closest waypoint is further than the current lookahead point distance and shorter than the ideal 
@@ -58,118 +54,62 @@ class PurePursuitController(AbstractController):
                 indexOfLookaheadPoint = i                                   # Sets the index of the lookahead point to i.
                 lookaheadPointDist = pointDistance                          # Sets the distance to the lookahead point distance so we calculate
                 self.lookaheadIndex = indexOfLookaheadPoint
-                i+=1
-                                                                            #   the wheel velocities based on the target waypoint.
-
+                                                                            #   the wheel velocities based on the target waypoint.      
+            # If the distance of the new closest waypointis further than the lookahead distance, do the following.
             elif pointDistance > self.lookaheadDistance:        
-                # If the distance of the new closest waypointis further than the lookahead distance, do the following.
-                indexOfLookaheadPoint = self.lookaheadIndex                # Sets the lookahead index to be the index of the current lookahead 
+                indexOfLookaheadPoint = i - 1                           # Sets the lookahead index to be one option before the 
+                                                                        #   current index. (Rounds down.)    
+                return self.waypoints[indexOfLookaheadPoint] 
+        return self.waypoints[indexOfLookaheadPoint]                    # Returns the waypoint of the index chosen above.
 
-                                                                            #   point so it doesn't change for this loop.
-            return self.waypoints[indexOfLookaheadPoint]                # Returns the waypoint of the index of the lookahead point above.
-
-        # If we run out of points, use the last valid one
-        #return self.waypoints[indexOfLookaheadPoint]
-
-    # init whatever is needed at the start of each path
-    def initController(self):
-        pass
-    
 
     def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
-        chosenWaypoint: PointRef = self.findLookaheadPoint(robotOutput)
+        # Calls findLookaheadPoint function to find the desired lookahead 
+        #   waypoint and saves it to chosenWayppint.
+        chosenWaypoint: PointRef = self.findLookaheadPoint(robotOutput)   
 
-        #point to line distance from robot's heading vector
-        waypointXPos, waypointYPos = chosenWaypoint.fieldRef
-        robotX, robotY = robotOutput.position.fieldRef
+        # Finds position of waypoint and robot respectively and separates them into X and Y components
+        waypointXPos, waypointYPos = chosenWaypoint.fieldRef    # Waypoint
+        robotX, robotY = robotOutput.position.fieldRef          # Robot
+
+        # Calculates the angle in which the robot needs to travel, then finds the distance between this 
+        #   and the robot heading.
         angleOfLookaheadVectorFromXAxis = math.atan2((waypointYPos - robotY), (waypointXPos - robotX))
         angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading
         
-        distToWaypoint = distanceTuples(robotOutput.position.fieldRef, chosenWaypoint.fieldRef)   #temporary arbitrary value so the code stops getting mad. Code is commented above
+        # Finds the overall distance from the robot to the waypoint, then the horizontal distance between 
+        #   the lookahead vector and the waypoint.
+        distToWaypoint = distanceTuples(robotOutput.position.fieldRef, chosenWaypoint.fieldRef)   
         horizontalDistToWaypoint = math.sin(angleBetweenRobotHeadingAndLookaheadPoint)*distToWaypoint
         
+        # This represents the case where the robot is either on the lookahead point (last point)
+        #   or is already at the right heading and doesn't need to curve.
         if horizontalDistToWaypoint == 0:
-            # This represents the case where the robot is either on the lookahead point (last point)
-            # Or is already at the right heading and doesn't need to curve
             curvature = 0
+
+        # If the robot needs to curve:
         else:
-            # Radius of curvature from robot to point
+            # Radius of curvature from robot to point.
             radiusOfCurvature = (distToWaypoint)**2/(2*horizontalDistToWaypoint)
 
-            # Curvature from robot to point
+            # Curvature from robot to point.
             curvature = 1/radiusOfCurvature
 
-        kp = robotSpecs.maximumVelocity
-        error = kp #* (distToWaypoint/self.lookaheadDistance)
+        # Constant used to scale overall velocity up or down for tuning.
+        kp = 1/3
+
+        # Slows robot down around curves.
+        kd = 1/(2*(1-curvature)) 
+
+        # Calculates desired overall robot velocity.
+        error = kp * (distToWaypoint/self.lookaheadDistance) * robotSpecs.maximumVelocity 
 
         # Curvature to robot wheel velocities:
-        leftWheelVelocity = error * (2 + curvature*robotSpecs.trackWidth)/2
-        rightWheelVelocity = error * (2 - curvature*robotSpecs.trackWidth)/2
+        leftWheelVelocity = kd * error * (2 + curvature*robotSpecs.trackWidth)/2
+        rightWheelVelocity = kd * error * (2 - curvature*robotSpecs.trackWidth)/2
 
-        print(f"{(2 + curvature*robotSpecs.trackWidth)/2}")
-
-        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), False, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
-        
-
-
-        #distToWaypoint = distanceTwoPoints(self.waypoints[indexOfLookaheadPoint], pointOnLineClosestToPoint(self.robotOutput.robotHeading, self.waypoint(indexOfLookaheadPoint)))
-        #radiusOfCurvature = (distance to lookahead point)^2/(2*distToWaypoint)
-        #curvature = 1/radiusOfCurvature
-
-        #leftVelocity = robotSpecs.maxVelocity * (2 + curvature*robotSpecs.trackWidth)/2
-        #rightVelocity = robotSpecs.maxVelocity * (2 - curvature*robotSpecs.trackWidth)/2
-
-        #return RobotModelInput(leftVelocity, rightVelocity)
-
-        """
-        find lookahead pt
-        point to line distance from robot's heading vector
-         -> distToWaypoint = distanceTwoPoints(chosenWaypoint, pointOnLineClosestToPoint([robotHeadingVector], chosenWaypoint.position.fieldRef))
-        radius of curvature from robot to point
-         -> r = (distance to lookahead point)^2/2x
-         -> C = 1/r     # Curvature
-        Curvature to robot wheel velocities:
-         -> L = robotSpecs.maxVelocity * (2 + C*robotSpecs.trackWidth)/2
-         -> R = robotSpecs.maxVelocity * (2 - C*robotSpecs.trackWidth)/2
-        return RobotModelInput(L,R)
-        """
-    
-    
-
-        """
-        given current x, y, and theta;
-        given desired x, y, and theta of each waypoint
-        given list of waypoints 
-
-        find closest waypoint; might be given via order of stored data
-        for (i>0, i<=maxi -1: i+=1):
-            read current pos info
-            read desired waypoint info
-            find lookahead distance (l=sqrt(xerror^2 + yerror^2))
-
-        GIVEN: 
-            V = Max Speed
-            C = curvature
-            T = Track Width
-
-        if (V >= maxSpeed - acceleration):
-            V += acceleration
-
-        L = V*(2 + CT)/2
-        R = V*(2 - CT)/2
-        """
-
-        """
-
-        waypointXPos, waypointYPos = waypointChosen.fieldRef
-
-
-        angleOfLookaheadVectorFromXAxis = atan2((waypointYPos - robotOutput.yPosition.fieldRef), (waypointXPos - robotOutput.xPosition.fieldRef))
-        angleBetweenRobotHeadingAndLookaheadPoint = angleOfLookaheadVectorFromXAxis - robotOutput.heading.fieldRef
-        horizontalDistToWaypoint = cos(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
-
-
-        verticalDistToWaypoint = sin(angleBetweenRobotHeadingAndLookaheadPoint)*distTwoPoints(robot.position.fieldRef, waypointChosen)
-        """
-
+        # Tells the system that the PP loop is done.
+        isDone = distToWaypoint < self.tolerance and chosenWaypoint==self.waypoints[-1]
+        # Returns the desired wheel velocities to be used in RobotModelInput.
+        return RobotModelInput(leftWheelVelocity,rightWheelVelocity), isDone, PPGraphics(robotOutput.position, chosenWaypoint, self.lookaheadDistance)
         

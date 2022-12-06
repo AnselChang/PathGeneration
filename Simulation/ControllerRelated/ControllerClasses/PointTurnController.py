@@ -1,6 +1,7 @@
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
+from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
@@ -18,7 +19,7 @@ class PointTurnController(AbstractController):
         super().__init__("Point Turns")
     
     # Not user-configurable, so return an empty list
-    def defineParameterSliders(self) -> list[Slider]:
+    def defineParameterSliders(self) -> list[ControllerSliderState]:
         return []
 
     # To be called at the start of a simulation. Sets waypoints and initial state

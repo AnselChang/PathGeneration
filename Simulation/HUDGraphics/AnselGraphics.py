@@ -9,12 +9,13 @@ HUD Graphics related to the pure pursuit controller.
 Currently, displays only the position of the lookahead
 """
 
-class PPGraphics(HUDGraphics):
+class AnselGraphics(HUDGraphics):
 
-    def __init__(self, robotPosition: PointRef, waypoint: PointRef, lookaheadDistance: float):
-        self.position = robotPosition.copy()
-        self.waypoint: PointRef = waypoint
+    def __init__(self, closest: PointRef, target: PointRef):
+        self.closest = closest
+        self.target = target
 
     def draw(self, screen: pygame.Surface):
         
-        Graphics.drawCircle(screen, *self.waypoint.screenRef, colors.BLUE, 4)
+        Graphics.drawCircle(screen, *self.closest.screenRef, colors.BLUE, 4)
+        Graphics.drawCircle(screen, *self.target.screenRef, colors.RED, 4)
