@@ -51,7 +51,11 @@ def getLighterImage(image: pygame.Surface, lightenPercent: float) -> pygame.Surf
 
     return newImage
 
-
+def drawSurface(surface: pygame.Surface, drawnSurface: pygame.Surface, cx: int, cy: int, angle: float):
+    drawnSurface = pygame.transform.rotate(drawnSurface, angle)
+    r = drawnSurface.get_rect()
+    rect = drawnSurface.get_rect(center = (cx + r.width/2, cy + r.height/2))
+    surface.blit(drawnSurface, (rect.x, rect.y))
 
 # align = 0 -> align left/top
 # align = 0.5 -> align mid

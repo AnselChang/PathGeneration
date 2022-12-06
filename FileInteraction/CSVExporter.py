@@ -11,8 +11,8 @@ class CSVExporter(AbstractExporter):
     def export(self, location: str):
         with open(location, "w+", newline='') as csvfile:
             writer = csv.writer(csvfile)
-            for list in self.path.waypoints.points:
-                for point in list:
+            for section in self.path.sections:
+                for point in section.waypoints:
                     # Each row just contains x,y
                     writer.writerow(point.fieldRef)
                 # Black row to signify moving to a new segment

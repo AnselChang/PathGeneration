@@ -118,8 +118,8 @@ class UserInput:
 
             elif event.type == pygame.MOUSEWHEEL:
                 self.mousewheelDelta = event.y
-            elif event.type == pygame.DROPFILE:
-                self.loadedFile = event.file
+            elif event.type == pygame.DROPFILE and event.file is not None:
+                self.loadedFile = str(event.file)
 
         # Update mouse position
         self.isMousePressing = self._mouse.get_pressed()[0]

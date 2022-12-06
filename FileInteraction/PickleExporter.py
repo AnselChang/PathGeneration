@@ -8,9 +8,9 @@ class PickleExporter(AbstractExporter):
 
     # Exports the list of PathPoints to the specified location using the pickle library
     def export(self, location: str):
-        with open(location, "w+", newline='') as exportFile:
+        with open(location, "wb") as exportFile:
             # use self.path.pathPoints
-            pickle.dump(self.path.pathPoints, exportFile)
+            pickle.dump(self.path.sections, exportFile)
 
     # Returns some general information regarding the file extension this exporter uses
     def getExtension(self) -> tuple[str,str]:

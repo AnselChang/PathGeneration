@@ -1,9 +1,7 @@
-from Simulation.InterpolatedPoints import InterpolatedPoints
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotModels.AbstractRobotModel import AbstractRobotModel
 from Simulation.RobotModels.SimpleRobotModel import SimpleRobotModel
 from Simulation.RobotModels.ComplexRobotModel import ComplexRobotModel
-from Simulation.ControllerRelated.ControllerStateMachine import ControllerStateMachine
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
@@ -55,50 +53,57 @@ class Simulation:
     def runSimulation(self):
 
         self.simulationIndex = 0
+        timestep = 0
 
         # we're running a new simulation now, so delete the data from the old one
-        self.recordedSimulation.clear() 
+        self.recordedSimulation.clear()
 
-        waypoints: list[list[PointRef]] = self.path.waypoints.points
-
-        # Set up the controller state machine that alternates between path following and point turn controllers
-        controllerSM = ControllerStateMachine(self.robotSpecs, waypoints, self.controllers.getController())
-        
-
-        # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
-        initialPosition: PointRef = waypoints[0][0]
-
-        initialHeading: float =  Utility.thetaTwoPoints(waypoints[0][0].fieldRef, waypoints[0][1].fieldRef)
-        robotOutput: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
-
-        # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
-        # different simulation implementations
-        robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, robotOutput)
-
-        # Iterate until robot has reached the destination
-        timesteps = 0
-        isDone = False
-        while timesteps < 10000 and not isDone: # hard limit of 10000 in case of getting stuck in simulation
-
-            # Input robot position to controller and obtain wheel velocities
-            robotInput, isDone, graphics = controllerSM.runController(robotOutput)
-
-            # Take in wheel velocities from controller and simulate the robot model for a tick
-            robotOutput: RobotModelOutput = robot.simulateTick(robotInput)
-
-            # Store the robot position at each tick
-            self.recordedSimulation.append(SimulationTimestep(timesteps * self.robotSpecs.timestep, robotInput, robotOutput, graphics))
-
-            # Increment number of timesteps elapsed
-            timesteps += 1
-
+        # Reset and run simulation for each section
+        for section in self.path.sections:
+            print("a")
+            timestep = self.runSimulationSection(section.waypoints, timestep)
 
         # Now that running simulation is complete, adjust slider bounds
         self.slider.setBounds(0, len(self.recordedSimulation) - 1)
         self.slider.setValue(0)
 
-        #for step in self.recordedSimulation:
-        #    print(step)
+    # Run robot simulation given one section of the entire path
+    def runSimulationSection(self, waypoints: list[PointRef], timestepStart):
+
+        # Set up the controller state machine that alternates between path following and point turn controllers
+        controller: AbstractController = self.controllers.getController()
+        controller.initSimulation(self.robotSpecs, waypoints)
+        
+        # Get the initial robot conditions by setting robot position to be at first waypoint, and aimed at second waypoint
+        initialPosition: PointRef = waypoints[0]
+
+        initialHeading: float =  Utility.thetaTwoPoints(waypoints[0].fieldRef, waypoints[1].fieldRef)
+        robotOutput: RobotModelOutput = RobotModelOutput(*initialPosition.fieldRef, initialHeading, 0, 0)
+
+        # Instantiate robot model with type AbstractRobotModel. This allows easy substitution of
+        # different simulation implementations
+        print("initial heading: ", initialHeading*180/3.1415, waypoints[0].fieldRef, waypoints[1].fieldRef)
+        robot: AbstractRobotModel = ComplexRobotModel(self.robotSpecs, robotOutput)
+
+        # Iterate until robot has reached the destination
+        isDone = False
+        timestep = timestepStart
+        while timestep < timestepStart + 2000 and not isDone: # hard limit of 10000 in case of getting stuck in simulation
+
+            # Input robot position to controller and obtain wheel velocities
+            robotInput, isDone, graphics = controller.simulateTick(robotOutput, self.robotSpecs)
+
+            # Take in wheel velocities from controller and simulate the robot model for a tick
+            robotOutput: RobotModelOutput = robot.simulateTick(robotInput)
+
+            # Store the robot position at each tick
+            self.recordedSimulation.append(SimulationTimestep(timestep * self.robotSpecs.timestep, robotInput, robotOutput, graphics))
+
+            # Increment number of timesteps elapsed
+            timestep += 1
+
+        return timestep
+
 
 
     # Draw the line the robot takes in the simulation when following the path on the field

@@ -1,16 +1,16 @@
 from SingletonState.SoftwareState import SoftwareState, Mode
 from Panel.AbstractButtons.ToggleButton import ToggleButton
 from VisibleElements.Tooltip import Tooltip
-from Simulation.InterpolatedPoints import InterpolatedPoints
+from VisibleElements.FullPath import FullPath
 from SingletonState.ReferenceFrame import PointRef
 import Utility, pygame, Graphics
 
 # Button on panel to select simulate mode
 class SimulateButton(ToggleButton):
 
-    def __init__(self, state: SoftwareState, waypoints: InterpolatedPoints):
+    def __init__(self, state: SoftwareState, path: FullPath):
         self.softwareState = state
-        self.waypoints = waypoints
+        self.path = path
         self.tooltipEnabled = Tooltip("Tune parameters for path following on the virtual", "robot, and simulate path following algorithms")
         self.tooltipDisabled = Tooltip("Disabled: Draw a path first in Edit mode", "before trying to simulate path following!")
 
@@ -34,9 +34,10 @@ class SimulateButton(ToggleButton):
 
     # robot button is disabled if there is no path
     def isDisabled(self) -> bool:
-        return self.waypoints.size < 2
+        return self.path.isEmptyInterpolated()
 
     # Implementing ToggleButton function
     # When toggled on, set mode to edit
     def toggleButtonOn(self):
         self.softwareState.mode = Mode.SIMULATE
+        self.softwareState.rerunSimulation = True

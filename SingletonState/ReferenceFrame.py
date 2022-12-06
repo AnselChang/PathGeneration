@@ -156,11 +156,10 @@ class VectorRef:
     # Returns an new vector that is rotated counterclockwise the specified theta in radians
     # Does not modify the current object
     def rotate(self, theta: float) -> 'VectorRef':
-        ct = math.cos(theta)
-        st = math.sin(theta)
-        x2 = ct * self._vxf - st * self._vyf
-        y2 = st * self._vxf + ct * self._vyf
-        return VectorRef(Ref.FIELD, (x2, y2))
+        mag = self.magnitude(Ref.FIELD)
+        angle = self.theta()
+        angle += theta
+        return VectorRef(Ref.FIELD, (mag * math.cos(angle), mag * math.sin(angle)))
 
     # Does not modify the current object but creates a new object with a magnitude of 1
     def normalize(self) -> 'VectorRef':
