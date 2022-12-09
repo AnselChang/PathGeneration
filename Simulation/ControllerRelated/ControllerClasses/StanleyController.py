@@ -104,10 +104,10 @@ class StanleyController(AbstractController):
         curvature = math.sqrt(2 - 2*math.cos(2*steeringAngle)) / self.robotSpecs.trackWidth
 
         # Slow down the robot linearly as it approaches the final waypoint
-        if (lastPointDist := distanceTuples(output.position.fieldRef, self.waypoints[-1])) < self.slowdownDistance:
-            velocity = (lastPointDist/self.slowdownDistance)*self.robotSpecs.maximumVelocity
-        else:
-            velocity = self.robotSpecs.maximumVelocity
+        #if (lastPointDist := distanceTuples(output.position.fieldRef, self.waypoints[-1].fieldRef)) < self.slowdownDistance:
+        #    velocity = (lastPointDist/self.slowdownDistance)*self.robotSpecs.maximumVelocity
+        #else:
+        velocity = self.robotSpecs.maximumVelocity / 5
 
         # Curvature to robot wheel velocities, accounting for the aforementioned slowdown
         leftWheelVelocity = velocity * (2 + curvature*self.robotSpecs.trackWidth)/2

@@ -161,7 +161,8 @@ class Simulation:
         # Draw the robot and HUD graphics at current simulation timestep
         currentTimestep: SimulationTimestep = self.getCurrent()
         self.drawRobot(screen, currentTimestep.output)
-        currentTimestep.graphics.draw(screen)
+        if currentTimestep.graphics is not None:
+            currentTimestep.graphics.draw(screen)
         
             
         

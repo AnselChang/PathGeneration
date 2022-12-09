@@ -51,7 +51,7 @@ class Slider(Draggable, TooltipOwner):
 
     # Get the current slider value
     # If the bounds and step size are integers, should return an integer. Otherwise return float
-    def getValue(self) -> float:
+    def getValue(self):
         if round(self.val) == self.val:
             return int(self.val)
         else:
