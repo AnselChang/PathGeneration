@@ -99,10 +99,9 @@ class StanleyController(AbstractController):
         # The second controller is a crosstrack error-based controller, within an atan to convert to a steering angle by adjusting by the current velocity
         steeringAngle = headingError + math.atan2(self.crossTrackKP*crossTrackError,self.softeningConstant+currentVelocity)
 
-        # Use basic trig to calculate the radius resulting from such a steering angle
-        radius = self.robotSpecs.trackWidth / math.sqrt(2 - 2*math.cos(2*steeringAngle))
+        # Use basic trig to calculate the radius resulting from such a steering angle, and
         # converts that to a curvature that we can use to map the steering angle to a differential drive
-        curvature = 1 / radius
+        curvature = math.sqrt(2 - 2*math.cos(2*steeringAngle)) / self.robotSpecs.trackWidth
 
         # Slow down the robot linearly as it approaches the final waypoint
         if (lastPointDist := distanceTuples(output.position.fieldRef, self.waypoints[-1])) < self.slowdownDistance:
