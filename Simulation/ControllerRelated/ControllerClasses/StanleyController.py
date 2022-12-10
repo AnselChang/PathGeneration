@@ -2,8 +2,12 @@ from xml.etree.ElementTree import PI
 from Simulation.ControllerRelated.ControllerClasses.AbstractController import AbstractController
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
+
 from SingletonState.ReferenceFrame import PointRef
 from Sliders.Slider import Slider
+
+from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
+
 from RobotSpecs import RobotSpecs
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 
@@ -27,10 +31,15 @@ class StanleyController(AbstractController):
         self.slowdownDistance = 7.5
     
 
-    def defineParameterSliders(self) -> list[Slider]:
+    def defineParameterSliders(self) -> list[ControllerSliderState]:
         #TODO define the tunable parameters of this controller
-        pass
+
+        #pass
     
+
+        return []
+
+
     # init whatever is needed at the start of each path
     def initController(self):
         self.ticks = 0

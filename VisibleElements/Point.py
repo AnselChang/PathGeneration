@@ -5,10 +5,6 @@ import Utility, pygame, Graphics
 from enum import Enum
 
 
-class Shape(Enum):
-    SMOOTH = 1
-    SHARP = 2
-
 """
 Abstract class defined as a draggable point drawn on the screen
 Implemented by PathPoint and ControlPoint
@@ -16,11 +12,13 @@ Implemented by PathPoint and ControlPoint
 class Point(Draggable):
 
 
-    def __init__(self, hoverRadius: int, drawRadius: int, drawRadiusBig: int):
+    def __init__(self, sectionIndex: int, hoverRadius: int, drawRadius: int, drawRadiusBig: int):
 
         self.HOVER_RADIUS = hoverRadius
         self.DRAW_RADIUS = drawRadius
         self.DRAW_RADIUS_BIG = drawRadiusBig
+
+        self.section: int = sectionIndex
 
         super().__init__()
 

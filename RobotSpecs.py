@@ -14,5 +14,9 @@ class RobotSpecs:
 
         # Used only for robot simulation
         self.maximumAcceleration = 0.5 # maximum change in velocity in inches/sec per second
+        
+        # THIS ONE IS IRRELEVANT FOR NOW
         self.mesialFriction = 1 # coefficient of friction along heading of robot (Between 0 and 1 only)
-        self.lateralFriction = 0.1# coefficient of friction perpendicular to heading of robot (Between 0 and 1)
+        
+        
+        self.lateralFriction = 0.1 # coefficient of friction perpendicular to heading of robot (Between 0 and 1)

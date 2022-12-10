@@ -13,6 +13,7 @@ from MouseInterfaces.Draggable import Draggable
 from MouseInterfaces.Clickable import Clickable
 import Utility
 from typing import Iterator
+from FileInteraction.PickleImporter import importFile
 
 import pygame
 
@@ -39,20 +40,29 @@ def handleLeftClick(state: SoftwareState, shadowPointRef: PointRef, fieldSurface
 
         # If nothing is hovered, create a new PathPoint at that location
         if state.objectHovering is fieldSurface:
-            path.createPathPoint(shadowPointRef)
-            state.recomputeInterpolation = True
+            if len(path.sections) == 0:
+                path.createSection(shadowPointRef)
+            else:
+                path.createPathPoint(shadowPointRef, path.currentSection)
         elif isinstance(state.objectHovering, PathSegment):
-            index = path.segments.index(state.objectHovering) + 1
-            path.createPathPoint(shadowPointRef, index)
-            state.recomputeInterpolation = True
+            sectionIndex, segmentIndex = path.getSegmentIndex(state.objectHovering)
+            path.currentSection = sectionIndex
+            path.createPathPoint(shadowPointRef, sectionIndex, segmentIndex + 1)
 
 # Handle right clicks for dealing with the field
-def handleRightClick(state: SoftwareState):
+def handleRightClick(state: SoftwareState, path: FullPath, mousePosition: PointRef):
+
     print("Right click")
-    # Right clicking PathPoint toggles its shape
-    if isinstance(state.objectHovering, PathPoint):
-        state.objectHovering.toggleShape()
-        state.recomputeInterpolation = True
+
+    if state.mode != Mode.EDIT:
+        return
+
+    if type(state.objectHovering) == FieldSurface:
+        path.createSection(mousePosition)
+    elif type(state.objectHovering) == PathPoint:
+        hoveredPathPoint: PathPoint = state.objectHovering
+        path.currentSection = hoveredPathPoint.section.sectionIndex # set the active section to be the clicked one
+        print("right pathpoint", hoveredPathPoint.section)
         
 # Handle zooming through mousewheel. Zoom "origin" should be at the mouse location
 def handleMousewheel(fieldSurface: FieldSurface, fieldTransform: FieldTransform, userInput: UserInput) -> None:
@@ -82,12 +92,10 @@ def handleDeleting(userInput: UserInput, state: SoftwareState, path: FullPath):
 
     if isinstance(state.objectHovering, PathPoint): # Delete pathPoint
         path.deletePathPoint(state.objectHovering)
-        state.recomputeInterpolation = True
 
     elif isinstance(state.objectHovering, PathSegment): # Delete segment
         path.deletePathPoint(state.objectHovering.pointA)
         path.deletePathPoint(state.objectHovering.pointB)
-        state.recomputeInterpolation = True
 
 
 # Find the object that is hoverable, update that object's hoverable state, and return the object
@@ -120,7 +128,7 @@ def handleStartingPressingObject(userInput: UserInput, state: SoftwareState, fie
 
 # Determine what object is being dragged based on the mouse's rising and falling edges, and actually drag the object in question
 # If the mouse is dragging but not on any particular object, it will pan the field
-def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: FieldSurface) -> None:
+def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: FieldSurface, path: FullPath) -> None:
 
     if userInput.leftPressed and userInput.mousewheelDelta == 0: # left mouse button just pressed
 
@@ -136,7 +144,9 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
     if state.objectDragged is not None:
         changed = state.objectDragged.beDraggedByMouse(userInput)
         if changed and (isinstance(state.objectDragged, Point)):
-            state.recomputeInterpolation = True
+            point: Point = state.objectDragged
+            path.currentSection = point.section.sectionIndex
+            path.sections[point.section.sectionIndex].calculateInterpolatedPoints()
 
         # if an object is being dragged it always takes precedence over any object that might be "hovering"
         if state.objectHovering is not state.objectDragged:
@@ -144,3 +154,13 @@ def handleDragging(userInput: UserInput, state: SoftwareState, fieldSurface: Fie
                 state.objectHovering.resetHoverableObject()
             state.objectHovering = state.objectDragged
             state.objectHovering.setHoveringObject()
+
+# If file is dragged into screen, import contents
+def handleImportPath(filename, state: SoftwareState, path: FullPath):
+
+    if filename is None or not filename.endswith(".path"):
+        return
+    
+    importFile(filename, state, path)
+    state.mode = Mode.EDIT
+    print("Imported .path file.")

@@ -1,5 +1,5 @@
 from SingletonState.ReferenceFrame import PointRef, Ref
-from VisibleElements.Point import Point, Shape
+from VisibleElements.Point import Point
 from SingletonState.UserInput import UserInput
 from VisibleElements.ControlPoint import ControlPoint
 import Utility, Graphics, colors, pygame
@@ -18,16 +18,17 @@ by some delta will also shift the control points the same amount.
 
 class PathPoint(Point):
 
-    def __init__(self, spawnPosition: PointRef, spawnVector: tuple):
+    def __init__(self, spawnPosition: PointRef, spawnVector: tuple, section):
+
+        super().__init__(section, hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
+
         self.position = spawnPosition
         self.controlA: ControlPoint = ControlPoint(self, *spawnVector)
         self.controlB: ControlPoint = ControlPoint(self, 0, 0)
         self.controlA.updateOtherVector()
 
-        # By default, self.controlPositionA and self.controlPositionB are linked and the curve is continuous
-        self.shape = Shape.SMOOTH
 
-        super().__init__(hoverRadius = 20, drawRadius = 10, drawRadiusBig = 12)
+        
 
     # Given one of the points, return the other one. Useful when called from one of the control points
     def other(self, control: ControlPoint) -> ControlPoint:
@@ -36,14 +37,6 @@ class PathPoint(Point):
         elif control is self.controlB:
             return self.controlA
         raise Exception("Given ControlPoint object not found in PathPoint")
-
-    # Toggle the shape of the point (whether control points and synced and whether to point turn or curve)
-    def toggleShape(self):
-        if self.shape == Shape.SMOOTH:
-            self.shape = Shape.SHARP
-        else:
-            self.shape = Shape.SMOOTH
-            self.controlA.updateOtherVector()
 
     # Implementing Hoverable
     # Check whether the mouse is hovering over object
@@ -60,12 +53,12 @@ class PathPoint(Point):
         return False
 
 
-    def draw(self, screen: pygame.Surface, index: int):
+    def draw(self, screen: pygame.Surface, label = None):
 
         position = self.position.screenRef
-        color: tuple = colors.ORANGE if self.shape == Shape.SHARP else colors.GREEN
-        super().draw(screen, position, color) # draw circle
-        Graphics.drawText(screen, Graphics.FONT20, str(index), colors.BLACK, *position)
+        super().draw(screen, position, colors.GREEN) # draw circle
+        if label is not None:
+            Graphics.drawText(screen, Graphics.FONT20, str(label), colors.BLACK, *position)
 
 
     def __str__(self):

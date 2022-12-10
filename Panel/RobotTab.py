@@ -1,18 +1,19 @@
 from Panel.AbstractTab import AbstractTab
 from MouseInterfaces.Hoverable import Hoverable
-from Simulation.Simulation import Simulation
+from VisibleElements.FullPath import FullPath
+from SingletonState.SoftwareState import SoftwareState
 from typing import Iterator
 import pygame
 
 
 """
-Stores all the UI for the Simulation tab
+Stores all the UI for the Robot tab
 """
 
 class RobotTab(AbstractTab):
 
-    def __init__(self, simulation: Simulation):
-        self.simulation = simulation
+    def __init__(self, state: SoftwareState, path: FullPath):
+        pass
 
     # A generator for all the hoverable UI objects
     def getHoverables(self) -> Iterator[Hoverable]:

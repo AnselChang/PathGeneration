@@ -25,15 +25,15 @@ class Panel:
             
             AIButton.AIButton(state),
             EditButton.EditButton(state),
-            SimulateButton.SimulateButton(state, path.waypoints),
-            RobotButton.RobotButton(state, path.waypoints),
+            SimulateButton.SimulateButton(state, path),
+            RobotButton.RobotButton(state, path),
             OdomButton.OdomButton(state)
         ]
 
         self.aiTab: AITab.AITab = AITab.AITab(discManager)
         self.editTab: EditTab.EditTab = EditTab.EditTab(state, path)
         self.simulationTab: SimulationTab.SimulationTab = SimulationTab.SimulationTab(state, simulation)
-        self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(simulation)
+        self.robotTab: RobotTab.RobotTab = RobotTab.RobotTab(state, path)
         self.odomTab: OdomTab.OdomTab = OdomTab.OdomTab(driver)
 
     # Given the mode, get the tab oject associated with that mode

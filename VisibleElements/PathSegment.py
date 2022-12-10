@@ -10,7 +10,7 @@ mouse detection and drawing the segment.
 """
 class PathSegment(Hoverable):
 
-    def __init__(self, pointA: PathPoint, pointB: PathPoint):
+    def __init__(self, pointA: PathPoint, pointB: PathPoint, section):
 
         super().__init__()
 
@@ -19,6 +19,8 @@ class PathSegment(Hoverable):
 
         self.SEGMENT_THICKNESS = 3
         self.SEGMENT_HITBOX_THICKNESS = 10
+
+        self.section = section
 
     # Check whether mouse is near the segment using a little math
     def checkIfHovering(self, userInput: UserInput) -> bool:

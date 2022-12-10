@@ -4,7 +4,54 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fb3ca0f5-86d6-4997-a2f2-5f03ac1fdb04" name="Changes" comment="" />
+    <list default="true" id="fb3ca0f5-86d6-4997-a2f2-5f03ac1fdb04" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FileInteraction/AbstractExporter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FileInteraction/CSVExporter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FileInteraction/PickleExporter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FileInteraction/PickleImporter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Images/Buttons/csv.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Images/Buttons/reset.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Images/Buttons/save.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Images/robot.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Panel/UIButtons/ExportButton.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Panel/UIButtons/ParamResetButton.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/AnselPPController.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerSliderBuilder.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Simulation/HUDGraphics/AnselGraphics.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/VisibleElements/PathSection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Graphics.py" beforeDir="false" afterPath="$PROJECT_DIR$/Graphics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MouseInteraction.py" beforeDir="false" afterPath="$PROJECT_DIR$/MouseInteraction.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Panel/EditTab.py" beforeDir="false" afterPath="$PROJECT_DIR$/Panel/EditTab.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Panel/Panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/Panel/Panel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Panel/RobotTab.py" beforeDir="false" afterPath="$PROJECT_DIR$/Panel/RobotTab.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Panel/SimulationTab.py" beforeDir="false" afterPath="$PROJECT_DIR$/Panel/SimulationTab.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Panel/TabButtons/RobotButton.py" beforeDir="false" afterPath="$PROJECT_DIR$/Panel/TabButtons/RobotButton.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Panel/TabButtons/SimulateButton.py" beforeDir="false" afterPath="$PROJECT_DIR$/Panel/TabButtons/SimulateButton.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Panel/UIButtons/SimulationOnOffButton.py" beforeDir="false" afterPath="$PROJECT_DIR$/Panel/UIButtons/SimulationOnOffButton.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RobotSpecs.py" beforeDir="false" afterPath="$PROJECT_DIR$/RobotSpecs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/AbstractController.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/AbstractController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/PointTurnController.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/PointTurnController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/PurePursuitController.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/PurePursuitController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/StanleyController.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/StanleyController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/TestController.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerClasses/TestController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/ControllerRelated/ControllerStateMachine.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/InterpolatedPoints.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Simulation/Simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/Simulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SingletonState/ReferenceFrame.py" beforeDir="false" afterPath="$PROJECT_DIR$/SingletonState/ReferenceFrame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SingletonState/SoftwareState.py" beforeDir="false" afterPath="$PROJECT_DIR$/SingletonState/SoftwareState.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SingletonState/UserInput.py" beforeDir="false" afterPath="$PROJECT_DIR$/SingletonState/UserInput.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sliders/Slider.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sliders/Slider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utility.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utility.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VisibleElements/ControlPoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/VisibleElements/ControlPoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VisibleElements/FullPath.py" beforeDir="false" afterPath="$PROJECT_DIR$/VisibleElements/FullPath.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VisibleElements/PathPoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/VisibleElements/PathPoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VisibleElements/PathSegment.py" beforeDir="false" afterPath="$PROJECT_DIR$/VisibleElements/PathSegment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/VisibleElements/Point.py" beforeDir="false" afterPath="$PROJECT_DIR$/VisibleElements/Point.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,12 +68,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="StanleyController" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="PathGeneration" />
