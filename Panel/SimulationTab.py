@@ -9,6 +9,7 @@ from typing import Iterator
 from Simulation.Simulation import Simulation
 import pygame, Graphics, colors, Utility
 from Sliders.Slider import Slider
+from Simulation.ControllerRelated import SimulatorAnalysis
 
 
 """
@@ -26,6 +27,7 @@ class SimulationTab(AbstractTab):
         self.rightButton: RightButton = RightButton(simulation.controllers)
         self.resetButton: ParamResetButton = ParamResetButton(simulation.controllers)
         self.playButton: SimulationOnOffButton = SimulationOnOffButton(state, simulation)
+        self.analysis: SimulatorAnalysis = SimulatorAnalysis()
 
     # If space key pressed, toggle play button.
     # If left or right key pressed, scrub one frame for simulation
@@ -70,6 +72,7 @@ class SimulationTab(AbstractTab):
         self.leftButton.draw(screen)
         self.rightButton.draw(screen)
         self.playButton.draw(screen)
+        self.analysis.draw(screen)
 
         if self.simulation.exists():
             self.simulation.slider.draw(screen)

@@ -5,6 +5,7 @@ from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSlide
 from RobotSpecs import RobotSpecs
 from Sliders.Slider import Slider
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
+from Simulation.ControllerRelated.SimulatorAnalysis import SimulationAnaysis
 
 from typing import Tuple
 
@@ -33,7 +34,7 @@ class PointTurnController(AbstractController):
 
     # Simulate a point turn to self.targetHeading
     # Simple non-blocking P control to desired heading
-    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
+    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs, analysis: SimulationAnaysis = None) -> Tuple[RobotModelInput, bool, HUDGraphics]:
           
         K_p = 5
 

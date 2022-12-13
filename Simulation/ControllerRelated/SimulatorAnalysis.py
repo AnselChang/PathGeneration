@@ -1,5 +1,6 @@
-from Graphics import *
+import Graphics
 import Utility
+import pygame
 
 class SimulationAnaysis:
     def __init__(self):
@@ -16,7 +17,12 @@ class SimulationAnaysis:
         posString = "Average Position Error: "+self.positionErrorAvg
         headString = "Average Position Error: "+self.headingErrorAvg
         # Print centered on the panel, halfway down the screen
-        drawText(surface, font=FONT20, string=posString, 
+        Graphics.drawText(surface, font=Graphics.FONT20, string=posString, 
             x=Utility.FIELD_SIZE_IN_PIXELS+Utility.PANEL_WIDTH/2, y=Utility.SCREEN_SIZE/2)
-        drawText(surface, font=FONT20, string=headString, 
+        Graphics.drawText(surface, font=Graphics.FONT20, string=headString, 
             x=Utility.FIELD_SIZE_IN_PIXELS+Utility.PANEL_WIDTH/2, y=Utility.SCREEN_SIZE/2+25)
+
+    def reset(self):
+        self.positionErrorAvg =  0
+        self.headingErrorAvg = 0
+        self.numTicks = 0

@@ -4,6 +4,7 @@ from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
+from Simulation.ControllerRelated.SimulatorAnalysis import SimulationAnaysis
 from RobotSpecs import RobotSpecs
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 from Simulation.HUDGraphics.PurePursuitGraphics import PPGraphics
@@ -63,7 +64,7 @@ class PurePursuitController(AbstractController):
         return self.waypoints[indexOfLookaheadPoint]                    # Returns the waypoint of the index chosen above.
 
 
-    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
+    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs, analysis: SimulationAnaysis = None) -> Tuple[RobotModelInput, bool, HUDGraphics]:
         # Calls findLookaheadPoint function to find the desired lookahead 
         #   waypoint and saves it to chosenWayppint.
         chosenWaypoint: PointRef = self.findLookaheadPoint(robotOutput)   

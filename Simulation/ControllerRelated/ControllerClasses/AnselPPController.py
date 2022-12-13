@@ -4,9 +4,11 @@ from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from SingletonState.ReferenceFrame import PointRef
 from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
+from Simulation.ControllerRelated.SimulatorAnalysis import SimulationAnaysis
 from RobotSpecs import RobotSpecs
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 from Simulation.HUDGraphics.AnselGraphics import AnselGraphics
+
 
 
 from typing import Tuple
@@ -59,7 +61,7 @@ class AnselPPController(AbstractController):
         self.HEADING_KP = self.getSliderValue("Heading KP")
         self.TOLERANCE = self.getSliderValue("Tolerance (in.)")
 
-    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
+    def simulateTick(self, robotOutput: RobotModelOutput, robotSpecs: RobotSpecs, analysis: SimulationAnaysis = None) -> Tuple[RobotModelInput, bool, HUDGraphics]:
 
         closestIndex = self.findClosestWaypointIndex(robotOutput)
         index = min(closestIndex + self.TARGET_INDEX_DELTA, len(self.waypoints) - 1)

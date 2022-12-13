@@ -2,6 +2,7 @@ from Simulation.ControllerRelated.ControllerClasses.AbstractController import Ab
 from Simulation.RobotRelated.RobotModelInput import RobotModelInput
 from Simulation.RobotRelated.RobotModelOutput import RobotModelOutput
 from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState
+from Simulation.ControllerRelated.SimulatorAnalysis import SimulationAnaysis
 from RobotSpecs import RobotSpecs
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 
@@ -29,7 +30,7 @@ class TestController(AbstractController):
 
     # Performs one timestep of the stanley algorithm
     # Returns the list of RobotStates at each timestep, and whether the robot has reached the destination
-    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs) -> Tuple[RobotModelInput, bool, HUDGraphics]:
+    def simulateTick(self, output: RobotModelOutput, robotSpecs: RobotSpecs, analysis: SimulationAnaysis = None) -> Tuple[RobotModelInput, bool, HUDGraphics]:
         #TODO implement this!
         self.ticks += 1
         if self.ticks <= 40: # first 100 ticks, go straight

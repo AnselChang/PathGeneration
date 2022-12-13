@@ -7,6 +7,7 @@ from RobotSpecs import RobotSpecs
 from Simulation.ControllerRelated.ControllerSliderBuilder import ControllerSliderState, buildControllerSliders
 from Simulation.HUDGraphics.HUDGraphics import HUDGraphics
 from Sliders.Slider import Slider
+from Simulation.ControllerRelated.SimulatorAnalysis import SimulationAnaysis
 
 from typing import Tuple
 
@@ -39,7 +40,7 @@ class AbstractController(ABC):
         raise Exception("Slider not found from label")
 
     # To be called at the start of a simulation. Sets waypoints and initial state
-    def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[PointRef]):
+    def initSimulation(self, robotSpecs: RobotSpecs, waypoints: list[PointRef], analysis: SimulationAnaysis = None):
         self.robotSpecs = robotSpecs
         self.waypoints: list[PointRef] = waypoints
 
